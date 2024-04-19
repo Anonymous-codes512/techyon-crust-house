@@ -1,0 +1,257 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
+
+main {
+    justify-content: start;
+    height: 100%;
+    position: relative;
+}
+
+#overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: none;
+    z-index: 999; 
+}
+.newrider {
+    display: none;
+    flex-direction: column;
+    background-color: #ffffff; 
+    position: absolute;
+    border-radius: 10px;
+    width: 30vw;
+    height: 32vw;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
+}
+
+.newrider h3{
+    margin: 0;
+    padding: 1vw 2vw;
+    font-family: "Poppins", sans-serif;
+    
+}
+.inputdivs{
+    margin: 0.4vw auto;
+    width: 85%;
+    display: flex;
+    flex-direction: column;
+    font-family: "Poppins", sans-serif;
+    font-size: 1vw;
+}
+
+.inputdivs input, .inputdivs select{
+    border: none;
+    border-radius: 6px;
+    padding: 0.5vw 0.2vw;
+    background-color: #e2e2e2;
+}
+
+.btns{
+    display: flex;
+    justify-content: space-around;
+    margin: 01vw auto;
+    width: 85%;
+}
+
+.btns button , .btns input{
+    display: flex;
+    font-family: "Poppins", sans-serif;
+    font-size: 1.2vw;
+    padding: 0.5vw 2vw;
+    border-radius: 10px;
+    border: none;
+}
+
+#cancel{
+    background-color: #e2e2e2;
+}
+
+.btns input{
+    background-color: #ffbb00;
+    color: #fff;
+}
+
+#cancel:hover{
+    background-color: #d3d3d3;
+}
+
+.btns input:hover{
+    background-color: #d4a011;
+    color: #fff;
+}
+
+.path {
+    display: flex;
+    font-family: "Poppins", sans-serif;
+    font-size: 1vw;
+    margin: 0.5rem 1rem;
+}
+
+.headings {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 90%;
+}
+
+.headings h3 {
+    font-family: "Poppins", sans-serif;
+    letter-spacing: 0.01rem;
+    padding-left: 1rem;
+    margin: 0;
+}
+
+.headings button {
+    text-decoration: none;
+    padding: 0.7vw 1vw;
+    border-radius: 10px;
+    font-family: "Poppins", sans-serif;
+    background-color: #ffbb00;
+    color: #ffffff;
+    text-align: center;
+    border: none;
+}
+
+.headings button:hover {
+    background: #a97e05;
+}
+
+
+.processbtns{
+    display: flex;
+    width: 80%;
+    margin: 0.5vw auto;
+}
+
+.inactivebtn, .activebtn{
+    border: none;
+    margin-right: 0.5vw;
+    padding: 0.5vw 1vw;
+    border-radius: 7px;
+    font-family: "Poppins", sans-serif;
+}
+
+.inactivebtn{
+    background-color: #E0E0E0;
+}
+.activebtn{
+    background-color: #ffbb00;
+    color: #fff;
+}
+
+.activebtn:hover{
+    background-color:#a97e05 ;
+}
+.inactivebtn:hover{
+    background-color: #d3d3d3;
+}
+
+table {
+    width: 80% !important;
+    margin: 1vw auto;
+    margin-top: 0;
+    padding: 1vw;
+    background-color: #ffffff;
+    font-family: "Poppins", sans-serif;
+    font-size: 0.75rem;
+    border-radius: 10px;
+}
+
+table thead tr {
+    font-size: 0.85vw;
+    color: #454545;
+}
+
+table thead tr td:nth-child(7),
+table thead tr td:last-child,
+table tbody tr td:last-child {
+    text-align: center;
+}
+
+table tbody tr td:nth-child(7) {
+    text-align: center;
+}
+
+
+.order-status{
+    display: flex;
+    justify-content: center;
+}
+.order-status a{
+    padding: 0.2vw 0.8vw;
+    margin-right: 0.4vw;
+    border-radius: 6px;
+    text-decoration: none;
+    color: #fff;
+}
+
+.order-status a:nth-child(1){
+    background-color: #F45B69;
+}
+
+.order-status a:nth-child(2){
+    background-color: #3FC28A;
+}
+
+.order-status a:nth-child(1):hover{
+    background-color: #f84857;
+}
+
+.order-status a:nth-child(2):hover{
+    background-color: #2da571;
+}
+
+@media (max-width: 1050px) and (min-width: 850px) {
+    .path {
+        font-size: 1.3vw;
+    }
+
+    table tbody tr,
+    table thead tr {
+        margin: 0.5vw 0;
+        font-size: 1.3vw;
+    }
+}
+
+@media (max-width: 850px) and (min-width: 600px) {
+    table{
+        width: 95%;
+    }
+    table tbody tr,
+    table thead tr {
+        margin: 0.5vh 0;
+        font-size: 1.3vh;
+    }
+}
+@media (max-width: 600px) {
+
+    .rgtpnl{
+        height: auto;
+    }
+    
+    .path {
+        font-size: 1vh;
+    }
+
+    table{
+        width: 95%;
+    }
+    table tbody tr td:last-child {
+        display: flex;
+        flex-direction: column;
+    }
+    .status{
+        background-color: transparent !important;
+    }
+    table tbody tr,
+    table thead tr {
+        margin: 0.3vh 0;
+        font-size: 1vh;
+    }
+}

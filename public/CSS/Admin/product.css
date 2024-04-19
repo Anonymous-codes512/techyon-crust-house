@@ -1,0 +1,212 @@
+main {
+    display: flex;
+    flex-direction: column;
+    background-color: #e0e0e0;
+    border-radius: 03px;
+    width: 100%;
+}
+
+.path {
+    display: flex;
+    font-family: "Poppins", sans-serif;
+    font-size: 1vw;
+    margin: 1vw 1vw 0 1vw;
+} 
+
+.path p {
+    margin: 0;
+}
+
+.newCategory {
+    display: flex;
+    font-family: "Poppins", sans-serif;
+    width: 85%;
+    font-size: 1vw;
+    margin: 0.5vw auto;
+    padding: 0.5vw 1vw;
+}
+
+.newCategory button{
+    background-color: #ffbb00;
+    border: none;
+    padding: 0.81vw 1.2vw;
+    color: #fff;
+    font-size: 1rem;
+    font-weight: 550;
+    border-radius: 10px;
+    cursor: pointer;
+}
+.newCategory button:hover{
+    background-color: #bc9017;
+}
+
+table {
+    border-collapse: collapse;
+    width: 85%;
+    margin: 1vw auto;
+    margin-bottom: 2vw;
+}
+
+table thead tr {
+    border-bottom: 2px solid #000;
+}
+
+table thead tr th {
+    text-align: left;
+}
+
+
+table tbody tr {
+    border-bottom: 1px solid #898989;
+}
+
+table tbody tr td:first-child {
+    text-align: left;
+}
+
+table tbody tr td:first-child img {
+    width: 100px;
+}
+
+table tbody tr td:last-child a {
+    padding: 0.3vw 0.5vw;
+    text-decoration: none;
+    color: #fff;
+    border-radius: 6px;
+    font-size: 1.3vw;
+}
+
+table tbody tr td:last-child a:first-child {
+    background-color: #3fc28a;
+}
+
+table tbody tr td:last-child a:last-child {
+    background-color: #f45b69;
+}
+
+table tbody tr td:last-child a:first-child:hover {
+    background-color: #2da571;
+}
+
+table tbody tr td:last-child a:last-child:hover {
+    background-color: #f84857;
+}
+
+#overlay, #editOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: none;
+    z-index: 999; 
+}
+
+.newproduct , .editproduct{
+    display: none;
+    flex-direction: column;
+    background-color: #ffffff; 
+    position: absolute;
+    border-radius: 10px;
+    width: 30vw;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
+}
+
+.newproduct h3, .editproduct h3{
+    margin: 0;
+    padding: 1vw 2vw;
+    font-family: "Poppins", sans-serif;    
+}
+.newproduct hr, .editproduct hr{
+    border: 1px solid #9b9b9b;
+    width: 98%;
+    margin: 0 auto 1vw;
+}
+
+.choose-file-btn {
+    display: flex;
+    background-color: #e2e2e2;
+    color: #333;
+    text-align: center;
+    border-radius: 10px;
+}
+  
+.choose-file-btn input[type="file"] {
+    display: none;
+}
+
+.choose-file-btn span {
+    padding: 0.5vw;
+    border: 1px solid #bbbbbb;
+    background-color: #bbbbbb;
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+    cursor: pointer;
+}
+
+.choose-file-btn p {
+    margin: 0;
+    padding: 0.5vw;
+}
+
+.inputdivs{
+    margin: 0.4vw auto;
+    width: 85%;
+    display: flex;
+    flex-direction: column;
+    font-family: "Poppins", sans-serif;
+    font-size: 1vw;
+}
+
+.inputdivs input, .inputdivs select {
+    border: none;
+    border-radius: 10px; 
+    padding: 0.71vw 0.5vw;
+    background-color: #e2e2e2;
+}
+
+.btns{
+    display: flex;
+    justify-content: flex-end;
+    margin: 01vw auto;
+    width: 85%;
+}
+
+.btns button , .btns input{
+    display: flex;
+    font-family: "Poppins", sans-serif;
+    font-size: 1.2vw;
+    padding: 0.5vw 2vw;
+    border-radius: 10px;
+    margin: 0.5vw;
+    border: none;
+}
+
+#cancel{
+    background-color: #e2e2e2;
+}
+
+.btns input{
+    background-color: #ffbb00;
+    color: #fff;
+}
+
+#cancel:hover{
+    background-color: #d3d3d3;
+}
+
+.btns input:hover{
+    background-color: #d4a011;
+    color: #fff;
+}
+
+.error-message{
+    color:#F45B69;
+    font-size: 0.8rem;
+    margin:0px 05px;
+    font-family: "Poppins", sans-serif;
+}

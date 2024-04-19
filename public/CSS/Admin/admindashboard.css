@@ -1,0 +1,230 @@
+main {
+    display: flex;
+    flex-direction: column;
+    background-color: #e0e0e0;
+    border-radius: 03px;
+    width: 100%;
+}
+
+.path {
+    display: flex;
+    font-family: "Poppins", sans-serif;
+    font-size: 1vw;
+    margin: 1vw 1vw 0 1vw;
+}
+
+.path p {
+    margin: 0;
+}
+
+.heading {
+    display: flex;
+    font-family: "Poppins", sans-serif;
+    font-size: 1vw;
+    margin: 0.5vw 1vw;
+}
+
+.heading h3 {
+    font-family: "Poppins", sans-serif;
+    letter-spacing: 0.01rem;
+    margin: 0;
+}
+
+.cards {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin: 0 1vw 1vw;
+    flex-wrap: wrap;
+}
+
+.cards a {
+    display: flex;
+    flex-direction: row;
+    font-family: "Poppins", sans-serif;
+    width: 24%;
+    border-radius: 10px;
+    background-color: #fff;
+    color: #262626;
+    font-size: 1.2vw;
+    padding: 0.5vw 0;
+    text-decoration: none;
+}
+
+.icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.icon i {
+    font-size: 1.3rem;
+    color: #ffbb00;
+    margin: 0.5rem 1rem;
+}
+
+.disc {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+.disc p,
+.disc h3 {
+    margin: 0;
+    font-family: "Poppins", sans-serif;
+}
+
+.graph {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin: 0 1vw 1vw;
+}
+
+.monthlyRevenuegraph,
+.totalRevenueGraph {
+    position: relative;
+    width: 49%;
+    background-color: #fff;
+    border-radius: 10px;
+}
+
+.info {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    font-family: "Poppins", sans-serif;
+    align-items: center;
+    text-align: center;
+}
+
+.info .ttle {
+    font-size: 1.4vw;
+    margin: 0 0.5vw;
+    padding: 0.5vw;
+    font-weight: bold;
+}
+.info .filter {
+    font-size: 1vw;
+    margin: 0 0.5vw;
+    padding: 0.5vw;
+    border: none;
+}
+
+canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.map {
+    display: flex;
+    flex-direction: column;
+    height: 30vw;
+    margin: 0 1vw 1vw;
+    font-family: "Poppins", sans-serif;
+}
+
+.map h4 {
+    margin: 0.5vw;
+}
+
+.map iframe {
+    display: flex;
+    width: 98%;
+    height: 75%;
+    margin: 0 auto;
+    border-radius: 10px;
+}
+
+@media (max-width: 1050px) and (min-width: 600px) {
+    .path {
+        width: 90vw;
+        font-size: 0.91rem;
+        margin: 1vh ;
+    }
+
+    .heading {
+        width: 90vw;
+        font-size: 1rem;
+        margin: 1vh ;
+    }
+    
+    .cards a{
+        font-size: 0.65rem;
+        padding: 0.51vh 0;
+    }
+}
+
+@media (max-width: 600px) {
+    .path {
+        width: 90vw;
+        font-size: 0.91rem;
+        margin: 1vh auto;
+    }
+    
+    .heading {
+        width: 90vw;
+        font-size: 1rem;
+        margin: 1vh auto ;
+    }
+    
+    .cards {
+        width: 90vw;
+        margin: auto;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: space-between;
+    }
+
+    .cards a {
+        width: 48%;
+        font-size: 0.75rem;
+        margin: 0.5vh auto;
+        padding: 1vh 0;
+    }
+
+    .icon i {
+        font-size: 1.3rem;
+    }
+    
+    .graph {
+        flex-direction: column;
+        margin: auto;
+        width: 90vw;
+        margin-top: 1vh;
+    }
+
+    .monthlyRevenuegraph,
+    .totalRevenueGraph {
+        width: 95%;
+        margin: auto;
+        margin-bottom: 2vh;
+        padding: 1vh;
+    }
+
+    .info .ttle {
+        font-size: 0.7rem;
+        margin: 0 0 0 1vh;
+    }
+
+    .info .filter {
+        font-size: 0.75rem;
+        margin: 0.5vh 1vh 0 0;
+    }
+
+    .map {
+        width: 90vw;
+        margin: 1vh auto;
+        height: 45vh;
+        font-size: 0.75rem;
+    }
+
+    .map h4 {
+        margin: 0;
+    }
+
+    .map iframe {
+        width: 95%;
+    }
+}
