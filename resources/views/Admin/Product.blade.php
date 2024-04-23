@@ -58,10 +58,10 @@
             <hr>
 
             <div class="inputdivs">
-                <select name="categoryId" id="category">
+                <select name="categoryId" id="category" onclick="updateProductSizeDropdown()">
                     <option value="none" selected disabled>Select Product Category</option>
                     @foreach ($categoryData as $category)
-                        <option value="{{ $category->id }}">{{ $category->categoryName }}</option>
+                    <option value="{{ $category->id }},{{ $category->categoryName }}">{{ $category->categoryName }}</option>
                     @endforeach
                 </select>
             </div>
@@ -77,14 +77,7 @@
             @enderror
 
             <div class="inputdivs">
-                <select name="productSize" id="productSize">
-                    <option value="none" selected disabled>Select Product Size</option>
-                    <option value="Small">Small</option>
-                    <option value="Medium">Medium</option>
-                    <option value="Large">Large</option>
-                    <option value="XLarge">Extra Large</option>
-                    <option value="jombo">Jombo</option>
-                </select>
+                <select name="productSize" id="productSize"></select>
             </div>
             @error('productSize')
                 <span class="error-message">{{ $message }}</span>
@@ -132,7 +125,7 @@
                 <select name="categoryId" id="pCategory">
                     <option value="none" disabled>Select Product Category</option>
                     @foreach ($categoryData as $category)
-                        <option value="{{ $category->id }}">{{ $category->categoryName }}</option>
+                    <option value="{{ $category->id }},{{ $category->categoryName }}">{{ $category->categoryName }}</option>
                     @endforeach
                 </select>
             </div>
@@ -245,27 +238,39 @@
         });
 
 
-        {{--  function updateProductSizeDropdown() {
-            let category = document.getElementById("category");
+        function updateProductSizeDropdown() {
+
+            let categoryField = document.getElementById("category").value;
             let productSizeDropdown = document.getElementById("productSize");
 
             productSizeDropdown.innerHTML = "";
-            let foodProductStandardSizes = ["Small", "Medium", "Large"];
 
-            if (category.value === "food") {
-                for (let i = 0; i < foodProductStandardSizes.length; i++) {
-                    let option = document.createElement("option");
-                    option.text = foodProductStandardSizes[i];
-                    productSizeDropdown.add(option);
-                }
+            category = categoryField.split(',');
+
+
+            if (category[1] == "Drinks") {
+                let drinkProductSizes = ["250ml", "1ltr", "1.5ltr"];
+                addOptionsToDropdown(drinkProductSizes, productSizeDropdown);
             } else {
-                let option = document.createElement("option");
-                option.text = "Select Product Size";
-                option.disabled = true;
-                option.selected = true;
-                productSizeDropdown.add(option);
+                let foodProductSizes = ["Small", "Medium", "Large", "Extra Large", "Jumbo"];
+                addOptionsToDropdown(foodProductSizes, productSizeDropdown);
             }
         }
-        document.getElementById("category").addEventListener("change", updateProductSizeDropdown); --}}
+
+        function addOptionsToDropdown(optionsArray, dropdown) {
+            document.getElementByQ
+            let defaultOption = document.createElement("option");
+            defaultOption.disabled = true;
+            defaultOption.selected = true;
+            defaultOption.text = "Select Product Size";
+            dropdown.add(defaultOption);
+
+            for (let i = 0; i < optionsArray.length; i++) {
+                let option = document.createElement("option");
+                option.text = optionsArray[i];
+                option.value = optionsArray[i];
+                dropdown.add(option);
+            }
+        }
     </script>
 @endsection

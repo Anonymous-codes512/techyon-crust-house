@@ -64,7 +64,7 @@
                 <select name="unit" id="stockunit">
                     <option value="" selected disabled>Select unit</option>
                     <option value="g">Gram</option>
-                    <option value="l">Liter</option>
+                    <option value="ml">Milliliter</option>
                 </select>
             </div>
 
@@ -74,7 +74,7 @@
                 <select name="unit" id="minStockUnit">
                     <option value="" selected disabled>Select unit</option>
                     <option value="g">Gram</option>
-                    <option value="l">Liter</option>
+                    <option value="ml">Milliliter</option>
                 </select>
             </div>
 
@@ -96,7 +96,8 @@
         --}}
 
         <div id="editOverlay"></div>
-        <form class="editstock" id="editStock" action="{{ route('updateStock') }}" method="POST" enctype="multipart/form-data">
+        <form class="editstock" id="editStock" action="{{ route('updateStock') }}" method="POST"
+            enctype="multipart/form-data">
             @csrf
             <h3>Edit Stock</h3>
             <hr>
@@ -111,7 +112,7 @@
                 <input type="number" id="iQuantity" name="stockQuantity" required>
                 <select name="unit" id="iQUnit">
                     <option value="g">Gram</option>
-                    <option value="l">Liter</option>
+                    <option value="ml">milliliter</option>
                 </select>
             </div>
 
@@ -119,7 +120,7 @@
                 <input type="number" id="mQuantity" name="minStockQuantity" required>
                 <select name="unit" id="mQUnit">
                     <option value="g">Gram</option>
-                    <option value="l">Liter</option>
+                    <option value="ml">milliliter</option>
                 </select>
             </div>
 
@@ -158,19 +159,28 @@
             overlay.style.display = 'block';
             popup.style.display = 'flex';
 
-            let itemQuantity = parseFloat(stock.itemQuantity) * 1000;
-            let iQUnit = stock.itemQuantity.replace(/[0-9.]/g, '');
-
-            let mimimumItemQuantity = parseFloat(stock.mimimumItemQuantity) * 1000;
-            let mQUnit = stock.mimimumItemQuantity.replace(/[0-9.]/g, '');
-
-            console.log(typeof(iQUnit));
             document.getElementById('sId').value = stock.id;
             document.getElementById('iName').value = stock.itemName;
-            document.getElementById('iQuantity').value = itemQuantity;
-            document.getElementById('iQUnit').value = iQUnit === "kg" ? "g" : "l";
-            document.getElementById('mQuantity').value = mimimumItemQuantity;
-            document.getElementById('iQUnit').value = mQUnit === "kg" ? "g" : "l";
+
+            let iQUnit = stock.itemQuantity.replace(/[0-9.]/g, '');
+            let mQUnit = stock.mimimumItemQuantity.replace(/[0-9.]/g, '');
+
+            if (iQUnit == 'kg') {
+                let itemQuantity = (parseFloat(stock.itemQuantity) < 1000) ? (parseFloat(stock.itemQuantity) * 1000): (parseFloat(stock.itemQuantity));
+                document.getElementById('iQuantity').value = itemQuantity;
+                document.getElementById('iQUnit').value = itemQuantity <= 1000 ? "Kg" : "g";
+                let mimimumItemQuantity = (parseFloat(stock.mimimumItemQuantity) > 1000) ? (parseFloat(stock.mimimumItemQuantity) * 1000) : (parseFloat(stock.mimimumItemQuantity));
+                document.getElementById('mQuantity').value = mimimumItemQuantity;
+                document.getElementById('mQUnit').value = mimimumItemQuantity >= 1000 ? "kg" : "g";
+                
+            } else if (iQUnit == 'ltr') {
+                let itemQuantity = (parseFloat(stock.itemQuantity) < 1000) ? (parseFloat(stock.itemQuantity) * 1000): (parseFloat(stock.itemQuantity));
+                document.getElementById('iQuantity').value = itemQuantity;
+                document.getElementById('iQUnit').value = itemQuantity <= 1000 ? "ltr" : "ml";
+                let mimimumItemQuantity = (parseFloat(stock.mimimumItemQuantity) > 1000) ? (parseFloat(stock.mimimumItemQuantity) * 1000) : (parseFloat(stock.mimimumItemQuantity));
+                document.getElementById('mQuantity').value = mimimumItemQuantity;
+                document.getElementById('mQUnit').value = mimimumItemQuantity >= 1000 ? "ltr" : "ml";            
+            }
             document.getElementById('UPrice').value = parseFloat(stock.unitPrice);
         }
 

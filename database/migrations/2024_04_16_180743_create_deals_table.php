@@ -16,9 +16,12 @@ return new class extends Migration
 
             $table->string('dealImage')->nullable();
             $table->string('dealTitle')->nullable();
-            $table->string('dealPrice')->nullable();
             $table->string('dealStatus')->nullable();
-            $table->string('dealProducts')->nullable();
+            $table->string('dealProductName')->nullable();
+            $table->string('dealProductQuantity')->nullable();
+            $table->string('dealProductPrice')->nullable();
+            $table->string('dealActualPrice')->nullable();
+            $table->string('dealDiscountedPrice')->nullable();
             $table->string('dealEndDate')->nullable();
             
             $table->timestamps();

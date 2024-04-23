@@ -25,14 +25,16 @@ class AdminController extends Controller
     |======================= Category Functions ====================|
     |---------------------------------------------------------------|
     */
-    public function viewCategoryPage() {
+    public function viewCategoryPage()
+    {
         // $categories = Category::paginate(2);
         $category = Category::all();
 
         return view('Admin.Category')->with(['categories' => $category]);
     }
 
-    public function createCategory(Request $request){
+    public function createCategory(Request $request)
+    {
         $validatedData = $request->validate([
             'CategoryImage' => 'required|image|mimes:jpeg,png,jpg|',
             'categoryName' => 'required|string|max:255',
@@ -52,7 +54,8 @@ class AdminController extends Controller
         return redirect()->route('viewCategoryPage');
     }
 
-    public function updateCategory(Request $request){
+    public function updateCategory(Request $request)
+    {
         $validatedData = $request->validate([
             'CategoryImage' => 'required|image|mimes:jpeg,png,jpg|max:2048',
             'categoryName' => 'required|string|max:255',
@@ -77,7 +80,8 @@ class AdminController extends Controller
         return redirect()->route('viewCategoryPage');
     }
 
-    public function deleteCategory($id){
+    public function deleteCategory($id)
+    {
 
         $category = Category::find($id);
         $category->delete();
@@ -94,7 +98,8 @@ class AdminController extends Controller
     |---------------------------------------------------------------|
     */
 
-    public function viewProductPage(){
+    public function viewProductPage()
+    {
         $categories = Category::all();
         $products = Product::all();
 
@@ -105,16 +110,9 @@ class AdminController extends Controller
         return view('Admin.Product')->with(['categoryData' => $categories, 'productsData' => $products]);
     }
 
-    public function createProduct(Request $request) {
-        $validatedData = $request->validate([
-            'productImage' => 'required|image|mimes:jpeg,png,jpg|max:2048',
-            'productName' => 'required|string|max:255',
-            'productSize' => 'required|string|max:255',
-            'productPrice' => 'required|string|max:255',
-            'categoryId' => 'required|exists:categories,id'
-        ]);
-
-        $categoryName = Category::findOrFail($validatedData['categoryId'])->categoryName;
+    public function createProduct(Request $request)
+    {
+        [$categoryId, $categoryName] = explode(',', $request->categoryId);
 
         $imageName = null;
         if ($request->hasFile('productImage')) {
@@ -125,10 +123,10 @@ class AdminController extends Controller
 
         $product = new Product();
         $product->productImage = $imageName;
-        $product->productName = $validatedData['productName'];
-        $product->productSize = $validatedData['productSize'];
-        $product->productPrice = $validatedData['productPrice'];
-        $product->category_id = $validatedData['categoryId'];
+        $product->productName = $request->productName;
+        $product->productSize = $request->productSize;
+        $product->productPrice = $request->productPrice;
+        $product->category_id = $categoryId;
         $product->category_name = $categoryName;
         $product->save();
 
@@ -136,7 +134,8 @@ class AdminController extends Controller
     }
 
 
-    public function updateProduct(Request $request){
+    public function updateProduct(Request $request)
+    {
         $validatedData = $request->validate([
             'categoryId' => 'required|exists:categories,id',
             'productName' => 'required|string|max:255',
@@ -167,7 +166,8 @@ class AdminController extends Controller
         return redirect()->route('viewProductPage');
     }
 
-    public function deleteProduct($id){
+    public function deleteProduct($id)
+    {
         $product = Product::find($id);
         $product->delete();
         $imagePath = public_path('Images/ProductImages') . '/' . $product->productImage;
@@ -183,22 +183,26 @@ class AdminController extends Controller
     |---------------------------------------------------------------|
     */
 
-    public function viewDealPage() {
+    public function viewDealPage()
+    {
         $deals = Deal::all();
         return view('Admin.Deal')->with(['dealsData' => $deals]);
     }
 
-    public function viewDealProductsPage(){
+    public function viewDealProductsPage()
+    {
         $product = Product::all();
         return view('Admin.DealProducts')->with(['Products' => $product]);
     }
 
-    public function viewUpdateDealProductsPage(){
+    public function viewUpdateDealProductsPage()
+    {
         $product = Product::all();
         return view('Admin.UpdateDealProduct')->with(['Products' => $product]);
     }
 
-    public function createDeal(Request $request){
+    public function createDeal(Request $request)
+    {
         $deal = new Deal();
 
         $imageName = null;
@@ -210,7 +214,6 @@ class AdminController extends Controller
 
         $deal->dealImage = $imageName;
         $deal->dealTitle = $request->dealTitle;
-        $deal->dealPrice = $request->dealPrice;
         $deal->dealStatus = $request->dealStatus;
         $deal->dealEndDate = $request->dealEndDate;
 
@@ -219,18 +222,47 @@ class AdminController extends Controller
         return redirect()->route('viewDealProductsPage');
     }
 
-    public function createDealProducts(Request $request){
+    public function createDealProducts(Request $request)
+    {
+
+        $productNames = '';
+        $productQuantities = '';
+        $productPrices = '';
+
+        $index = 0;
+
+        while ($request->has("product_name_{$index}")) {
+            $productName = $request->input("product_name_{$index}");
+            $productQuantity = $request->input("product_quantity_{$index}");
+            $productPrice = $request->input("product_total_price_{$index}");
+
+            $productNames .= $productName . ', ';
+            $productQuantities .= $productQuantity . ', ';
+            $productPrices .= $productPrice . ', ';
+            $index++;
+        }
+        
+        $productNames = rtrim($productNames, ', ');
+        $productQuantities = rtrim($productQuantities, ', ');
+        $productPrices = rtrim($productPrices, ', ');
+
+
+        $currentDealPrice = $request->input('currentDealPrice');
+        $dealFinalPrice = $request->input('dealFinalPrice') . " " . "Pkr";
 
         $deal = Deal::find($request->id);
-
-        $dealProducts = rtrim($request->dealProducts, ',');
-        $deal->dealProducts    = $dealProducts;
+        $deal->dealProductName = $productNames;
+        $deal->dealProductQuantity = $productQuantities;
+        $deal->dealProductPrice = $productPrices;
+        $deal->dealActualPrice = $currentDealPrice;
+        $deal->dealDiscountedPrice = $dealFinalPrice;
         $deal->save();
 
         return redirect()->route('viewDealPage');
     }
 
-    public function updateDeal(Request $request){
+    public function updateDeal(Request $request)
+    {
 
         $deal = Deal::find($request->dId);
 
@@ -246,7 +278,6 @@ class AdminController extends Controller
         }
 
         $deal->dealTitle = $request->dealTitle;
-        $deal->dealPrice = $request->dealPrice;
         $deal->dealStatus = $request->dealStatus;
         $deal->dealEndDate = $request->dealEndDate;
 
@@ -255,17 +286,49 @@ class AdminController extends Controller
         return redirect()->route('viewUpdateDealProductsPage');
     }
 
-    public function updateDealProducts(Request $request){
+    public function updateDealProducts(Request $request)
+    {
+
+        $productNames = '';
+        $productQuantities = '';
+        $productPrices = '';
+
+        $index = 0;
+
+        while ($request->has("product_name_{$index}")) {
+            $productName = $request->input("product_name_{$index}");
+            $productQuantity = $request->input("product_quantity_{$index}");
+            $productPrice = $request->input("product_total_price_{$index}");
+
+            $productNames .= $productName . ', ';
+            $productQuantities .= $productQuantity . ', ';
+            $productPrices .= $productPrice . ', ';
+            $index++;
+        }
+        
+        $productNames = rtrim($productNames, ', ');
+        $productQuantities = rtrim($productQuantities, ', ');
+        $productPrices = rtrim($productPrices, ', ');
+
+
+        $currentDealPrice = $request->input('currentDealPrice');
+        $dealFinalPrice = $request->input('dealFinalPrice') . " " . "Pkr";
+
         $deal = Deal::find($request->id);
 
-        $dealProducts = rtrim($request->dealProducts, ',');
-        $deal->dealProducts    = $dealProducts;
+        $deal->dealProductName = $productNames;
+        $deal->dealProductQuantity = $productQuantities;
+        $deal->dealProductPrice = $productPrices;
+        $deal->dealActualPrice = $currentDealPrice;
+        $deal->dealDiscountedPrice = $dealFinalPrice;
+
         $deal->save();
 
         return redirect()->route('viewDealPage');
     }
 
-    public function deleteDeal($id){
+    public function deleteDeal($id)
+    {
         $deal = Deal::find($id);
         $deal->delete();
         $imagePath = public_path('Images/DealImages') . '/' . $deal->dealImage;
@@ -281,21 +344,28 @@ class AdminController extends Controller
     |---------------------------------------------------------------|
     */
 
-    public function viewStockPage(){
+    public function viewStockPage()
+    {
         $stockData = Stock::all();
         return view('Admin.Stock')->with(['stockData' => $stockData]);
     }
 
-    public function createStock(Request $request){
+    public function createStock(Request $request)
+    {
         $existingStock = Stock::where('itemName', $request->itemName)->first();
 
         if ($existingStock) {
 
             $ESIQ = floatval($existingStock->itemQuantity) < 1000 ? floatval($existingStock->itemQuantity) * 1000 : floatval($existingStock->itemQuantity);         // $ESIQ ==> Existing Stock Item Quantity
-            $ESMIQ = floatval($existingStock->mimimumItemQuantity) ? floatval($existingStock->mimimumItemQuantity) : floatval($existingStock->mimimumItemQuantity);  // $ESMIQ ==> Existing Stock Minimun Item Quantity
+            // $ESMIQ = floatval($existingStock->mimimumItemQuantity) ? floatval($existingStock->mimimumItemQuantity) : floatval($existingStock->mimimumItemQuantity);  // $ESMIQ ==> Existing Stock Minimun Item Quantity
 
-            $itemQuantity = ($ESIQ + $request->stockQuantity) >= 1000 ? ($ESIQ + $request->stockQuantity) / 1000 . 'kg' : ($ESIQ + $request->stockQuantity) . 'g';
-            $mimimumItemQuantity = ($ESMIQ + $request->minStockQuantity) >= 1000 ? ($ESMIQ + $request->minStockQuantity) / 1000 . 'kg' : ($ESMIQ + $request->minStockQuantity) . 'g';
+            if ($request->unit === "g") {
+                $itemQuantity = ($ESIQ + $request->stockQuantity) >= 1000 ? ($ESIQ + $request->stockQuantity) / 1000 . 'kg' : ($ESIQ + $request->stockQuantity) . 'g';
+                $mimimumItemQuantity = ($request->minStockQuantity) >= 1000 ? ($request->minStockQuantity) / 1000 . 'kg' : ($request->minStockQuantity) . 'g';
+            } else if ($request->unit === "ml") {
+                $itemQuantity = ($ESIQ + $request->stockQuantity) >= 1000 ? ($ESIQ + $request->stockQuantity) / 1000 . 'ltr' : ($ESIQ + $request->stockQuantity) . 'ml';
+                $mimimumItemQuantity = (+$request->minStockQuantity) >= 1000 ? ($request->minStockQuantity) / 1000 . 'ltr' : ($request->minStockQuantity) . 'ml';
+            }
 
             $existingStock->itemName = $request->itemName;
             $existingStock->itemQuantity = $itemQuantity;
@@ -307,8 +377,13 @@ class AdminController extends Controller
         } else {
             $newStock = new Stock();
 
-            $itemQuantity = $request->stockQuantity >= 1000 ? ($request->stockQuantity / 1000) . 'kg' : $request->stockQuantity . 'g';
-            $mimimumItemQuantity = $request->minStockQuantity >= 1000 ? ($request->minStockQuantity / 1000) . 'kg' : $request->minStockQuantity . 'g';
+            if ($request->unit === "g") {
+                $itemQuantity = $request->stockQuantity >= 1000 ? ($request->stockQuantity / 1000) . 'kg' : $request->stockQuantity . 'g';
+                $mimimumItemQuantity = $request->minStockQuantity >= 1000 ? ($request->minStockQuantity / 1000) . 'kg' : $request->minStockQuantity . 'g';
+            } else if ($request->unit === "ml") {
+                $itemQuantity = $request->stockQuantity >= 1000 ? ($request->stockQuantity / 1000) . 'ltr' : $request->stockQuantity . 'ml';
+                $mimimumItemQuantity = $request->minStockQuantity >= 1000 ? ($request->minStockQuantity / 1000) . 'ltr' : $request->minStockQuantity . 'ml';
+            }
 
             $newStock->itemName = $request->itemName;
             $newStock->itemQuantity = $itemQuantity;
@@ -320,7 +395,8 @@ class AdminController extends Controller
         }
     }
 
-    public function updateStock(Request $request){
+    public function updateStock(Request $request)
+    {
         $stockData = Stock::find($request->sId);
 
         $itemQuantity = $request->stockQuantity >= 1000 ? ($request->stockQuantity / 1000) . 'kg' : $request->stockQuantity . 'g';
@@ -335,7 +411,8 @@ class AdminController extends Controller
         return redirect()->route('viewStockPage');
     }
 
-    public function deleteStock($id){
+    public function deleteStock($id)
+    {
         $stockData = Stock::find($id);
         $stockData->delete();
 
@@ -348,13 +425,15 @@ class AdminController extends Controller
     |---------------------------------------------------------------|
     */
 
-    public function totalCategories(){
+    public function totalCategories()
+    {
         $Categories = Category::count();
         session(['totalCategories' => $Categories]);
         return $Categories;
     }
 
-    public function totalProducts(){
+    public function totalProducts()
+    {
         $Products = Product::count();
         session(['totalProducts' => $Products]);
         return $Products;

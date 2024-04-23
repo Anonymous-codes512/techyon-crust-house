@@ -18,41 +18,30 @@
                 <tr>
                     <th>Deal Image</th>
                     <th>Deal Title</th>
-                    <th>Deal Price</th>
                     <th>Deal Status</th>
                     <th>Deal Products</th>
+                    <th>Deal Price</th>
                     <th>Deal End Date</th>
                     <th>Action</th>
                 </tr>
             </thead>
             <tbody>
-
-                @php
-                    $imgUrl = null;
-                @endphp
-
                 @foreach ($dealsData as $deal)
                     <tr>
-                        <td onclick="showDealInfo({{ json_encode($deal) }})"><img src={{ asset('Images/DealImages/' . $deal->dealImage) }} alt=" Deal Image"></td>
+                        <td onclick="showDealInfo({{ json_encode($deal) }})"><img
+                                src={{ asset('Images/DealImages/' . $deal->dealImage) }} alt=" Deal Image"></td>
                         <td onclick="showDealInfo({{ json_encode($deal) }})">{{ $deal->dealTitle }}</td>
-                        <td onclick="showDealInfo({{ json_encode($deal) }})">{{ $deal->dealPrice }}</td>
                         <td onclick="showDealInfo({{ json_encode($deal) }})">
                             <p class="status">{{ $deal->dealStatus }}</p>
                         </td>
                         <td onclick="showDealInfo({{ json_encode($deal) }})" class="ellipsis" style="max-width: 100px;">
-                            {{ $deal->dealProducts }}</td>
+                            {{ $deal->dealProductName }}</td>
+                        <td onclick="showDealInfo({{ json_encode($deal) }})">{{ $deal->dealDiscountedPrice }}</td>
                         <td onclick="showDealInfo({{ json_encode($deal) }})">{{ $deal->dealEndDate }}</td>
                         <td>
                             <a onclick= "editDeal({{ json_encode($deal) }})"><i class='bx bxs-edit-alt'></i></a>
                             <a href="{{ route('deleteDeal', $deal->id) }}"><i class='bx bxs-trash-alt'></i></a>
                         </td>
-
-                        @if ($deal != null)
-                            @php
-                                $imgUrl =$deal->dealImage;
-                            @endphp
-                        @endif
-                        
                     </tr>
                 @endforeach
             </tbody>
@@ -85,10 +74,6 @@
 
             <div class="inputdivs">
                 <input type="text" id="dealTitle" name="dealTitle" placeholder="Deal title" required>
-            </div>
-
-            <div class="inputdivs">
-                <input type="number" id="dealPrice" name="dealPrice" placeholder="Deal price" required>
             </div>
 
             <div class="inputdivs">
@@ -138,10 +123,6 @@
             </div>
 
             <div class="inputdivs">
-                <input type="number" id="deal-Price" name="dealPrice"required>
-            </div>
-
-            <div class="inputdivs">
                 <select name="dealStatus" id="deal-Status">
                     <option value="" selected disabled>Select Stauts</option>
                     <option value="active">Active</option>
@@ -170,7 +151,7 @@
             <hr>
 
             <div class="imgdiv">
-                <img id="dealInfoImage" src="{{ asset('Images/DealImages/' . $imgUrl) }}" alt="deal Image">
+                <img id="dealInfoImage"  alt="deal Image">
             </div>
 
             <div class="infodiv">
@@ -239,7 +220,6 @@
             popup.style.display = 'flex';
             document.getElementById('d-Id').value = Deal.id;
             document.getElementById('deal-Title').value = Deal.dealTitle;
-            document.getElementById('deal-Price').value = Deal.dealPrice;
             document.getElementById('deal-Status').value = Deal.dealStatus;
             document.getElementById('deal-End-Date').value = Deal.dealEndDate;
         }
@@ -268,14 +248,23 @@
             overlay.style.display = 'block';
             popup.style.display = 'flex';
 
+            let dealProdName = deal.dealProductName.split(',');
+            let dealProdQuantity = deal.dealProductQuantity.split(',');
+            let dealproducts = '';
 
+            for (let i = 0; i < dealProdName.length; i++) {
+                dealproducts += dealProdQuantity[i] + " " + dealProdName[i];
+                if (i < dealProdName.length - 1) {
+                    dealproducts += ", ";
+                }
+            }
+
+            document.getElementById("dealInfoImage").src = `{{ asset('Images/DealImages/${deal.dealImage}') }}`;
             document.getElementById("dealInfoTitle").innerHTML = deal.dealTitle;
-            document.getElementById("dealInfoPrice").innerHTML = deal.dealPrice + " Pkr";
-            document.getElementById("dealInfoProducts").innerHTML = deal.dealProducts;
+            document.getElementById("dealInfoPrice").innerHTML = deal.dealDiscountedPrice;
+            document.getElementById("dealInfoProducts").innerHTML = dealproducts;
             document.getElementById("dealInfoStatus").innerHTML = deal.dealStatus;
             document.getElementById("dealInfoEndDate").innerHTML = deal.dealEndDate;
-
-            // console.log(deal);
         }
 
         function hideDealInfo(deal) {
