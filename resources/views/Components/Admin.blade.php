@@ -52,6 +52,12 @@
                             <p class="link">Stock</p>
                         </a>
                     </div>
+                    <div class="menuItems" id="menu4">
+                        <i class='bx bx-cookie'></i>
+                        <a href="{{ route('viewRecipePage') }}" style="text-decoration: none;">
+                            <p class="link">Recipe</p>
+                        </a>
+                    </div>
                     <div class="menuItems" id="menu5">
                         <i class='bx bxs-file-import'></i>
                         <a href="" style="text-decoration: none;">

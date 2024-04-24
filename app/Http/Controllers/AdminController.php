@@ -241,7 +241,7 @@ class AdminController extends Controller
             $productPrices .= $productPrice . ', ';
             $index++;
         }
-        
+
         $productNames = rtrim($productNames, ', ');
         $productQuantities = rtrim($productQuantities, ', ');
         $productPrices = rtrim($productPrices, ', ');
@@ -305,7 +305,7 @@ class AdminController extends Controller
             $productPrices .= $productPrice . ', ';
             $index++;
         }
-        
+
         $productNames = rtrim($productNames, ', ');
         $productQuantities = rtrim($productQuantities, ', ');
         $productPrices = rtrim($productPrices, ', ');
@@ -399,8 +399,13 @@ class AdminController extends Controller
     {
         $stockData = Stock::find($request->sId);
 
-        $itemQuantity = $request->stockQuantity >= 1000 ? ($request->stockQuantity / 1000) . 'kg' : $request->stockQuantity . 'g';
-        $mimimumItemQuantity = $request->minStockQuantity >= 1000 ? ($request->minStockQuantity / 1000) . 'kg' : $request->minStockQuantity . 'g';
+        if ($request->unit === "g") {
+            $itemQuantity = $request->stockQuantity >= 1000 ? ($request->stockQuantity / 1000) . 'kg' : $request->stockQuantity . 'g';
+            $mimimumItemQuantity = $request->minStockQuantity >= 1000 ? ($request->minStockQuantity / 1000) . 'kg' : $request->minStockQuantity . 'g';
+        } else if ($request->unit === "ml") {
+            $itemQuantity = $request->stockQuantity >= 1000 ? ($request->stockQuantity / 1000) . 'ltr' : $request->stockQuantity . 'ml';
+            $mimimumItemQuantity = $request->minStockQuantity >= 1000 ? ($request->minStockQuantity / 1000) . 'ltr' : $request->minStockQuantity . 'ml';
+        }
 
         $stockData->itemName = $request->itemName;
         $stockData->itemQuantity = $itemQuantity;
@@ -417,6 +422,19 @@ class AdminController extends Controller
         $stockData->delete();
 
         return redirect()->route('viewStockPage');
+    }
+
+    /*
+        |---------------------------------------------------------------|
+        |======================= Recipe Functions ======================|
+        |---------------------------------------------------------------|
+        */
+
+    public function viewRecipePage()
+    {
+        $products = Product::all();
+        $stocks = Stock::all();
+        return view('Admin.Recipe')->with(['products'=>$products, 'stocks'=>$stocks]);
     }
 
     /*

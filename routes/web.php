@@ -107,3 +107,14 @@ Route::get('/viewStockPage', [AdminController::class,'viewStockPage'])->name('vi
 Route::post('/createStock', [AdminController::class,'createStock'])->name('createStock');
 Route::post('/updateStock',[AdminController::class,'updateStock'])->name('updateStock');
 Route::get('/deleteStock/{id}',[AdminController::class,'deleteStock'])->name('deleteStock');
+
+/*
+|---------------------------------------------------------------|
+|========================= Stock Routes ========================|
+|---------------------------------------------------------------|
+*/
+
+Route::get('/viewRecipePage', [AdminController::class,'viewRecipePage'])->name('viewRecipePage');
+// Route::post('/createStock', [AdminController::class,'createStock'])->name('createStock');
+// Route::post('/updateStock',[AdminController::class,'updateStock'])->name('updateStock');
+// Route::get('/deleteStock/{id}',[AdminController::class,'deleteStock'])->name('deleteStock');
