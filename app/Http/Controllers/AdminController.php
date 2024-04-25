@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Models\Deal;
 use App\Models\Product;
+use App\Models\Recipe;
 use App\Models\Stock;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
@@ -423,7 +424,7 @@ class AdminController extends Controller
 
         return redirect()->route('viewStockPage');
     }
-
+    
     /*
         |---------------------------------------------------------------|
         |======================= Recipe Functions ======================|
@@ -434,9 +435,36 @@ class AdminController extends Controller
     {
         $products = Product::all();
         $stocks = Stock::all();
-        return view('Admin.Recipe')->with(['products'=>$products, 'stocks'=>$stocks]);
+        return view('Admin.Recipe')->with(['products' => $products, 'stocks' => $stocks]);
     }
 
+    public function createRecipe(Request $request)
+    {
+        $recipe = new Recipe();
+        $product = Product::find($request->pId);
+
+        $productRecipe = $request->input('productRecipe');
+        $formattedRecipe = str_replace("\n", "", trim($productRecipe));
+        
+        $recipe->productCategory = $product->category_name;
+        $recipe->productSize = $product->productSize;
+        $recipe->productName = $product->productName;
+        $recipe->productRecipe = $formattedRecipe;
+        
+        $recipe->save();
+        
+        return redirect()->route('viewRecipePage');
+    }
+    
+    public function deleteRecipe($id)
+    {
+        $recipe = Recipe::find($id);
+        $recipe->delete();
+        
+        return redirect()->route('viewRecipePage');
+        
+    }
+    
     /*
     |---------------------------------------------------------------|
     |==================== Dashboard Functions ======================|

@@ -113,15 +113,14 @@ table tbody tr td:last-child a:last-child:hover {
 #recipepad {
     display: flex;
     flex-direction: column;
-    /* border: 1px solid #000; */
     width: 45%;
     height: 90%;
     margin-right: 2px;
 }
 
-#recipelist h4,
+#recipelist h5,
 #recipepad h4 {
-    /* border: 1px solid #000; */
+    border: 1px solid #000;
     text-align: center;
     margin: 0;
     flex: 1;
@@ -139,7 +138,7 @@ table tbody tr td:last-child a:last-child:hover {
     scrollbar-width: none;
 }
 .stockContainer p {
-    border: 0.01rem solid #6b6b6b;
+    border-bottom: 0.01rem solid #6b6b6b;
     margin: 0;
     padding: 2px 10px;
     font-size: 1vw;
@@ -148,7 +147,7 @@ table tbody tr td:last-child a:last-child:hover {
     background-color: #e0e0e0;
 }
 
-#closebtn {
+#buttons {
     display: flex;
     justify-content: flex-start;
     align-items: center;
@@ -156,7 +155,8 @@ table tbody tr td:last-child a:last-child:hover {
     padding: 05px;
 }
 
-#closebtn button {
+#buttons button,
+#buttons input[type="submit"] {
     font-size: 1.2vw;
     font-weight: 500;
     border: none;
@@ -164,4 +164,29 @@ table tbody tr td:last-child a:last-child:hover {
     color: #fff;
     padding: 0.5vw 2vw;
     border-radius: 8px;
+    margin: 0.3vw;
+}
+
+#buttons button:hover,
+#buttons input[type="submit"]:hover {
+    background-color: #bc9017;
+}
+
+.searchBar {
+    display: flex;
+    margin-bottom: 2px;
+    position: relative;
+}
+
+#Search {
+    width: 100%;
+    border-radius: 5px;
+    padding: 5px;
+    border: 1px solid #6b6b6b;
+}
+
+.searchBar .bx-search {
+    position: absolute;
+    right: 1%;
+    top: 25%;
 }
