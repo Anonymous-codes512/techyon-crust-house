@@ -138,11 +138,9 @@ let texts = document.getElementsByClassName('status');
 Array.from(texts).forEach(text => {
     if (text.textContent.toLowerCase() === "active") {
         text.style.color = '#3FC28A';
-        text.style.backgroundColor = '#3FC28A14';
     }
     else if(text.textContent.toLowerCase() === "inactive"){
         text.style.color = '#F45B69';
-        text.style.backgroundColor = '#F45B6914';
     }
 });
 

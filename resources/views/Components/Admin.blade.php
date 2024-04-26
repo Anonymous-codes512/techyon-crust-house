@@ -60,13 +60,13 @@
                     </div>
                     <div class="menuItems" id="menu5">
                         <i class='bx bxs-file-import'></i>
-                        <a href="" style="text-decoration: none;">
+                        <a href="{{ route('viewOrdersPage') }}" style="text-decoration: none;">
                             <p class="link">Orders</p>
                         </a>
                     </div>
                     <div class="menuItems" id="menu8">
                         <i class='bx bxs-group'></i>
-                        <a href="" style="text-decoration: none;">
+                        <a href="{{ route('viewStaffPage') }}" style="text-decoration: none;">
                             <p class="link">My Staff</p>
                         </a>
                     </div>

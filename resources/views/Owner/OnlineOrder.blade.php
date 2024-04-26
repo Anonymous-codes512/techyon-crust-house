@@ -11,7 +11,7 @@
         </div>
         <div class="headings">
             <h3>Online Orders</h3>
-        </div>
+        </div> 
         
         <div class="processbtns">
             <a href="" style="text-decoration: none;"><button class="activebtn">In Process</button></a>
