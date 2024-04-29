@@ -3,6 +3,7 @@
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\OwnerController;
+use App\Http\Controllers\SalesmanController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -127,3 +128,15 @@ Route::post('/createRecipe', [AdminController::class,'createRecipe'])->name('cre
 
 Route::get('/viewOrdersPage', [AdminController::class,'viewOrdersPage'])->name('viewOrdersPage');
 Route::get('/viewStaffPage', [AdminController::class,'viewStaffPage'])->name('viewStaffPage');
+
+
+/*
+|---------------------------------------------------------------|
+|==================== Sales Man Routes =========================|
+|---------------------------------------------------------------|
+*/
+
+
+Route::get('salesman/dashboard', [SalesmanController::class,'viewSalesmanDashboard'])->name('salesman_dashboard');
+Route::get('salesman/dashboard/{categoryName}', [SalesmanController::class,'salesmanCategoryDashboard'])->name('salesman_dash');
+Route::post('salesman/placeOrder', [SalesmanController::class,'placeOrder'])->name('placeOrder');

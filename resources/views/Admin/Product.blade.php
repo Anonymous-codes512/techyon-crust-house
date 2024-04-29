@@ -61,7 +61,8 @@
                 <select name="categoryId" id="category" onclick="updateProductSizeDropdown()">
                     <option value="none" selected disabled>Select Product Category</option>
                     @foreach ($categoryData as $category)
-                    <option value="{{ $category->id }},{{ $category->categoryName }}">{{ $category->categoryName }}</option>
+                        <option value="{{ $category->id }},{{ $category->categoryName }}">{{ $category->categoryName }}
+                        </option>
                     @endforeach
                 </select>
             </div>
@@ -125,7 +126,8 @@
                 <select name="categoryId" id="pCategory">
                     <option value="none" disabled>Select Product Category</option>
                     @foreach ($categoryData as $category)
-                    <option value="{{ $category->id }},{{ $category->categoryName }}">{{ $category->categoryName }}</option>
+                        <option value="{{ $category->id }},{{ $category->categoryName }}">{{ $category->categoryName }}
+                        </option>
                     @endforeach
                 </select>
             </div>
@@ -248,13 +250,17 @@
             category = categoryField.split(',');
 
 
-            if (category[1] == "Drinks") {
+            if (category[1].toLowerCase() === "drinks") {
                 let drinkProductSizes = ["250ml", "1ltr", "1.5ltr"];
                 addOptionsToDropdown(drinkProductSizes, productSizeDropdown);
+            } else if (category[1].toLowerCase() === "appetizer") {
+                let foodProductSizes = ["3 Pieces", "6 Pieces", "12 Pieces"];
+                addOptionsToDropdown(foodProductSizes, productSizeDropdown);
             } else {
                 let foodProductSizes = ["Small", "Medium", "Large", "Extra Large", "Jumbo"];
                 addOptionsToDropdown(foodProductSizes, productSizeDropdown);
             }
+
         }
 
         function addOptionsToDropdown(optionsArray, dropdown) {

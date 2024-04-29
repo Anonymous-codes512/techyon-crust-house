@@ -180,7 +180,6 @@ table tbody tr td:last-child a:last-child:hover{
     border-radius: 10px; 
     padding: 0.71vw 0.5vw;
     background-color: #e2e2e2;
-    
 }
 
 #unitsDiv input{
@@ -227,7 +226,6 @@ table tbody tr td:last-child a:last-child:hover{
 
 .btns input:hover{
     background-color: #d4a011;
-    color: #fff;
 }
 
 .error-message{

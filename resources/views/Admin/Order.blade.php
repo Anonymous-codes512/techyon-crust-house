@@ -18,7 +18,7 @@
                     <th>Product Quantity</th>
                     <th>Price</th>
                     <th>Status</th>
-                    <th>Action</th>
+                    {{-- <th>Action</th> --}}
                 </tr>
             </thead>
             <tbody>
@@ -28,10 +28,10 @@
                     <td>2 Large</td>
                     <td>400 Pkr</td>
                     <td class="status">Accept</td>
-                    <td class="order-status">
+                    {{-- <td class="order-status">
                         <a href="">Accept</a>
                         <a href="">Reject</a>
-                    </td>
+                    </td> --}}
                 </tr>
                 <tr>
                     <td>Pizza</td>
@@ -39,10 +39,10 @@
                     <td>1 Jumbo</td>
                     <td>2500 Pkr</td>
                     <td class="status">Reject</td>
-                    <td class="order-status">
+                    {{-- <td class="order-status">
                         <a href="">Accept</a>
                         <a href="">Reject</a>
-                    </td>
+                    </td> --}}
                 </tr>
             </tbody>
         </table>
