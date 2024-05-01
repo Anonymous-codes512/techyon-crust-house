@@ -139,4 +139,5 @@ Route::get('/viewStaffPage', [AdminController::class,'viewStaffPage'])->name('vi
 
 Route::get('salesman/dashboard', [SalesmanController::class,'viewSalesmanDashboard'])->name('salesman_dashboard');
 Route::get('salesman/dashboard/{categoryName}', [SalesmanController::class,'salesmanCategoryDashboard'])->name('salesman_dash');
+Route::get('salesman/deals/', [SalesmanController::class,'deals'])->name('deals');
 Route::post('salesman/placeOrder', [SalesmanController::class,'placeOrder'])->name('placeOrder');

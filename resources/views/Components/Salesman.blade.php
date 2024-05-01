@@ -47,6 +47,8 @@
     </div>
 
     <script src="{{ asset('JavaScript/index.js') }}"></script>
+    @stack('scripts')
+    
 </body>
 
 </html>

@@ -4,25 +4,55 @@
     <link rel="stylesheet" href="{{ asset('CSS/Salesman/dashboard.css') }}">
 @endpush
 
+@push('scripts')
+    <script src="{{ asset('JavaScript/salesman.js') }}"></script>
+@endpush
+
 @section('main')
     <main id="salesman">
         <div id="productsSide">
             <div id="category_bar">
-                <a href="{{ route('salesman_dashboard') }}" name="categoryName"> All</a>
+                <a href="{{ route('salesman_dashboard') }}"> All</a>
                 @foreach ($Categories as $category)
-                    <a href="{{ route('salesman_dash', $category->categoryName) }}"
-                        name="categoryName">{{ $category->categoryName }} </a>
+                    <a href="{{ route('salesman_dash', $category->categoryName) }}">{{ $category->categoryName }} </a>
                 @endforeach
+                <a href="{{ route('salesman_dash', 'Deals') }}"> Deals</a>
             </div>
 
             <div id="products">
-                @foreach ($Products as $product)
-                    <div class="imgbox" onclick="showAddToCart({{ json_encode($product) }})">
-                        <img src="{{ asset('Images/ProductImages/' . $product->productImage) }}" alt="Product">
-                        <p class="product_name">{{ $product->productName }}</p>
-                    </div>
-                @endforeach
+                @php
+                    $displayedProductNames = [];
+                @endphp
+
+                @if ($Products !== null)
+                    
+                    @foreach ($Products as $product)
+                        @if (!in_array($product->productName, $displayedProductNames))
+                            @php
+                                $displayedProductNames[] = $product->productName;
+                            @endphp
+
+                            <div class="imgbox"
+                                onclick="showAddToCart({{ json_encode($product) }}, {{ json_encode($Products) }})">
+                                <img src="{{ asset('Images/ProductImages/' . $product->productImage) }}" alt="Product">
+                                <p class="product_name">{{ $product->productName }}</p>
+                                <p class="product_price">From Rs. {{ $product->productPrice }}</p>
+                            </div>
+                        @endif
+                    @endforeach
+                
+                @elseif ($Deals !== null)
+                
+                    @foreach ($Deals as $deal)
+                        <div class="imgbox" onclick="showAddToCart({{ json_encode($deal) }}, {{ json_encode($Deals) }})">
+                            <img src="{{ asset('Images/DealImages/' . $deal->dealImage) }}" alt="Product">
+                            <p class="product_name">{{ $deal->dealTitle }}</p>
+                        </div>
+                    @endforeach
+
+                @endif
             </div>
+
         </div>
         <div id="receipt">
             <h3 id="heading">Receipt</h3>
@@ -42,10 +72,15 @@
             <p id="prodName"></p>
             <p id="prodPrice">Product Price <span id="price"></span></p>
             <p class="head1">Please Select</p>
-            <select name="prodSize" id="prodSize">
+
+            <select name="addOn" id="addons">
+            </select>
+
+            <select name="prodVariation" id="prodVariation">
             </select>
 
             <div id="quantity">
+                <p>Quantity</p>
                 <i onclick="decrease()" class='bx bxs-checkbox-minus'></i>
                 <input type="number" name="prodQuantity" id="prodQuantity" value="1" min="1">
                 <i onclick="increase()" class='bx bxs-plus-square'></i>
@@ -58,140 +93,5 @@
                 <button type="button" onclick="add()">Add</button>
             </div>
         </div>
-
     </main>
-
-    <script>
-        function showAddToCart(product) {
-            let overlay = document.getElementById('overlay');
-            let popup = document.getElementById('addToCart');
-
-            document.getElementById('prodName').textContent = product.productName;
-            document.getElementById('price').textContent = 'Rs. ' + product.productPrice;
-            document.getElementById('totalprice').textContent = 'Rs. ' + product.productPrice;
-
-            updateProductSizeDropdown(product.category_name);
-
-            overlay.style.display = 'block';
-            popup.style.display = 'flex';
-        }
-
-        function closeAddToCart() {
-            let overlay = document.getElementById('overlay');
-            let popup = document.getElementById('addToCart');
-
-            overlay.style.display = 'none';
-            popup.style.display = 'none';
-        }
-
-        function increase() {
-            let quantityInput = document.getElementById('prodQuantity');
-            let currentValue = parseInt(quantityInput.value);
-            currentValue = currentValue + 1;
-            quantityInput.value = currentValue;
-
-            let totalPriceElement = document.getElementById('totalprice');
-            let numericValue = totalPriceElement.textContent.match(/\d+(\.\d+)?/);
-            let totalPrice = parseFloat(numericValue);
-
-            totalPrice = totalPrice * currentValue;
-            totalPriceElement.textContent = "Rs. " + totalPrice.toFixed(2);
-        }
-
-
-        function decrease() {
-            let quantityInput = document.getElementById('prodQuantity');
-            let currentValue = parseInt(quantityInput.value);
-
-            if (currentValue <= 1) {
-                alert('Minimum quantity should be 1.');
-            } else {
-                currentValue = currentValue - 1;
-                quantityInput.value = currentValue;
-
-                let totalPriceElement = document.getElementById('totalprice');
-                let numericValue = totalPriceElement.textContent.match(/\d+(\.\d+)?/);
-                let totalPrice = parseFloat(numericValue);
-
-                totalPrice = totalPrice / (currentValue + 1); // Divide by previous quantity
-                totalPriceElement.textContent = "Rs. " + totalPrice.toFixed(2);
-            }
-        }
-
-
-        function updateProductSizeDropdown(category) {
-
-            let productSizeDropdown = document.getElementById("prodSize");
-            productSizeDropdown.innerHTML = "";
-
-            if (category == "Drinks") {
-                let drinkProductSizes = ["250ml", "1ltr", "1.5ltr"];
-                addOptionsToDropdown(drinkProductSizes, productSizeDropdown);
-            } else {
-                let foodProductSizes = ["Small", "Medium", "Large", "Extra Large", "Jumbo"];
-                addOptionsToDropdown(foodProductSizes, productSizeDropdown);
-            }
-        }
-
-        function addOptionsToDropdown(optionsArray, dropdown) {
-            document.getElementByQ
-            let defaultOption = document.createElement("option");
-            defaultOption.disabled = true;
-            defaultOption.selected = true;
-            defaultOption.text = "Select Product Size";
-            dropdown.add(defaultOption);
-
-            for (let i = 0; i < optionsArray.length; i++) {
-                let option = document.createElement("option");
-                option.text = optionsArray[i];
-                option.value = optionsArray[i];
-                dropdown.add(option);
-            }
-        }
-
-        function add() {
-            let productName = document.getElementById('prodName').textContent;
-            let productPrice = document.getElementById('price').textContent.replace('Rs. ', '');
-            let productSize = document.getElementById('prodSize').value;
-            let quantity = document.getElementById('prodQuantity').value;
-
-            let totalPrice = parseFloat(productPrice) * parseInt(quantity);
-            let productDetails = quantity + ' ' + productSize + ' ' + productName + ' ' + (productPrice * quantity);
-            let textarea = document.getElementById('selectedProducts');
-            textarea.value += productDetails + ' Pkr\n';
-
-            let totalBillInput = document.getElementById('totalbill');
-            let currentTotal = parseFloat(totalBillInput.value);
-            let newTotal = currentTotal + totalPrice;
-            totalBillInput.value = newTotal.toFixed(2);
-            closeAddToCart();
-        }
-
-        window.addEventListener('beforeunload', function(event) {
-            let textareaValue = document.getElementById('selectedProducts').value;
-            let totalBillValue = document.getElementById('totalbill').value;
-            localStorage.setItem('textareaValue', textareaValue);
-            localStorage.setItem('totalBillValue', totalBillValue);
-        });
-
-
-        window.addEventListener('DOMContentLoaded', function(event) {
-            let savedTextareaValue = localStorage.getItem('textareaValue');
-            let savedTotalBillValue = localStorage.getItem('totalBillValue');
-            if (savedTextareaValue) {
-                document.getElementById('selectedProducts').value = savedTextareaValue;
-            }
-            if (savedTotalBillValue) {
-                document.getElementById('totalbill').value = savedTotalBillValue;
-            }
-
-            window.addEventListener('keydown', function(event) {
-                if ((event.ctrlKey && event.shiftKey && event.keyCode === 82)||(event.ctrlKey && event.keyCode === 82   )) {
-                    document.getElementById('selectedProducts').value = '';
-                    document.getElementById('totalbill').value = 0;
-                    window.location.reload(true);
-                }
-            });
-        });
-    </script>
 @endsection

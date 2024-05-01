@@ -189,6 +189,8 @@
         function addProduct() {
             let overlay = document.getElementById('overlay');
             let popup = document.getElementById('newProduct');
+            let productSizeDropdown = document.getElementById("productSize");
+            productSizeDropdown.style.display = "none";
 
             overlay.style.display = 'block';
             popup.style.display = 'flex';
@@ -244,27 +246,38 @@
 
             let categoryField = document.getElementById("category").value;
             let productSizeDropdown = document.getElementById("productSize");
-
             productSizeDropdown.innerHTML = "";
 
             category = categoryField.split(',');
 
 
             if (category[1].toLowerCase() === "drinks") {
-                let drinkProductSizes = ["250ml", "1ltr", "1.5ltr"];
+                productSizeDropdown.style.display = "block";
+                let drinkProductSizes = ["Regular", "1 Liter", "1.5 Liter"];
                 addOptionsToDropdown(drinkProductSizes, productSizeDropdown);
             } else if (category[1].toLowerCase() === "appetizer") {
+                productSizeDropdown.style.display = "block";
                 let foodProductSizes = ["3 Pieces", "6 Pieces", "12 Pieces"];
                 addOptionsToDropdown(foodProductSizes, productSizeDropdown);
+            } else if (category[1].toLowerCase() === "fries") {
+                productSizeDropdown.style.display = "block";
+                let foodProductSizes = ["Regular", "Large"];
+                addOptionsToDropdown(foodProductSizes, productSizeDropdown);
+            } else if (category[1].toLowerCase() === "pizza") {
+                productSizeDropdown.style.display = "block";
+                let foodProductSizes = ["Small", "Regular", "Large","Party"];
+                addOptionsToDropdown(foodProductSizes, productSizeDropdown);
+            } else if (category[1].toLowerCase() === "burger") {
+                productSizeDropdown.style.display = "none";
+            } else if (category[1].toLowerCase() === "others") {
+                productSizeDropdown.style.display = "none";
             } else {
                 let foodProductSizes = ["Small", "Medium", "Large", "Extra Large", "Jumbo"];
                 addOptionsToDropdown(foodProductSizes, productSizeDropdown);
             }
-
         }
 
         function addOptionsToDropdown(optionsArray, dropdown) {
-            document.getElementByQ
             let defaultOption = document.createElement("option");
             defaultOption.disabled = true;
             defaultOption.selected = true;
