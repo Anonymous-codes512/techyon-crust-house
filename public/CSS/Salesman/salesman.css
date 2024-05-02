@@ -106,8 +106,23 @@ header {
     display: flex;
     align-items: center;
     border-radius: 10%;
+    cursor: pointer;
 }
 .notification i {
+    font-size: 1.2rem;
+}
+
+.logout {
+    display: flex;
+    align-items: center;
+    border-radius: 10%;
+}
+.logout a {
+    text-decoration: none;
+    color: #000000;
+}
+
+.logout a i {
     font-size: 1.2rem;
 }
 
@@ -117,6 +132,7 @@ header {
     background-color: #000000;
     border-radius: 10%;
     padding: 0.4rem 0.8rem;
+    cursor: pointer;
 }
 
 .theme i {

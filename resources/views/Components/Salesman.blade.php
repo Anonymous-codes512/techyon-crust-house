@@ -35,6 +35,10 @@
                 <div class="notification">
                     <i class='bx bx-bell'></i>
                 </div>
+                
+                <div class="logout">
+                    <a href="{{ route('logout') }}"><i class='bx bx-log-out'></i></a>
+                </div>
 
                 <div class="theme">
                     <i class='bx bx-moon' id="theme" onclick="toggleTheme()"></i>
@@ -48,7 +52,7 @@
 
     <script src="{{ asset('JavaScript/index.js') }}"></script>
     @stack('scripts')
-    
+
 </body>
 
 </html>

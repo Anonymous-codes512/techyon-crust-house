@@ -18,6 +18,10 @@ Route::get('/viewRegisterPage',[AuthController::class, 'registrationIndex'])->na
 Route::post('/storeRegistrationData',[AuthController::class, 'register'])->name('storeRegistrationData');
 Route::post('/login',[AuthController::class, 'login'])->name('login');
 
+Route::get('/logout',function(){
+    return view('Auth.Login');
+})->name('logout');
+
 Route::get('/dashboard', [OwnerController::class, 'viewOwnerDashboard'])->name('dashboard');
 
 // Route::get('/dashboard2', function () {

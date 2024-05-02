@@ -10,15 +10,30 @@ function showAddToCart(product, allProducts) {
         document.getElementById('totalprice').textContent = 'Rs. ' + product.productPrice;
 
         if (product.category_name.toLowerCase() != 'others') {
+
+            // if(product.category_name.toLowerCase() == 'burger') {
+            //     let name = document.getElementById("prodName");
+            //     name.textContent = product.productName;
+            //     document.getElementById('addons').style.display = 'none';
+            //     document.getElementById('addOnsLabel').style.display = 'none'
+            //     document.getElementById("prodVariation").style.display = 'none';
+            //     document.getElementById('prodVariationLabel').style.display = 'none'
+
+            // }else{
+
             document.getElementById("prodVariation").style.display = 'block';
             document.getElementById('addons').style.display = 'block';
             updateProductSizeDropdown(product, allProducts);
+            // }
+
         } else {
+
             let name = document.getElementById("prodName");
             name.textContent = product.productName;
-            document.getElementById("prodVariation").style.display = 'none';
             document.getElementById('addons').style.display = 'none';
-
+            document.getElementById('addOnsLabel').style.display = 'none'
+            document.getElementById("prodVariation").style.display = 'none';
+            document.getElementById('prodVariationLabel').style.display = 'none'
         }
 
     } else {
@@ -44,6 +59,8 @@ function closeAddToCart() {
 }
 
 function updateProductSizeDropdown(product, allProducts) {
+    console.log(product);
+    console.log(allProducts);
     let productVariationDropdown = document.getElementById("prodVariation");
     let drinkFlavourDropdown = document.getElementById("addons");
     productVariationDropdown.innerHTML = "";
@@ -52,17 +69,26 @@ function updateProductSizeDropdown(product, allProducts) {
     let drinkFlavour = [];
 
     if (product.category_name.toLowerCase() === "pizza") {
-
-        addons.style.display = 'none';
+        let addOnsArray = [];
+        document.getElementById("prodVariationLabel").style.display = 'block';
+        document.getElementById('addOnsLabel').style.display = 'none'
         allProducts.forEach(element => {
+            if (element.category_name.toLowerCase() == 'addons') {
+                if (element.productName.includes('Topping')) {
+                    addOnsArray.push(`${element.productName} (Rs. ${element.productPrice})`);
+                }
+            }
             if (element.productName.toLowerCase() === product.productName.toLowerCase()) {
                 productVariations.push(`${element.productSize} (Rs. ${element.productPrice})`);
             }
         });
+        addOnsDropdown(addOnsArray, drinkFlavourDropdown)
         addOptionsToDropdown(productVariations, productVariationDropdown);
 
     } else if (product.category_name.toLowerCase() === "drinks") {
 
+        document.getElementById('addOnsLabel').style.display = 'block'
+        document.getElementById("prodVariationLabel").style.display = 'block';
         let uniqueDrinkFlavours = new Set();
 
         allProducts.forEach(element => {
@@ -81,12 +107,36 @@ function updateProductSizeDropdown(product, allProducts) {
         drinkFlavourDropdown.addEventListener('change', () => {
             let selectedFlavour = drinkFlavourDropdown.value;
             let filteredVariations = allProducts.filter(product => product.category_name.toLowerCase() === "drinks" && product.productName === selectedFlavour);
-            let variationOptions = filteredVariations.map(product => `${product.productSize} (Rs. ${product.productPrice})`);
 
-            addOptionsToDropdown(variationOptions, productVariationDropdown);
+            if (filteredVariations.length > 0) {
+                let selectedProduct = filteredVariations[0];
+                let variationOptions = filteredVariations.map(product => `${product.productSize} (Rs. ${product.productPrice})`);
+                document.getElementById('price').textContent = 'Rs. ' + selectedProduct.productPrice;
+                document.getElementById('totalprice').textContent = 'Rs. ' + selectedProduct.productPrice;
+                addOptionsToDropdown(variationOptions, productVariationDropdown);
+            }
         });
 
+    } else if (product.category_name.toLowerCase() === "burger") {
+        let addOnsArray = [];
+        document.getElementById("prodVariationLabel").style.display = 'block';
+        document.getElementById('addOnsLabel').style.display = 'block';
+        allProducts.forEach(element => {
+            if (element.category_name.toLowerCase() == 'addons') {
+                if (!element.productName.includes('Topping')) {
+                    addOnsArray.push(`${element.productName} (Rs. ${element.productPrice})`);
+                }
+            }
+            if (element.productName.toLowerCase() === product.productName.toLowerCase()) {
+                productVariations.push(`${element.productSize} (Rs. ${element.productPrice})`);
+            }
+        });
+        addOnsDropdownBurger(addOnsArray, drinkFlavourDropdown)
+        addOptionsToDropdownBurger(productVariations, productVariationDropdown);
+
     } else {
+        document.getElementById('addOnsLabel').style.display = 'block'
+        document.getElementById("prodVariationLabel").style.display = 'block';
 
         allProducts.forEach(element => {
             if (element.productName.toLowerCase() === product.productName.toLowerCase()) {
@@ -100,11 +150,47 @@ function updateProductSizeDropdown(product, allProducts) {
 
 function addOptionsToDropdown(optionsArray, dropdown) {
     dropdown.innerHTML = "";
+    label = document.getElementById("prodVariationLabel");
+    label.textContent = "Select Variation";
+
+    for (let i = 0; i < optionsArray.length; i++) {
+        let option = document.createElement("option");
+        option.text = optionsArray[i];
+        option.value = optionsArray[i];
+        dropdown.add(option);
+    }
+
+    dropdown.addEventListener('change', () => {
+        document.getElementById('prodQuantity').value = '1';
+        let selectedOption = dropdown.options[dropdown.selectedIndex];
+
+        let totalPriceElement = document.getElementById('totalprice');
+        let match = selectedOption.value.match(/Rs\. (\d+)/);
+        let price = match ? match[1] : 0;
+
+        let addonsoption = document.getElementById('addons');
+        let price1 = 0;
+        if (addonsoption.value != '') {
+            let match1 = addonsoption.value.match(/Rs\. (\d+)/);
+            price1 = match1 ? match1[1] : 0;
+        }
+
+        const order_price = parseFloat(price) + parseFloat(price1);
+        totalPriceElement.textContent = 'Rs. ' + order_price;
+        document.getElementById('price').textContent = 'Rs. ' + order_price;
+    });
+
+}
+
+function addOnsDropdown(optionsArray, dropdown) {
+    dropdown.innerHTML = "";
+
+    label = document.getElementById("addOnsLabel");
+    label.textContent = "Select Drink Flavour";
 
     let defaultOption = document.createElement("option");
-    defaultOption.disabled = true;
-    defaultOption.selected = true;
-    defaultOption.text = "Select Variation";
+    defaultOption.text = 'Select Addon';
+    defaultOption.value = '';
     dropdown.add(defaultOption);
 
     for (let i = 0; i < optionsArray.length; i++) {
@@ -115,26 +201,31 @@ function addOptionsToDropdown(optionsArray, dropdown) {
     }
 
     dropdown.addEventListener('change', () => {
-
         document.getElementById('prodQuantity').value = '1';
         let selectedOption = dropdown.options[dropdown.selectedIndex];
-        let totalPriceElement = document.getElementById('totalprice');
 
+        let totalPriceElement = document.getElementById('totalprice');
         let match = selectedOption.value.match(/Rs\. (\d+)/);
-        let price = match ? match[1] : null;
-        totalPriceElement.textContent = 'Rs. ' + price;
+        let price = match ? match[1] : 0;
+        
+        if (selectedOption.value == '') {
+            price = 0;
+        }
+        
+        let variationprice = document.getElementById('prodVariation');
+        let match1 = variationprice.value.match(/Rs\. (\d+)/);
+        let price1 = match1 ? match1[1] : 0;
+
+        const order_price = parseFloat(price) + parseFloat(price1);
+        totalPriceElement.textContent = 'Rs. ' + order_price;
+        document.getElementById('price').textContent = 'Rs. ' + order_price;
     });
 }
 
-
-function addOnsDropdown(optionsArray, dropdown) {
+function addOptionsToDropdownBurger(optionsArray, dropdown) {
     dropdown.innerHTML = "";
-
-    let defaultvariation = document.createElement("option");
-    defaultvariation.disabled = true;
-    defaultvariation.selected = true;
-    defaultvariation.text = "Drink Flavour";
-    dropdown.add(defaultvariation);
+    label = document.getElementById("prodVariationLabel");
+    label.textContent = "Select Combo";
 
     for (let i = 0; i < optionsArray.length; i++) {
         let option = document.createElement("option");
@@ -142,9 +233,172 @@ function addOnsDropdown(optionsArray, dropdown) {
         option.value = optionsArray[i];
         dropdown.add(option);
     }
+
+    dropdown.addEventListener('change', () => {
+        document.getElementById('prodQuantity').value = '1';
+        let selectedOption = dropdown.options[dropdown.selectedIndex];
+
+        let totalPriceElement = document.getElementById('totalprice');
+        let match = selectedOption.value.match(/Rs\. (\d+)/);
+        let price = match ? match[1] : 0;
+
+        let addonsoption = document.getElementById('addons');
+        let price1 = 0;
+        if (addonsoption.value != '') {
+            let match1 = addonsoption.value.match(/Rs\. (\d+)/);
+            price1 = match1 ? match1[1] : 0;
+        }
+
+        const order_price = parseFloat(price) + parseFloat(price1);
+        totalPriceElement.textContent = 'Rs. ' + order_price;
+        document.getElementById('price').textContent = 'Rs. ' + order_price;
+    });
+}
+
+function addOnsDropdownBurger(optionsArray, dropdown) {
+    dropdown.innerHTML = "";
+
+    label = document.getElementById("addOnsLabel");
+    label.textContent = "Select Addon";
+
+    let defaultOption = document.createElement("option");
+    defaultOption.text = 'None';
+    defaultOption.value = '';
+    dropdown.add(defaultOption);
+
+    for (let i = 0; i < optionsArray.length; i++) {
+        let option = document.createElement("option");
+        option.text = optionsArray[i];
+        option.value = optionsArray[i];
+        dropdown.add(option);
+    }
+
+    dropdown.addEventListener('change', () => {
+        document.getElementById('prodQuantity').value = '1';
+        let selectedOption = dropdown.options[dropdown.selectedIndex];
+
+        let totalPriceElement = document.getElementById('totalprice');
+        let match = selectedOption.value.match(/Rs\. (\d+)/);
+        let price = match ? match[1] : 0;
+        
+        if (selectedOption.value == '') {
+            price = 0;
+        }
+        
+        let variationprice = document.getElementById('prodVariation');
+        let match1 = variationprice.value.match(/Rs\. (\d+)/);
+        let price1 = match1 ? match1[1] : 0;
+
+        const order_price = parseFloat(price) + parseFloat(price1);
+        totalPriceElement.textContent = 'Rs. ' + order_price;
+        document.getElementById('price').textContent = 'Rs. ' + order_price;
+    });
+}
+
+function add() {
+    let productName = document.getElementById('prodName').textContent;
+    product = productName.split(" ");
+    prod = product[0];
+    productName = productName.replace(prod, "");
+
+    let productVariation = document.getElementById('prodVariation').value;
+    let addOns = document.getElementById('addons').value;
+
+    let productPrice = document.getElementById('totalprice').textContent.replace('Rs. ', '');
+    let quantity = document.getElementById('prodQuantity').value;
+
+    let extractedText;
+
+    let totalPrice = parseFloat(productPrice) * parseInt(quantity);
+    let totalBillInput = document.getElementById('totalbill').value;
+    let currentTotal = parseFloat(totalBillInput);
+    let newTotal = currentTotal + totalPrice;
+    totalBillInput.value = newTotal.toFixed(2);
+    alert(totalBillInput);
+    let textarea = document.getElementById('selectedProducts');
+
+    if (!addOns) {
+        let productDetails = quantity + ' ' + productVariation + ' ' + productName;
+        extractedText = productDetails.replace(/\(.*?\)/, '');
+        extractedText = extractedText.trim();
+
+    } else {
+        let productDetails = quantity + ' ' + productVariation + ' ' + addOns;
+        extractedText = productDetails.replace(/\(.*?\)/, '');
+        extractedText = extractedText.trim();
+
+    }
+
+    let Name = productName;
+    textarea.value += Name + '\n' + extractedText + '\t' + productPrice + '\n';
+
+    document.getElementById('prodQuantity').value = '1';
+
+    closeAddToCart();
+}
+
+function increase() {
+    let quantityInput = document.getElementById('prodQuantity');
+    let currentValue = parseInt(quantityInput.value);
+    currentValue = currentValue + 1;
+    quantityInput.value = currentValue;
+
+    let productPriceElement = document.getElementById('price');
+    let numericValue = productPriceElement.textContent.match(/\d+(\.\d+)?/);
+    let totalPrice = parseFloat(numericValue[0]);
+    totalPrice = totalPrice * currentValue;
+
+    let totalPriceElement = document.getElementById('totalprice');
+    totalPriceElement.textContent = "Rs. " + totalPrice.toFixed(2);
 }
 
 
+function decrease() {
+    let quantityInput = document.getElementById('prodQuantity');
+    let currentValue = parseInt(quantityInput.value);
+
+    if (currentValue <= 1) {
+        alert('Minimum quantity should be 1.');
+    } else {
+        currentValue = currentValue - 1;
+        quantityInput.value = currentValue;
+
+        let productPriceElement = document.getElementById('price');
+        let numericValue = productPriceElement.textContent.match(/\d+(\.\d+)?/);
+        let unitPrice = parseFloat(numericValue[0]);
+
+        let totalPrice = unitPrice * currentValue;
+
+        let totalPriceElement = document.getElementById('totalprice');
+        totalPriceElement.textContent = "Rs. " + totalPrice.toFixed(2);
+    }
+}
+
+window.addEventListener('beforeunload', function (event) {
+    let textareaValue = document.getElementById('selectedProducts').value;
+    let totalBillValue = document.getElementById('totalbill').value;
+    localStorage.setItem('textareaValue', textareaValue);
+    localStorage.setItem('totalBillValue', totalBillValue);
+});
+
+window.addEventListener('DOMContentLoaded', function (event) {
+    let savedTextareaValue = localStorage.getItem('textareaValue');
+    let savedTotalBillValue = localStorage.getItem('totalBillValue');
+    if (savedTextareaValue) {
+        document.getElementById('selectedProducts').value = savedTextareaValue;
+    }
+    if (savedTotalBillValue) {
+        document.getElementById('totalbill').value = savedTotalBillValue;
+    }
+
+    window.addEventListener('keydown', function (event) {
+        if ((event.ctrlKey && event.shiftKey && event.keyCode === 82) || (event.ctrlKey && event.keyCode === 82)) {
+            document.getElementById('selectedProducts').value = '';
+            document.getElementById('totalbill').value = 0;
+            window.location.reload(true);
+        }
+    });
+});
 
 // function addOptionsToDropdownBurger(optionsArray, dropdown) {
 
@@ -178,90 +432,6 @@ function addOnsDropdown(optionsArray, dropdown) {
 //         dropdown.add(option);
 //     }
 // }
-
-// function add() {
-//     let productName = document.getElementById('prodName').textContent;
-//     let productPrice = document.getElementById('price').textContent.replace('Rs. ', '');
-//     let productSize = document.getElementById('prodVariation').value;
-//     let quantity = document.getElementById('prodQuantity').value;
-
-//     let totalPrice = parseFloat(productPrice) * parseInt(quantity);
-//     let productDetails = quantity + ' ' + productSize + ' ' + productName;
-//     let textarea = document.getElementById('selectedProducts');
-//     textarea.value += productDetails + '\n';
-
-//     let totalBillInput = document.getElementById('totalbill');
-//     let currentTotal = parseFloat(totalBillInput.value);
-//     let newTotal = currentTotal + totalPrice;
-//     totalBillInput.value = newTotal.toFixed(2);
-//     document.getElementById('prodQuantity').value = '1';
-//     closeAddToCart();
-// }
-
-// window.addEventListener('beforeunload', function (event) {
-//     let textareaValue = document.getElementById('selectedProducts').value;
-//     let totalBillValue = document.getElementById('totalbill').value;
-//     localStorage.setItem('textareaValue', textareaValue);
-//     localStorage.setItem('totalBillValue', totalBillValue);
-// });
-
-
-// window.addEventListener('DOMContentLoaded', function (event) {
-//     let savedTextareaValue = localStorage.getItem('textareaValue');
-//     let savedTotalBillValue = localStorage.getItem('totalBillValue');
-//     if (savedTextareaValue) {
-//         document.getElementById('selectedProducts').value = savedTextareaValue;
-//     }
-//     if (savedTotalBillValue) {
-//         document.getElementById('totalbill').value = savedTotalBillValue;
-//     }
-
-//     window.addEventListener('keydown', function (event) {
-//         if ((event.ctrlKey && event.shiftKey && event.keyCode === 82) || (event.ctrlKey && event.keyCode === 82)) {
-//             document.getElementById('selectedProducts').value = '';
-//             document.getElementById('totalbill').value = 0;
-//             window.location.reload(true);
-//         }
-//     });
-// });
-
-function increase() {
-    let quantityInput = document.getElementById('prodQuantity');
-    let currentValue = parseInt(quantityInput.value);
-    currentValue = currentValue + 1;
-    quantityInput.value = currentValue;
-
-    let totalPriceElement = document.getElementById('totalprice');
-    let numericValue = totalPriceElement.textContent.match(/\d+(\.\d+)?/);
-    let totalPrice = parseFloat(numericValue);
-
-    totalPrice = totalPrice * currentValue;
-    totalPriceElement.textContent = "Rs. " + totalPrice.toFixed(2);
-}
-
-function decrease() {
-    let quantityInput = document.getElementById('prodQuantity');
-    let currentValue = parseInt(quantityInput.value);
-
-    if (currentValue <= 1) {
-        alert('Minimum quantity should be 1.');
-    } else {
-        currentValue = currentValue - 1;
-        quantityInput.value = currentValue;
-
-        let totalPriceElement = document.getElementById('totalprice');
-        let numericValue = totalPriceElement.textContent.match(/\d+(\.\d+)?/);
-        let totalPrice = parseFloat(numericValue);
-
-        totalPrice = totalPrice / (currentValue + 1);
-        totalPriceElement.textContent = "Rs. " + totalPrice.toFixed(2);
-    }
-}
-
-
-
-
-
 
 /*
 function updateProductSizeDropdown(Product) {
@@ -306,4 +476,16 @@ function updateProductSizeDropdown(Product) {
         let foodProductSizes = ["Small", "Medium", "Large", "Extra Large", "Jumbo"];
         addOptionsToDropdown(foodProductSizes, productVariationDropdown);
     }
+
+     else if (product.category_name.toLowerCase() === "burger") {
+        document.getElementById('addOnsLabel').style.display = 'block'
+        document.getElementById("prodVariationLabel").style.display ='block';
+
+        allProducts.forEach(element => {
+            if (element.productName.toLowerCase() === product.productName.toLowerCase()) {
+                productVariations.push(`${element.productSize} (Rs. ${element.productPrice})`);
+                drinkFlavour.push(element.productName);
+            }
+        });
+        addOptionsToDropdown(productVariations, productVariationDropdown);
 }*/

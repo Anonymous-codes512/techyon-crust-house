@@ -268,7 +268,9 @@
                 let foodProductSizes = ["Small", "Regular", "Large","Party"];
                 addOptionsToDropdown(foodProductSizes, productSizeDropdown);
             } else if (category[1].toLowerCase() === "burger") {
-                productSizeDropdown.style.display = "none";
+                productSizeDropdown.style.display = "block";
+                let foodProductSizes = ["Burger", "Fries + Reg Drink"];
+                addOptionsToDropdown(foodProductSizes, productSizeDropdown);
             } else if (category[1].toLowerCase() === "others") {
                 productSizeDropdown.style.display = "none";
             } else {

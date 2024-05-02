@@ -32,7 +32,7 @@ class AuthController extends Controller
         $auth->email = $req->email;
         $auth->password = Hash::make($req->password);
         $auth->save();
-        
+
         return redirect()->route('viewLoginPage');
     }
 
@@ -46,18 +46,18 @@ class AuthController extends Controller
         $user = User::where('email', $request->email)->first();
 
         if ($user && Hash::check($request->password, $user->password)) {
-            if($user->role === 'owner' ){
+            if ($user->role === 'owner') {
                 session(['username' => $user->name]);
                 return redirect()->route('dashboard');
-            }
-            else if($user->role === 'admin' ){    
+            } else if ($user->role === 'admin') {
                 session(['username' => $user->name]);
                 return redirect()->route('admindashboard');
+            } else if ($user->role === 'salesman') {
+                session(['username' => $user->name]);
+                return redirect()->route('salesman_dashboard');
             }
         } else {
             return redirect()->back()->withErrors(['email' => 'Invalid credentials']);
         }
     }
 }
-
-

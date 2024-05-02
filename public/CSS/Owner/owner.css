@@ -158,7 +158,14 @@ header {
     font-family: "Poppins", sans-serif;
     font-size: 1.2vw;
 }
-
+.logout {
+    display: flex;
+    text-decoration: none;
+    color: #000;
+    font-size: 1.7vw;
+    align-items: center;
+    border-radius: 10%;
+}
 .notification {
     display: flex;
     align-items: center;

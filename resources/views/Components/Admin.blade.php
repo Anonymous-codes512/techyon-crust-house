@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -20,7 +21,7 @@
 
             <div class="menuList">
                 <i class='bx bx-menu' id="menuIcon" onclick="toggleMenu()"></i>
-                
+
                 <div class="menu" id="menu">
                     <div class="menuItems active" id="menu1">
                         <i class='bx bxs-dashboard'></i>
@@ -41,7 +42,7 @@
                         </a>
                     </div>
                     <div class="menuItems" id="menu3">
-                        <i class='bx bxs-dock-bottom bx-rotate-180' ></i>
+                        <i class='bx bxs-dock-bottom bx-rotate-180'></i>
                         <a href="{{ route('viewDealPage') }}" style="text-decoration: none;">
                             <p class="link">Deals</p>
                         </a>
@@ -88,13 +89,14 @@
                         <p class="profilename">{{ session('username') }}</p>
                     </div>
 
-                    <a href="" class="logout">
-                        <i class='bx bx-log-out-circle' title="logout"></i>
-                    </a>
 
                     <div class="notification">
                         <i class='bx bx-bell' title="notifications"></i>
                     </div>
+
+                    <a href="{{ route('logout') }}" class="logout">
+                        <i class='bx bx-log-out-circle' title="logout"></i>
+                    </a>
 
                     <div class="theme">
                         <i class='bx bx-moon' id="theme" title="theme change" onclick="toggleTheme()"></i>

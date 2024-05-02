@@ -10,6 +10,9 @@
 
 @section('main')
     <main id="salesman">
+        @php
+        $allProducts = $AllProducts;
+    @endphp
         <div id="productsSide">
             <div id="category_bar">
                 <a href="{{ route('salesman_dashboard') }}"> All</a>
@@ -33,7 +36,7 @@
                             @endphp
 
                             <div class="imgbox"
-                                onclick="showAddToCart({{ json_encode($product) }}, {{ json_encode($Products) }})">
+                                onclick="showAddToCart({{ json_encode($product) }}, {{ json_encode($allProducts) }})">
                                 <img src="{{ asset('Images/ProductImages/' . $product->productImage) }}" alt="Product">
                                 <p class="product_name">{{ $product->productName }}</p>
                                 <p class="product_price">From Rs. {{ $product->productPrice }}</p>
@@ -73,9 +76,11 @@
             <p id="prodPrice">Product Price <span id="price"></span></p>
             <p class="head1">Please Select</p>
 
+            <label id="addOnsLabel" for="addons"></label>
             <select name="addOn" id="addons">
             </select>
-
+            
+            <label id="prodVariationLabel" for="prodVariation"></label>
             <select name="prodVariation" id="prodVariation">
             </select>
 
