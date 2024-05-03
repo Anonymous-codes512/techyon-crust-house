@@ -11,8 +11,8 @@
 @section('main')
     <main id="salesman">
         @php
-        $allProducts = $AllProducts;
-    @endphp
+            $allProducts = $AllProducts;
+        @endphp
         <div id="productsSide">
             <div id="category_bar">
                 <a href="{{ route('salesman_dashboard') }}"> All</a>
@@ -28,7 +28,6 @@
                 @endphp
 
                 @if ($Products !== null)
-                    
                     @foreach ($Products as $product)
                         @if (!in_array($product->productName, $displayedProductNames))
                             @php
@@ -43,30 +42,28 @@
                             </div>
                         @endif
                     @endforeach
-                
                 @elseif ($Deals !== null)
-                
                     @foreach ($Deals as $deal)
                         <div class="imgbox" onclick="showAddToCart({{ json_encode($deal) }}, {{ json_encode($Deals) }})">
                             <img src="{{ asset('Images/DealImages/' . $deal->dealImage) }}" alt="Product">
                             <p class="product_name">{{ $deal->dealTitle }}</p>
                         </div>
                     @endforeach
-
                 @endif
             </div>
 
         </div>
         <div id="receipt">
             <h3 id="heading">Receipt</h3>
-            <form id="cart" action="{{ route('placeOrder') }}" method="POST" enctype="multipart/form-data">
+            <div id="cart" action="{{-- route('placeOrder') --}}" method="POST" enctype="multipart/form-data">
                 @csrf
-                <textarea id="selectedProducts" name="products" readonly></textarea>
+                <div id="selectedProducts" name="products"></div>
                 <input type="text" name="totalbill" id="totalbill" value="0" readonly>
                 <div id="buttons">
-                    <input type="submit" value="Proceed">
+                    <input type="submit" id="proceed" value="Proceed">
+                    <button type="button" onclick="printReceipt()">Print Receipt</button>
                 </div>
-            </form>
+            </div>
         </div>
 
         <div id="overlay"></div>
@@ -79,7 +76,7 @@
             <label id="addOnsLabel" for="addons"></label>
             <select name="addOn" id="addons">
             </select>
-            
+
             <label id="prodVariationLabel" for="prodVariation"></label>
             <select name="prodVariation" id="prodVariation">
             </select>
@@ -95,7 +92,7 @@
 
             <div id="buttons">
                 <button type="button" onclick="closeAddToCart()">close</button>
-                <button type="button" onclick="add()">Add</button>
+                <button type="button" onclick="add({{ json_encode($allProducts) }})">Add</button>
             </div>
         </div>
     </main>

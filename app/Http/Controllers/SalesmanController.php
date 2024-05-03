@@ -12,22 +12,43 @@ class SalesmanController extends Controller
     public function viewSalesmanDashboard()
     {
         $products = Product::all();
-        $category = Category::all();
+        $categories = Category::all();
         $deals = Deal::all();
-        return view('Sale Assistant.Dashboard')->with(['Products' => $products,'Deals' => $deals, 'Categories' => $category, 'AllProducts' => $products]);
+      
+        $filteredCategories = $categories->reject(function ($category) {
+            return $category->categoryName === 'Addons';
+        });
+    
+        $filteredProducts = $products->reject(function ($product) {
+            return $product->category_name === 'Addons';
+        });
+    
+        return view('Sale Assistant.Dashboard')->with([
+            'Products' => $filteredProducts,
+            'Deals' => $deals,
+            'Categories' => $filteredCategories,
+            'AllProducts' => $products,
+        ]);
     }
-
+    
     public function salesmanCategoryDashboard($categoryName)
     {
         $categories = Category::all();
         $allProducts = Product::all();
-    
-        if ($categoryName == 'Deals') {
-            $deals = $this->deals();
-            return view('Sale Assistant.Dashboard')->with(['Products' => null, 'Deals' => $deals, 'Categories' => $categories, 'AllProducts' => $allProducts]);
-        } else {
-            $products = Product::where('category_name', $categoryName)->get();
-            return view('Sale Assistant.Dashboard')->with(['Products' => $products, 'Categories' => $categories, 'AllProducts' => $allProducts]);
+
+        $filteredCategories = $categories->reject(function ($category) {
+            return $category->categoryName === 'Addons';
+        });
+
+        if($categoryName != 'Addons'){
+
+            if ($categoryName == 'Deals') {
+                $deals = $this->deals();
+                return view('Sale Assistant.Dashboard')->with(['Products' => null, 'Deals' => $deals, 'Categories' => $filteredCategories, 'AllProducts' => $allProducts]);
+            } else {
+                $products = Product::where('category_name', $categoryName)->get();
+                return view('Sale Assistant.Dashboard')->with(['Products' => $products, 'Categories' => $filteredCategories, 'AllProducts' => $allProducts]);
+            }
         }
     }
     
@@ -36,7 +57,6 @@ class SalesmanController extends Controller
         $deals = Deal::all();
         return $deals;
     }
-
 
     public function placeOrder(Request $request)
     {

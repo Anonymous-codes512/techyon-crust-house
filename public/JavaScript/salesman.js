@@ -10,21 +10,9 @@ function showAddToCart(product, allProducts) {
         document.getElementById('totalprice').textContent = 'Rs. ' + product.productPrice;
 
         if (product.category_name.toLowerCase() != 'others') {
-
-            // if(product.category_name.toLowerCase() == 'burger') {
-            //     let name = document.getElementById("prodName");
-            //     name.textContent = product.productName;
-            //     document.getElementById('addons').style.display = 'none';
-            //     document.getElementById('addOnsLabel').style.display = 'none'
-            //     document.getElementById("prodVariation").style.display = 'none';
-            //     document.getElementById('prodVariationLabel').style.display = 'none'
-
-            // }else{
-
             document.getElementById("prodVariation").style.display = 'block';
             document.getElementById('addons').style.display = 'block';
             updateProductSizeDropdown(product, allProducts);
-            // }
 
         } else {
 
@@ -41,7 +29,6 @@ function showAddToCart(product, allProducts) {
         document.getElementById('prodName').textContent = product.dealTitle;
         document.getElementById('price').textContent = 'Rs. ' + product.dealDiscountedPrice;
         document.getElementById('totalprice').textContent = 'Rs. ' + product.dealDiscountedPrice;
-        // document.getElementById("prodVariation").style.display = 'none';
     }
 
     overlay.style.display = 'block';
@@ -59,8 +46,7 @@ function closeAddToCart() {
 }
 
 function updateProductSizeDropdown(product, allProducts) {
-    console.log(product);
-    console.log(allProducts);
+
     let productVariationDropdown = document.getElementById("prodVariation");
     let drinkFlavourDropdown = document.getElementById("addons");
     productVariationDropdown.innerHTML = "";
@@ -207,11 +193,11 @@ function addOnsDropdown(optionsArray, dropdown) {
         let totalPriceElement = document.getElementById('totalprice');
         let match = selectedOption.value.match(/Rs\. (\d+)/);
         let price = match ? match[1] : 0;
-        
+
         if (selectedOption.value == '') {
             price = 0;
         }
-        
+
         let variationprice = document.getElementById('prodVariation');
         let match1 = variationprice.value.match(/Rs\. (\d+)/);
         let price1 = match1 ? match1[1] : 0;
@@ -280,11 +266,11 @@ function addOnsDropdownBurger(optionsArray, dropdown) {
         let totalPriceElement = document.getElementById('totalprice');
         let match = selectedOption.value.match(/Rs\. (\d+)/);
         let price = match ? match[1] : 0;
-        
+
         if (selectedOption.value == '') {
             price = 0;
         }
-        
+
         let variationprice = document.getElementById('prodVariation');
         let match1 = variationprice.value.match(/Rs\. (\d+)/);
         let price1 = match1 ? match1[1] : 0;
@@ -295,46 +281,123 @@ function addOnsDropdownBurger(optionsArray, dropdown) {
     });
 }
 
-function add() {
+let allAddedProducts = [];
+
+function add(allProducts) {
     let productName = document.getElementById('prodName').textContent;
-    product = productName.split(" ");
-    prod = product[0];
+    let product = productName.split(" ");
+    let prod = product[0];
     productName = productName.replace(prod, "");
 
     let productVariation = document.getElementById('prodVariation').value;
     let addOns = document.getElementById('addons').value;
-
-    let productPrice = document.getElementById('totalprice').textContent.replace('Rs. ', '');
+    let productPrice = parseFloat(document.getElementById('totalprice').textContent.replace('Rs. ', ''));
     let quantity = document.getElementById('prodQuantity').value;
 
     let extractedText;
 
-    let totalPrice = parseFloat(productPrice) * parseInt(quantity);
-    let totalBillInput = document.getElementById('totalbill').value;
-    let currentTotal = parseFloat(totalBillInput);
-    let newTotal = currentTotal + totalPrice;
-    totalBillInput.value = newTotal.toFixed(2);
-    alert(totalBillInput);
-    let textarea = document.getElementById('selectedProducts');
+    // let productObj = {
+    //     name: productName,
+    //     variation: productVariation.replace(/\s+/g, ''),
+    //     addons: addOns.replace(/\s*\(Rs\.\s*\d+\)\s*/, ""),
+    //     price: productPrice,
+    //     quantity: quantity.replace(/\s+/g, ' ')
+    // };
+
+
+    // allAddedProducts.push(productObj);
+
+    let pTag = document.createElement('p');
+    pTag.style.borderBottom = '1px solid #000';
+    let textarea = document.createElement('textarea');
+    textarea.name = "product";
+    textarea.readOnly = true;
+    textarea.style.resize = 'none';
+    textarea.rows = '3';
+    textarea.cols = '4';
+    textarea.style.width = "95%";
+    textarea.style.height = "auto";
+    textarea.style.border = 'none';
+
+    let divQuantity = document.createElement('div');
+    divQuantity.style.display = "flex";
+    divQuantity.style.alignItems = "center";
+    divQuantity.style.marginBottom = "5px";
+
+    let decreaseIcon = document.createElement('i');
+    decreaseIcon.style.fontSize = '2.5vw';
+    decreaseIcon.style.color = '#d40000';
+    decreaseIcon.className = 'bx bxs-checkbox-minus';
+    decreaseIcon.setAttribute('onclick', 'decrease()');
+
+    let quantityInput = document.createElement('input');
+    quantityInput.type = 'number';
+    quantityInput.name = 'prodQuantity';
+    quantityInput.id = 'prodQuantity';
+    quantityInput.style.width = '30px';
+    quantityInput.style.textAlign = 'center';
+    quantityInput.value = quantity;
+
+    let increaseIcon = document.createElement('i');
+    increaseIcon.style.fontSize = '2vw';
+    increaseIcon.style.color = '#d40000';
+    increaseIcon.className = 'bx bxs-plus-square';
+    increaseIcon.setAttribute('onclick', 'increase()');
+
+    divQuantity.appendChild(decreaseIcon);
+    divQuantity.appendChild(quantityInput);
+    divQuantity.appendChild(increaseIcon);
+
+    pTag.appendChild(textarea);
+    pTag.appendChild(divQuantity);
+
+    document.getElementById('selectedProducts').appendChild(pTag);
 
     if (!addOns) {
-        let productDetails = quantity + ' ' + productVariation + ' ' + productName;
+        let productDetails = quantity.replace(/\s+/g, ' ') + ' ' + productVariation.replace(/\s+/g, '') + productName;
         extractedText = productDetails.replace(/\(.*?\)/, '');
         extractedText = extractedText.trim();
 
     } else {
-        let productDetails = quantity + ' ' + productVariation + ' ' + addOns;
+        let productDetails = quantity.replace(/\s+/g, ' ') + ' ' + productVariation.replace(/\s+/g, '') + productName + ' with extra ' + addOns.replace(/\s*\(Rs\.\s*\d+\)\s*/, "");
+        allProducts.forEach(element => {
+            if (element.productName == addOns) {
+                if (element.category_name.toLowerCase() == 'drinks') {
+                    productName = addOns;
+                    productDetails = quantity.replace(/\s+/g, ' ') + ' ' + productVariation.replace(/\s+/g, '') + ' ' + addOns;
+                }
+            }
+        });
         extractedText = productDetails.replace(/\(.*?\)/, '');
         extractedText = extractedText.trim();
 
     }
 
-    let Name = productName;
-    textarea.value += Name + '\n' + extractedText + '\t' + productPrice + '\n';
+    textarea.textContent = productName.replace(/^ /, "") + '\n' + extractedText;
+    extractedText = '';
+    let totalSpan = document.createElement('span');
+    totalSpan.style.marginLeft = '3rem';
+    totalSpan.style.fontSize = '0.8rem';
+    totalSpan.textContent = 'Total: Rs. ' + productPrice.toFixed(2);
+    divQuantity.appendChild(totalSpan);
 
-    document.getElementById('prodQuantity').value = '1';
+    let totalBillString = document.getElementById('totalbill').value;
+    let totalBillValue;
+    
+    if (totalBillString.startsWith("Total Bill:")) {
+        totalBillValue = parseFloat(totalBillString.split("Rs. ")[1]);
+    } else {
+        totalBillValue = parseFloat(totalBillString);
+    }
+    
+    let currentTotal = totalBillValue + productPrice;    
+    document.getElementById('totalbill').value = "Total Bill:\t\t Rs. " + currentTotal.toFixed(2);
 
     closeAddToCart();
+
+    document.getElementById('prodVariation').value = '';
+    document.getElementById('addons').value = '';
+    document.getElementById('prodQuantity').value = '1';
 }
 
 function increase() {
@@ -351,7 +414,6 @@ function increase() {
     let totalPriceElement = document.getElementById('totalprice');
     totalPriceElement.textContent = "Rs. " + totalPrice.toFixed(2);
 }
-
 
 function decrease() {
     let quantityInput = document.getElementById('prodQuantity');
@@ -374,20 +436,91 @@ function decrease() {
     }
 }
 
+function printReceipt() {
+    let heading = document.getElementById('heading').cloneNode(true);
+    let selectedProducts = document.getElementById('selectedProducts').cloneNode(true);
+    let totalbill = document.getElementById('totalbill').cloneNode(true);
+    totalbill.style.fontSize = '3vw';
+    document.body.querySelectorAll('*').forEach(element => {
+        if ((element.id !== 'heading') && (element.id !== 'selectedProducts') && (element.id !== 'totalbill')) {
+            element.style.display = 'none';
+        }
+    });
+    document.body.appendChild(heading);
+    document.body.appendChild(selectedProducts);
+    document.body.appendChild(totalbill);
+    window.print();
+    heading.remove();
+    selectedProducts.remove();
+    totalbill.remove();
+    document.body.querySelectorAll('*').forEach(element => {
+        element.style.display = '';
+    });
+}
+
+// document.getElementById('proceed').addEventListener('click',()=>{
+//     console.log(allAddedProducts);
+
+// })
+
+/*
+function add() {
+    let productName = document.getElementById('prodName').textContent;
+    let product = productName.split(" ");
+    let prod = product[0];
+    productName = productName.replace(prod, "");
+
+    let productVariation = document.getElementById('prodVariation').value;
+    let addOns = document.getElementById('addons').value;
+
+    let productPrice = document.getElementById('totalprice').textContent.replace('Rs. ', '');
+    let quantity = document.getElementById('prodQuantity').value;
+
+    let extractedText;
+
+    let totalPrice = parseFloat(productPrice) * parseInt(quantity);
+    let totalBillInput = document.getElementById('totalbill');
+    let currentTotal = parseFloat(totalBillInput.value);
+    let newTotal = currentTotal + totalPrice;
+    totalBillInput.value = newTotal.toFixed(2);
+    alert(totalBillInput.value);
+    let textarea = document.getElementById('selectedProducts');
+
+    if (!addOns) {
+        let productDetails = quantity + ' ' + productVariation + ' ' + productName;
+        extractedText = productDetails.replace(/\(.*?\)/, '');
+        extractedText = extractedText.trim();
+
+    } else {
+        let productDetails = quantity + ' ' + productVariation + ' ' + addOns;
+        extractedText = productDetails.replace(/\(.*?\)/, '');
+        extractedText = extractedText.trim();
+
+    }
+
+    let Name = productName;
+    textarea.value += Name + '\n' + extractedText + '\t' + productPrice + '\n';
+
+    document.getElementById('prodQuantity').value = '1';
+
+    closeAddToCart();
+}
+ */
+
+/*
 window.addEventListener('beforeunload', function (event) {
     let textareaValue = document.getElementById('selectedProducts').value;
     let totalBillValue = document.getElementById('totalbill').value;
     localStorage.setItem('textareaValue', textareaValue);
     localStorage.setItem('totalBillValue', totalBillValue);
-});
 
 window.addEventListener('DOMContentLoaded', function (event) {
-    let savedTextareaValue = localStorage.getItem('textareaValue');
+        let savedTextareaValue = localStorage.getItem('textareaValue');
     let savedTotalBillValue = localStorage.getItem('totalBillValue');
     if (savedTextareaValue) {
-        document.getElementById('selectedProducts').value = savedTextareaValue;
-    }
-    if (savedTotalBillValue) {
+            document.getElementById('selectedProducts').value = savedTextareaValue;
+        }
+        if (savedTotalBillValue) {
         document.getElementById('totalbill').value = savedTotalBillValue;
     }
 
@@ -398,42 +531,42 @@ window.addEventListener('DOMContentLoaded', function (event) {
             window.location.reload(true);
         }
     });
-});
-
-// function addOptionsToDropdownBurger(optionsArray, dropdown) {
-
-//     let defaultOption = document.createElement("option");
-//     defaultOption.disabled = true;
-//     defaultOption.selected = true;
-//     defaultOption.text = "Combo";
-//     dropdown.add(defaultOption);
-
-//     for (let i = 0; i < optionsArray.length; i++) {
-//         let option = document.createElement("option");
-//         option.text = optionsArray[i];
-//         option.value = optionsArray[i];
-//         dropdown.add(option);
-//     }
-// }
-
-// function addOnsDropdownBurger(optionsArray, dropdown) {
-
-//     let defaultvariation = document.createElement("option");
-//     defaultvariation.disabled = true;
-//     defaultvariation.selected = true;
-//     defaultvariation.text = "Add On";
-//     defaultvariation.value = '';
-//     dropdown.add(defaultvariation);
-
-//     for (let i = 0; i < optionsArray.length; i++) {
-//         let option = document.createElement("option");
-//         option.text = optionsArray[i];
-//         option.value = optionsArray[i];
-//         dropdown.add(option);
-//     }
-// }
+});*/
 
 /*
+function addOptionsToDropdownBurger(optionsArray, dropdown) {
+
+    let defaultOption = document.createElement("option");
+    defaultOption.disabled = true;
+    defaultOption.selected = true;
+    defaultOption.text = "Combo";
+    dropdown.add(defaultOption);
+
+    for (let i = 0; i < optionsArray.length; i++) {
+        let option = document.createElement("option");
+        option.text = optionsArray[i];
+        option.value = optionsArray[i];
+        dropdown.add(option);
+    }
+}
+
+function addOnsDropdownBurger(optionsArray, dropdown) {
+
+    let defaultvariation = document.createElement("option");
+    defaultvariation.disabled = true;
+    defaultvariation.selected = true;
+    defaultvariation.text = "Add On";
+    defaultvariation.value = '';
+    dropdown.add(defaultvariation);
+
+    for (let i = 0; i < optionsArray.length; i++) {
+        let option = document.createElement("option");
+        option.text = optionsArray[i];
+        option.value = optionsArray[i];
+        dropdown.add(option);
+    }
+}
+
 function updateProductSizeDropdown(Product) {
 
     let productVariationDropdown = document.getElementById("prodVariation");
@@ -475,9 +608,7 @@ function updateProductSizeDropdown(Product) {
         addons.style.display = 'block';
         let foodProductSizes = ["Small", "Medium", "Large", "Extra Large", "Jumbo"];
         addOptionsToDropdown(foodProductSizes, productVariationDropdown);
-    }
-
-     else if (product.category_name.toLowerCase() === "burger") {
+    } else if (product.category_name.toLowerCase() === "burger") {
         document.getElementById('addOnsLabel').style.display = 'block'
         document.getElementById("prodVariationLabel").style.display ='block';
 
@@ -487,5 +618,5 @@ function updateProductSizeDropdown(Product) {
                 drinkFlavour.push(element.productName);
             }
         });
-        addOptionsToDropdown(productVariations, productVariationDropdown);
+    addOptionsToDropdown(productVariations, productVariationDropdown);
 }*/

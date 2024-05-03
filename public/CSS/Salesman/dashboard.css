@@ -94,20 +94,22 @@
 #cart{
     display: flex;
     flex-direction: column;
-    min-height: 90%;
-    margin:1vw 0.3vw;
+    height: 92%;
+    margin:0.3vw;
     border-radius: 07px;
 }
 
-#selectedProducts{
+#selectedProducts {
     border: none;
     min-height: 78%;
-    margin:0.3vw;
+    margin: 0 0.3vw;
     padding: 0.5vw;
-    border-radius: 07px;
-    resize: none;
-    cursor :default;
+    border-radius: 7px;
+    border: 1px solid #000;
     background-color: #efefef;
+    overflow: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #999 transparent;
 }
 
 #totalbill{
