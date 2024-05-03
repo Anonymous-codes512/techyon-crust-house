@@ -55,7 +55,7 @@
         </div>
         <div id="receipt">
             <h3 id="heading">Receipt</h3>
-            <div id="cart" action="{{-- route('placeOrder') --}}" method="POST" enctype="multipart/form-data">
+            <form id="cart" action="{{ route('placeOrder') }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 <div id="selectedProducts" name="products"></div>
                 <input type="text" name="totalbill" id="totalbill" value="0" readonly>
@@ -63,7 +63,7 @@
                     <input type="submit" id="proceed" value="Proceed">
                     <button type="button" onclick="printReceipt()">Print Receipt</button>
                 </div>
-            </div>
+            </form>
         </div>
 
         <div id="overlay"></div>

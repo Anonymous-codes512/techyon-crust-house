@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Models\Deal;
+use App\Models\Order;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Termwind\Components\Element;
 
 class SalesmanController extends Controller
 {
@@ -14,15 +16,15 @@ class SalesmanController extends Controller
         $products = Product::all();
         $categories = Category::all();
         $deals = Deal::all();
-      
+
         $filteredCategories = $categories->reject(function ($category) {
             return $category->categoryName === 'Addons';
         });
-    
+
         $filteredProducts = $products->reject(function ($product) {
             return $product->category_name === 'Addons';
         });
-    
+
         return view('Sale Assistant.Dashboard')->with([
             'Products' => $filteredProducts,
             'Deals' => $deals,
@@ -30,7 +32,7 @@ class SalesmanController extends Controller
             'AllProducts' => $products,
         ]);
     }
-    
+
     public function salesmanCategoryDashboard($categoryName)
     {
         $categories = Category::all();
@@ -40,7 +42,7 @@ class SalesmanController extends Controller
             return $category->categoryName === 'Addons';
         });
 
-        if($categoryName != 'Addons'){
+        if ($categoryName != 'Addons') {
 
             if ($categoryName == 'Deals') {
                 $deals = $this->deals();
@@ -51,7 +53,7 @@ class SalesmanController extends Controller
             }
         }
     }
-    
+
     public function deals()
     {
         $deals = Deal::all();
@@ -60,6 +62,22 @@ class SalesmanController extends Controller
 
     public function placeOrder(Request $request)
     {
-        dd($request->all());
+        $totalBill = preg_replace('/[^0-9.]/', '',$request->totalbill);
+        $totalBill = preg_replace('/^[.]+/', '', $totalBill);
+     
+        $productsArray = [];
+        $index = 1;
+        while ($request->has("product$index")) {
+            $product = json_decode($request->input("product$index"), true);
+            $productsArray[] = $product;
+            $index++;
+        }
+
+        $newOrder = new Order();
+        $newOrder->total_bill_amount = $totalBill;
+        $newOrder->products = $productsArray;
+        $newOrder->save();
+
+        return redirect()->back();
     }
 }
