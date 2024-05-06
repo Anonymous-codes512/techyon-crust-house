@@ -196,14 +196,14 @@
     font-size: 1vw;
 }
 
-#prodVariation, #addons{
+#prodVariation, #addons, #drinkFlavour{
     margin: 10px 0.5vw;
     margin-top: 0;
     border: none;
     border-bottom: 1px solid #000;
 }
 
-#addOnsLabel, #prodVariationLabel{
+#addOnsLabel, #prodVariationLabel ,#drinkFlavourLabel{
     margin: 0 .5vw;
     font-size: 1vw;
 }
@@ -224,7 +224,6 @@
 }
 
 #quantity i{
-    /* margin: 0 1vw; */
     font-size: 2.5vw;
     color: #d40000;
 }

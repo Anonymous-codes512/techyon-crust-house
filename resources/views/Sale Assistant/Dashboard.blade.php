@@ -44,7 +44,7 @@
                     @endforeach
                 @elseif ($Deals !== null)
                     @foreach ($Deals as $deal)
-                        <div class="imgbox" onclick="showAddToCart({{ json_encode($deal) }}, {{ json_encode($Deals) }})">
+                        <div class="imgbox" onclick="showAddToCart({{ json_encode($deal) }}, {{ json_encode($allProducts) }})">
                             <img src="{{ asset('Images/DealImages/' . $deal->dealImage) }}" alt="Product">
                             <p class="product_name">{{ $deal->dealTitle }}</p>
                         </div>
@@ -79,6 +79,10 @@
 
             <label id="prodVariationLabel" for="prodVariation"></label>
             <select name="prodVariation" id="prodVariation">
+            </select>
+            
+            <label id="drinkFlavourLabel" for="drinkFlavour"></label>
+            <select name="drinkFlavour" id="drinkFlavour">
             </select>
 
             <div id="quantity">

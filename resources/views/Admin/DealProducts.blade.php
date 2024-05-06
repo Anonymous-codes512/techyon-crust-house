@@ -117,6 +117,7 @@
                 productsDetails.forEach((product, index) => {
                     const prod_div = document.createElement("div");
                     const label_name = document.createElement("label");
+                    const size_input = document.createElement("input");
                     const name_input = document.createElement("input");
                     const label_quantity = document.createElement("label");
                     const quantity_input = document.createElement("input");
@@ -131,9 +132,15 @@
                     label_name.textContent = "Product Name:";
                     label_name.style.marginRight = '5px';
 
+                    size_input.type = "hidden";
+                    size_input.style.margin = '5px';
+                    size_input.value = product.size;
+                    size_input.readOnly = true;
+                    size_input.name = 'product_variation_' + index;
+
                     name_input.type = "text";
                     name_input.style.margin = '5px';
-                    name_input.value = product.size + " " + product.name;
+                    name_input.value = product.name;
                     name_input.readOnly = true;
                     name_input.name = 'product_name_' + index;
 

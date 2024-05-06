@@ -225,7 +225,7 @@ class AdminController extends Controller
 
     public function createDealProducts(Request $request)
     {
-
+        dd($request->all());
         $productNames = '';
         $productQuantities = '';
         $productPrices = '';
@@ -289,7 +289,6 @@ class AdminController extends Controller
 
     public function updateDealProducts(Request $request)
     {
-
         $productNames = '';
         $productQuantities = '';
         $productPrices = '';

@@ -1,6 +1,7 @@
 function showAddToCart(product, allProducts) {
     let overlay = document.getElementById('overlay');
     let popup = document.getElementById('addToCart');
+    document.getElementById('drinkFlavour').style.display = 'none'
 
     if (product.category_name) {
 
@@ -29,6 +30,9 @@ function showAddToCart(product, allProducts) {
         document.getElementById('prodName').textContent = product.dealTitle;
         document.getElementById('price').textContent = 'Rs. ' + product.dealDiscountedPrice;
         document.getElementById('totalprice').textContent = 'Rs. ' + product.dealDiscountedPrice;
+        document.getElementById('drinkFlavour').style.display = 'block'
+        updateDealsDropdown(product, allProducts);
+
     }
 
     overlay.style.display = 'block';
@@ -44,6 +48,30 @@ function closeAddToCart() {
     overlay.style.display = 'none';
     popup.style.display = 'none';
 }
+
+function updateDealsDropdown(deals, allProducts) {
+    let pizzaFlavour = document.getElementById("addons");
+    let drinkFlavour = document.getElementById("drinkFlavour");
+    let addOns = document.getElementById("prodVariation");
+
+    pizzaFlavour.innerHTML = "";
+    drinkFlavour.innerHTML = "";
+    addOns.innerHTML = "";
+
+    let dealProducts = deals.dealProductName.split(',');
+    // console.log(deals);
+    dealProducts.forEach(product => {
+        prod = product.split(' ');
+        let lastTwo = prod.slice(-2).join(' ');
+        
+        let middle = prod.slice(0);
+
+        // console.log(prod)
+        // console.log(lastTwo);
+        console.log(middle);
+    })
+}
+
 
 function updateProductSizeDropdown(product, allProducts) {
 
@@ -289,14 +317,14 @@ function add(allProducts) {
     let product = productName.split(" ");
     let prod = product[0];
     productName = productName.replace(prod, "");
-    
+
     let productVariation = document.getElementById('prodVariation').value;
     let addOns = document.getElementById('addons').value;
     let productPrice = parseFloat(document.getElementById('totalprice').textContent.replace('Rs. ', ''));
     let quantity = document.getElementById('prodQuantity').value;
-    
+
     let extractedText;
-    
+
     let variationName = (productVariation && productVariation.match(/^[^\(]+/)) ? productVariation.match(/^[^\(]+/)[0].trim() : '';
     let productObj = {
         name: productName,
@@ -305,18 +333,16 @@ function add(allProducts) {
         price: productPrice,
         quantity: quantity.replace(/\s+/g, ' ')
     };
-    
-    
+
+
     allAddedProducts.push(productObj);
 
-    console.log(productObj)
-    
     let hiddenInput = document.createElement('input');
     hiddenInput.type = 'hidden';
     hiddenInput.name = 'product' + index;
     hiddenInput.value = JSON.stringify(productObj);
     document.getElementById('cart').appendChild(hiddenInput);
-    
+
     let pTag = document.createElement('p');
     pTag.style.borderBottom = '1px solid #000';
     let textarea = document.createElement('textarea');
@@ -332,40 +358,40 @@ function add(allProducts) {
     divQuantity.style.display = "flex";
     divQuantity.style.alignItems = "center";
     divQuantity.style.marginBottom = "5px";
-    
+
     let decreaseIcon = document.createElement('i');
     decreaseIcon.style.fontSize = '2.5vw';
     decreaseIcon.style.color = '#d40000';
     decreaseIcon.className = 'bx bxs-checkbox-minus';
     decreaseIcon.setAttribute('onclick', 'decrease()');
-    
+
     let quantityInput = document.createElement('input');
     quantityInput.type = 'number';
     quantityInput.id = 'prodQuantity';
     quantityInput.style.width = '30px';
     quantityInput.style.textAlign = 'center';
     quantityInput.value = quantity;
-    
+
     let increaseIcon = document.createElement('i');
     increaseIcon.style.fontSize = '2vw';
     increaseIcon.style.color = '#d40000';
     increaseIcon.className = 'bx bxs-plus-square';
     increaseIcon.setAttribute('onclick', 'increase()');
-    
+
     divQuantity.appendChild(decreaseIcon);
     divQuantity.appendChild(quantityInput);
     divQuantity.appendChild(increaseIcon);
-    
+
     pTag.appendChild(textarea);
     pTag.appendChild(divQuantity);
-    
+
     document.getElementById('selectedProducts').appendChild(pTag);
-    
+
     if (!addOns) {
         let productDetails = quantity.replace(/\s+/g, ' ') + ' ' + productVariation.replace(/\s+/g, '') + productName;
         extractedText = productDetails.replace(/\(.*?\)/, '');
         extractedText = extractedText.trim();
-        
+
     } else {
         let productDetails = quantity.replace(/\s+/g, ' ') + ' ' + productVariation.replace(/\s+/g, '') + productName + ' with extra ' + addOns.replace(/\s*\(Rs\.\s*\d+\)\s*/, "");
         allProducts.forEach(element => {
@@ -378,9 +404,9 @@ function add(allProducts) {
         });
         extractedText = productDetails.replace(/\(.*?\)/, '');
         extractedText = extractedText.trim();
-        
+
     }
-    
+
     textarea.textContent = productName.replace(/^ /, "") + '\n' + extractedText;
     extractedText = '';
     let totalSpan = document.createElement('span');
@@ -388,21 +414,21 @@ function add(allProducts) {
     totalSpan.style.fontSize = '0.8rem';
     totalSpan.textContent = 'Total: Rs. ' + productPrice.toFixed(2);
     divQuantity.appendChild(totalSpan);
-    
+
     let totalBillString = document.getElementById('totalbill').value;
     let totalBillValue;
-    
+
     if (totalBillString.startsWith("Total Bill:")) {
         totalBillValue = parseFloat(totalBillString.split("Rs. ")[1]);
     } else {
         totalBillValue = parseFloat(totalBillString);
     }
-    
-    let currentTotal = totalBillValue + productPrice;    
+
+    let currentTotal = totalBillValue + productPrice;
     document.getElementById('totalbill').value = "Total Bill:\t\t Rs. " + currentTotal.toFixed(2);
     index++;
     closeAddToCart();
-    
+
     document.getElementById('prodVariation').value = '';
     document.getElementById('addons').value = '';
     document.getElementById('prodQuantity').value = '1';
@@ -422,7 +448,7 @@ function add(allProducts) {
 //     let extractedText;
 
 //     let productObj = {
-    //         name: productName,
+//         name: productName,
 //         variation: productVariation.replace(/\s+/g, ''),
 //         addons: addOns.replace(/\s*\(Rs\.\s*\d+\)\s*/, ""),
 //         price: productPrice,
@@ -508,13 +534,13 @@ function add(allProducts) {
 
 //     let totalBillString = document.getElementById('totalbill').value;
 //     let totalBillValue;
-    
+
 //     if (totalBillString.startsWith("Total Bill:")) {
 //         totalBillValue = parseFloat(totalBillString.split("Rs. ")[1]);
 //     } else {
 //         totalBillValue = parseFloat(totalBillString);
 //     }
-    
+
 //     let currentTotal = totalBillValue + productPrice;    
 //     document.getElementById('totalbill').value = "Total Bill:\t\t Rs. " + currentTotal.toFixed(2);
 
@@ -583,7 +609,7 @@ function printReceipt() {
     });
 }
 
-document.getElementById('proceed').addEventListener('click',()=>{
+document.getElementById('proceed').addEventListener('click', () => {
     console.log(allAddedProducts);
 
 })
