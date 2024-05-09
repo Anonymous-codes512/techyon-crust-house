@@ -100,11 +100,10 @@
                 let sizeArray = sizes.split(',').filter(Boolean);
                 let prices = document.getElementById('price').value;
                 let priceArray = prices.split(',').filter(Boolean);
-
                 container.innerHTML = '';
-
+                
                 let productsDetails = [];
-
+                
                 for (let i = 0; i < productNameArray.length; i++) {
                     let product = {
                         name: productNameArray[i],
@@ -113,6 +112,7 @@
                     };
                     productsDetails.push(product);
                 }
+                alert(sizeArray);
 
                 productsDetails.forEach((product, index) => {
                     const prod_div = document.createElement("div");
@@ -132,7 +132,7 @@
                     label_name.textContent = "Product Name:";
                     label_name.style.marginRight = '5px';
 
-                    size_input.type = "hidden";
+                    size_input.type = "text";
                     size_input.style.margin = '5px';
                     size_input.value = product.size;
                     size_input.readOnly = true;
@@ -167,6 +167,7 @@
                     total_price_input.name = 'product_total_price_' + index;
 
                     prod_div.appendChild(label_name);
+                    prod_div.appendChild(size_input);
                     prod_div.appendChild(name_input);
                     prod_div.appendChild(label_quantity);
                     prod_div.appendChild(quantity_input);

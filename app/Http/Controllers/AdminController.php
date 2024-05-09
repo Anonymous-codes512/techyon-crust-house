@@ -225,38 +225,44 @@ class AdminController extends Controller
 
     public function createDealProducts(Request $request)
     {
-        dd($request->all());
+        // dd($request->all());
         $productNames = '';
+        $productVariations = '';
         $productQuantities = '';
         $productPrices = '';
-
+        
         $index = 0;
-
+        
         while ($request->has("product_name_{$index}")) {
             $productName = $request->input("product_name_{$index}");
+            $productVariation = $request->input("product_variation_{$index}");
             $productQuantity = $request->input("product_quantity_{$index}");
             $productPrice = $request->input("product_total_price_{$index}");
-
-            $productNames .= $productName . ', ';
-            $productQuantities .= $productQuantity . ', ';
-            $productPrices .= $productPrice . ', ';
+        
+            $productNames .= $productName . ',';
+            $productVariations .= $productVariation . ',';
+            $productQuantities .= $productQuantity . ',';
+            $productPrices .= $productPrice . ',';
+            
             $index++;
         }
-
-        $productNames = rtrim($productNames, ', ');
-        $productQuantities = rtrim($productQuantities, ', ');
-        $productPrices = rtrim($productPrices, ', ');
-
-
+        
+        $productNames = rtrim($productNames, ',');
+        $productVariations = rtrim($productVariations, ',');
+        $productQuantities = rtrim($productQuantities, ',');
+        $productPrices = rtrim($productPrices, ',');
+        
         $currentDealPrice = $request->input('currentDealPrice');
         $dealFinalPrice = $request->input('dealFinalPrice') . " " . "Pkr";
 
         $deal = Deal::find($request->id);
         $deal->dealProductName = $productNames;
+        $deal->dealProductVariation = $productVariations;
         $deal->dealProductQuantity = $productQuantities;
         $deal->dealProductPrice = $productPrices;
         $deal->dealActualPrice = $currentDealPrice;
         $deal->dealDiscountedPrice = $dealFinalPrice;
+
         $deal->save();
 
         return redirect()->route('viewDealPage');
