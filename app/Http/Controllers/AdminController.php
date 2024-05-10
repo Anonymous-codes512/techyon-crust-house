@@ -7,8 +7,10 @@ use App\Models\Deal;
 use App\Models\Product;
 use App\Models\Recipe;
 use App\Models\Stock;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Hash;
 
 class AdminController extends Controller
 {
@@ -129,7 +131,10 @@ class AdminController extends Controller
         $product->productPrice = $request->productPrice;
         $product->category_id = $categoryId;
         $product->category_name = $categoryName;
+
         $product->save();
+        // dd($product->category->id);
+
 
         return redirect()->route('viewProductPage');
     }
@@ -225,33 +230,33 @@ class AdminController extends Controller
 
     public function createDealProducts(Request $request)
     {
-        // dd($request->all());
+        dd($request->all());
         $productNames = '';
         $productVariations = '';
         $productQuantities = '';
         $productPrices = '';
-        
+
         $index = 0;
-        
+
         while ($request->has("product_name_{$index}")) {
             $productName = $request->input("product_name_{$index}");
             $productVariation = $request->input("product_variation_{$index}");
             $productQuantity = $request->input("product_quantity_{$index}");
             $productPrice = $request->input("product_total_price_{$index}");
-        
+
             $productNames .= $productName . ',';
             $productVariations .= $productVariation . ',';
             $productQuantities .= $productQuantity . ',';
             $productPrices .= $productPrice . ',';
-            
+
             $index++;
         }
-        
+
         $productNames = rtrim($productNames, ',');
         $productVariations = rtrim($productVariations, ',');
         $productQuantities = rtrim($productQuantities, ',');
         $productPrices = rtrim($productPrices, ',');
-        
+
         $currentDealPrice = $request->input('currentDealPrice');
         $dealFinalPrice = $request->input('dealFinalPrice') . " " . "Pkr";
 
@@ -270,7 +275,6 @@ class AdminController extends Controller
 
     public function updateDeal(Request $request)
     {
-
         $deal = Deal::find($request->dId);
 
         if ($request->hasFile('dealImage')) {
@@ -285,16 +289,26 @@ class AdminController extends Controller
         }
 
         $deal->dealTitle = $request->dealTitle;
+        $deal->dealDiscountedPrice = $request->dealprice . " Pkr";
         $deal->dealStatus = $request->dealStatus;
         $deal->dealEndDate = $request->dealEndDate;
 
         $deal->save();
         session(['id' => $deal->id]);
-        return redirect()->route('viewUpdateDealProductsPage');
+        return redirect()->route('viewDealPage');
+    }
+
+    public function editDeal($id)
+    {
+        dd($id);
+        $deals = Deal::all();
+        return view('Admin.Deal')->with(['dealsData' => $deals]);
     }
 
     public function updateDealProducts(Request $request)
     {
+        dd($request->all());
+
         $productNames = '';
         $productQuantities = '';
         $productPrices = '';
@@ -318,7 +332,7 @@ class AdminController extends Controller
 
 
         $currentDealPrice = $request->input('currentDealPrice');
-        $dealFinalPrice = $request->input('dealFinalPrice') . " " . "Pkr";
+        $dealFinalPrice = $request->input('dealFinalPrice');
 
         $deal = Deal::find($request->id);
 
@@ -335,6 +349,18 @@ class AdminController extends Controller
 
     public function deleteDeal($id)
     {
+        $deal = Deal::find($id);
+        $deal->delete();
+        $imagePath = public_path('Images/DealImages') . '/' . $deal->dealImage;
+        if (File::exists($imagePath)) {
+            File::delete($imagePath);
+        }
+        return redirect()->route('viewDealPage');
+    }
+
+    public function deleteDealProduct($id)
+    {
+        dd($id);
         $deal = Deal::find($id);
         $deal->delete();
         $imagePath = public_path('Images/DealImages') . '/' . $deal->dealImage;
@@ -429,7 +455,7 @@ class AdminController extends Controller
 
         return redirect()->route('viewStockPage');
     }
-    
+
     /*
         |---------------------------------------------------------------|
         |======================= Recipe Functions ======================|
@@ -450,38 +476,65 @@ class AdminController extends Controller
 
         $productRecipe = $request->input('productRecipe');
         $formattedRecipe = str_replace("\n", "", trim($productRecipe));
-        
+
         $recipe->productCategory = $product->category_name;
         $recipe->productSize = $product->productSize;
         $recipe->productName = $product->productName;
         $recipe->productRecipe = $formattedRecipe;
-        
+
         $recipe->save();
-        
+
         return redirect()->route('viewRecipePage');
     }
-    
+
     public function deleteRecipe($id)
     {
         $recipe = Recipe::find($id);
         $recipe->delete();
-        
+
         return redirect()->route('viewRecipePage');
-        
     }
-    
+
     /*
     |---------------------------------------------------------------|
     |====================== Orders Functions =======================|
     |---------------------------------------------------------------|
     */
-    
-    public function viewOrdersPage(){
+
+    public function viewOrdersPage()
+    {
         return view('Admin.Order');
     }
-    
-    public function viewStaffPage(){
-        return view('Admin.Staff');
+
+    public function viewStaffPage()
+    {
+        $staff = User::whereIn('role', ['salesman', 'chef'])->get();
+        return view('Admin.Staff')->with(['Staff' => $staff]);
+    }
+
+    public function updateStaff(Request $req)
+    {
+        dd($req->all());
+        $validateData = $req->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => 'string|min:8|confirmed',
+        ]);
+
+        $auth = new User();
+        $auth->name = $req->name;
+        $auth->email = $req->email;
+        $auth->role = $req->role;
+        $auth->password = Hash::make($req->password);
+        $auth->save();
+
+        return redirect()->route('viewStaffPage');
+    }
+    public function deleteStaff($id)
+    {
+        $staff = User::find($id);
+        $staff->delete();
+        return redirect()->route('viewStaffPage');
     }
 
     /*

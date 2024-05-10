@@ -105,7 +105,7 @@ table tbody tr td a:last-child:hover {
     background-color: #f84857;
 }
 
-#overlay {
+#overlay, #editOverlay {
     position: fixed;
     top: 0;
     left: 0;
@@ -115,21 +115,20 @@ table tbody tr td a:last-child:hover {
     display: none;
     z-index: 999; 
 }
-.newrider {
+.newstaff, .editstaff {
     display: none;
     flex-direction: column;
     background-color: #ffffff; 
     position: absolute;
     border-radius: 10px;
     width: 30vw;
-    height: 32vw;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     z-index: 1000;
 }
 
-.newrider h3{
+.newstaff, .editstaff h3{
     margin: 0;
     padding: 1vw 2vw;
     font-family: "Poppins", sans-serif;
@@ -149,6 +148,34 @@ table tbody tr td a:last-child:hover {
     border-radius: 6px; 
     padding: 0.5vw 0.2vw;
     background-color: #e2e2e2;
+}
+
+.passwordfield{
+    display: flex;
+    width: 100%;
+    font-family: "Poppins", sans-serif;
+    border: 1px solid #8d8d8d;
+    border-radius: 5px;
+}
+
+.passwordfield input {
+    border: none;
+    padding: 0.5vw 0.2vw;
+    border-radius: 6px;
+    width: 90%;
+}
+
+.passwordfield i {
+    border-left: 1px solid #8d8d8d;
+    padding: 5px 10px;
+    background-color: #cdcdcd;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
+.error-message{
+    color:#F45B69;
+    font-size: 0.7rem;
+    margin:0px 20px;
 }
 
 .btns{

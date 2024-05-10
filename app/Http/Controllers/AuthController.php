@@ -14,7 +14,7 @@ class AuthController extends Controller
         return view('Auth.Login');
     }
 
-    public function registrationIndex()
+    public function registrationIndex() 
     {
         return view('Auth.Registration');
     }
@@ -26,14 +26,20 @@ class AuthController extends Controller
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
         ]);
-
+        
         $auth = new User();
         $auth->name = $req->name;
         $auth->email = $req->email;
+        $auth->role = $req->role;
         $auth->password = Hash::make($req->password);
         $auth->save();
 
-        return redirect()->route('viewLoginPage');
+        if($req->has('role')){
+            return redirect()->route('viewStaffPage');
+        }
+        else{
+            return redirect()->route('viewLoginPage');
+        }
     }
 
     public function login(Request $request)

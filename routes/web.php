@@ -98,9 +98,12 @@ Route::post('/createDeal', [AdminController::class,'createDeal'])->name('createD
 Route::get('/viewDealProductsPage', [AdminController::class,'viewDealProductsPage'])->name('viewDealProductsPage');
 Route::post('/createDealProducts', [AdminController::class,'createDealProducts'])->name('createDealProducts');
 Route::post('/updateDeal',[AdminController::class,'updateDeal'])->name('updateDeal');
+// Route::get('/viewUpdateDealProductsPage/{id}', [AdminController::class,'viewUpdateDealProductsPage'])->name('viewUpdateDealProductsPage');
 Route::get('/viewUpdateDealProductsPage', [AdminController::class,'viewUpdateDealProductsPage'])->name('viewUpdateDealProductsPage');
 Route::post('/updateDealProducts',[AdminController::class,'updateDealProducts'])->name('updateDealProducts');
+Route::get('/editDeal/{id}',[AdminController::class,'editDeal'])->name('editDeal');
 Route::get('/deleteDeal/{id}',[AdminController::class,'deleteDeal'])->name('deleteDeal');
+Route::get('/deleteDealProduct/{id}',[AdminController::class,'deleteDealProduct'])->name('deleteDealProduct');
 
 /*
 |---------------------------------------------------------------|
@@ -132,6 +135,8 @@ Route::post('/createRecipe', [AdminController::class,'createRecipe'])->name('cre
 
 Route::get('/viewOrdersPage', [AdminController::class,'viewOrdersPage'])->name('viewOrdersPage');
 Route::get('/viewStaffPage', [AdminController::class,'viewStaffPage'])->name('viewStaffPage');
+Route::get('/updateStaff', [AdminController::class,'updateStaff'])->name('updateStaff');
+Route::get('/deleteStaff/{id}', [AdminController::class,'deleteStaff'])->name('deleteStaff');
 
 
 /*

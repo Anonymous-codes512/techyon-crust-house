@@ -216,13 +216,13 @@
             console.log(Product);
             let overlay = document.getElementById('editOverlay');
             let popup = document.getElementById('editProduct');
-            overlay.style.display = 'block';
-            popup.style.display = 'flex';
             document.getElementById('pId').value = Product.id;
             document.getElementById('pName').value = Product.productName;
             document.getElementById('pSize').value = Product.productSize;
             document.getElementById('pPrice').value = Product.productPrice;
             document.getElementById('pCategory').value = Product.category_id;
+            overlay.style.display = 'block';
+            popup.style.display = 'flex';
         }
 
         function closeEditCatogry() {
