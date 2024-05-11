@@ -19,7 +19,7 @@
                     <th>Deal Image</th>
                     <th>Deal Title</th>
                     <th>Deal Status</th>
-                    <th>Deal Products</th>
+                    {{-- <th>Deal Products</th> --}}
                     <th>Deal Price</th>
                     <th>Deal End Date</th>
                     <th>Action</th>
@@ -37,8 +37,8 @@
                             <p class="status">{{ $deal->dealStatus }}</p>
                         </td>
 
-                        <td onclick="showDealInfo({{ json_encode($deal) }})" class="ellipsis" style="max-width: 100px;">
-                            {{ $deal->dealProductName }}</td>
+                        {{-- <td onclick="showDealInfo({{ json_encode($deal) }})" class="ellipsis" style="max-width: 100px;">
+                            {{ $deal->dealProductName }}</td> --}}
                         <td onclick="showDealInfo({{ json_encode($deal) }})">{{ $deal->dealDiscountedPrice }}</td>
 
                         <td onclick="showDealInfo({{ json_encode($deal) }})">{{ $deal->dealEndDate }}</td>
@@ -111,46 +111,48 @@
         <form class="editdeal" id="editDeal" action="{{ route('updateDeal') }}" method="POST"
             enctype="multipart/form-data">
             @csrf
-            <h3>Edit Deal</h3>
-            <hr>
+            <div id="form-div">
+                <h3>Edit Deal</h3>
+                <hr>
 
-            @php
-                $dealID = null;
-            @endphp
-            <input type="hidden" id="d-Id" name="dId">
+                @php
+                    $dealID = null;
+                @endphp
+                <input type="hidden" id="d-Id" name="dId">
 
-            <div class="inputdivs">
-                <label for="upload-update-file" class="choose-file-btn">
-                    <span>Choose File</span>
-                    <input type="file" id="upload-update-file" name="dealImage" accept=".jpg,.jpeg,.png">
-                    <p id="namefile"></p>
-                </label>
-            </div>
+                <div class="inputdivs">
+                    <label for="upload-update-file" class="choose-file-btn">
+                        <span>Choose File</span>
+                        <input type="file" id="upload-update-file" name="dealImage" accept=".jpg,.jpeg,.png">
+                        <p id="namefile"></p>
+                    </label>
+                </div>
 
-            <div class="inputdivs">
-                <input type="text" id="deal-Title" name="dealTitle" required>
-            </div>
+                <div class="inputdivs">
+                    <input type="text" id="deal-Title" name="dealTitle" required>
+                </div>
 
-            <div class="inputdivs">
-                <input type="text" id="deal-price" name="dealprice" required>
-            </div>
+                <div class="inputdivs">
+                    <input type="number" id="deal-price" name="dealprice" required>
+                </div>
 
-            <div class="inputdivs">
-                <select name="dealStatus" id="deal-Status">
-                    <option value="" selected disabled>Select Stauts</option>
-                    <option value="active">Active</option>
-                    <option value="not active">Not Active</option>
-                </select>
-            </div>
+                <div class="inputdivs">
+                    <select name="dealStatus" id="deal-Status">
+                        <option value="" selected disabled>Select Stauts</option>
+                        <option value="active">Active</option>
+                        <option value="not active">Not Active</option>
+                    </select>
+                </div>
 
-            <div class="inputdivs">
-                <input type="date" id="deal-End-Date" name="dealEndDate" required>
+                <div class="inputdivs">
+                    <input type="date" id="deal-End-Date" name="dealEndDate" required>
+                </div>
             </div>
 
             <hr id="line">
 
             <div id="product_details_tables">
-                <table>
+                <table id="products_table">
                     <thead id="header">
                         <tr id="header-row">
                             <th class="header-row-headings">Products</th>
@@ -166,8 +168,7 @@
 
             <div class="btns">
                 <button type="button" id="cancel" onclick="closeEditCatogry()">Cancel</button>
-                <a id="add-product-link" href="{{ route('viewUpdateDealProductsPage') }}"
-                    style="text-decoration: none;"><input type="button" value="Add Product"></a>
+                <a id="add-product-link" style="text-decoration: none;"><input type="button" value="Add Product"></a>
                 <input type="submit" value="Edit">
             </div>
         </form>
@@ -199,7 +200,6 @@
                 <button id="cancel" onclick="hideDealInfo()" style="background-color: #ffbb00;">Close</button>
             </div>
         </div>
-
 
     </main>
 
@@ -234,51 +234,57 @@
 
             document.getElementById('d-Id').value = Deal.id;
             document.getElementById('deal-Title').value = Deal.dealTitle;
-            document.getElementById('deal-price').value = Deal.dealDiscountedPrice;
+            document.getElementById('deal-price').value = Deal.dealDiscountedPrice.replace(/\sPkr$/, "");
             document.getElementById('deal-Status').value = Deal.dealStatus;
             document.getElementById('deal-End-Date').value = Deal.dealEndDate;
+
+            let dealId = Deal.id;
+            let route = `{{ route('viewUpdateDealProductsPage', ':dealId') }}`;
+            addroute = route.replace(':dealId', dealId);
+            document.getElementById('add-product-link').setAttribute('href', addroute);
 
             let tbody = document.getElementById('body');
             tbody.innerHTML = '';
 
-            // let productId = Deal.dealProductName.split(',');
-            let productNames = Deal.dealProductName.split(',');
-            let variations = Deal.dealProductVariation.split(',');
-            let quantities = Deal.dealProductQuantity.split(',');
-
-            for (let i = 0; i < productNames.length; i++) {
+            Deal.products.forEach(product => {
                 let newRow = document.createElement('tr');
                 newRow.setAttribute('id', 'body-row');
 
                 let productNameCell = document.createElement('td');
                 productNameCell.setAttribute('class', 'body-row-data');
-                productNameCell.textContent = productNames[i];
+                productNameCell.textContent = product.productName;
                 newRow.appendChild(productNameCell);
 
                 let variationCell = document.createElement('td');
                 variationCell.setAttribute('class', 'body-row-data');
-                variationCell.textContent = variations[i];
+                variationCell.textContent = product.productSize;
                 newRow.appendChild(variationCell);
 
                 let quantityCell = document.createElement('td');
                 quantityCell.setAttribute('class', 'body-row-data');
-                quantityCell.textContent = quantities[i];
+                quantityCell.textContent = product.pivot.product_quantity;
                 newRow.appendChild(quantityCell);
 
                 let actionCell = document.createElement('td');
                 actionCell.setAttribute('class', 'body-row-data');
                 let deleteLink = document.createElement('a');
-                // deleteLink.setAttribute('href', `{{ route('deleteDeal', $deal->id) }}`);
-                deleteLink.href = "{{ route('deleteDealProduct', $deal->id) }}".replace(/^.*\/\/[^\/]+/, '');
+
+                let productId = product.pivot.product_id;
+                let dealId = Deal.id; // Assuming Deal is the variable containing your deal data
+                let route = `{{ route('deleteDealProduct', [':productId', ':dealId']) }}`;
+                route = route.replace(':productId', productId).replace(':dealId', dealId);
+                deleteLink.setAttribute('href', route);
+
+
                 let trashIcon = document.createElement('i');
                 trashIcon.setAttribute('class', 'bx bxs-trash-alt');
+
                 deleteLink.appendChild(trashIcon);
                 actionCell.appendChild(deleteLink);
                 newRow.appendChild(actionCell);
 
                 tbody.appendChild(newRow);
-            }
-
+            });
         }
 
         function closeEditCatogry() {
@@ -290,30 +296,25 @@
         }
 
         function showDealInfo(deal) {
-
             let overlay = document.getElementById('dealInfoOverlay');
             let popup = document.getElementById('dealInfo');
 
-            overlay.style.display = 'block';
-            popup.style.display = 'flex';
+            let productsInfo = '';
+            deal.products.forEach(product => {
+                productsInfo += `${product.pivot.product_quantity} ${product.productName}, `;
+            });
 
-            let dealProdName = deal.dealProductName.split(',');
-            let dealProdQuantity = deal.dealProductQuantity.split(',');
-            let dealproducts = '';
-
-            for (let i = 0; i < dealProdName.length; i++) {
-                dealproducts += dealProdQuantity[i] + " " + dealProdName[i];
-                if (i < dealProdName.length - 1) {
-                    dealproducts += ", ";
-                }
-            }
+            productsInfo = productsInfo.trim().replace(/,+$/, "");
 
             document.getElementById("dealInfoImage").src = `{{ asset('Images/DealImages/${deal.dealImage}') }}`;
             document.getElementById("dealInfoTitle").innerHTML = deal.dealTitle;
             document.getElementById("dealInfoPrice").innerHTML = deal.dealDiscountedPrice;
-            document.getElementById("dealInfoProducts").innerHTML = dealproducts;
+            document.getElementById("dealInfoProducts").innerHTML = productsInfo;
             document.getElementById("dealInfoStatus").innerHTML = deal.dealStatus;
             document.getElementById("dealInfoEndDate").innerHTML = deal.dealEndDate;
+
+            overlay.style.display = 'block';
+            popup.style.display = 'flex';
         }
 
         function hideDealInfo(deal) {

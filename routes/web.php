@@ -98,12 +98,12 @@ Route::post('/createDeal', [AdminController::class,'createDeal'])->name('createD
 Route::get('/viewDealProductsPage', [AdminController::class,'viewDealProductsPage'])->name('viewDealProductsPage');
 Route::post('/createDealProducts', [AdminController::class,'createDealProducts'])->name('createDealProducts');
 Route::post('/updateDeal',[AdminController::class,'updateDeal'])->name('updateDeal');
-// Route::get('/viewUpdateDealProductsPage/{id}', [AdminController::class,'viewUpdateDealProductsPage'])->name('viewUpdateDealProductsPage');
-Route::get('/viewUpdateDealProductsPage', [AdminController::class,'viewUpdateDealProductsPage'])->name('viewUpdateDealProductsPage');
+Route::get('/viewUpdateDealProductsPage/{id}', [AdminController::class,'viewUpdateDealProductsPage'])->name('viewUpdateDealProductsPage');
+// Route::get('/viewUpdateDealProductsPage', [AdminController::class,'viewUpdateDealProductsPage'])->name('viewUpdateDealProductsPage');
 Route::post('/updateDealProducts',[AdminController::class,'updateDealProducts'])->name('updateDealProducts');
 Route::get('/editDeal/{id}',[AdminController::class,'editDeal'])->name('editDeal');
 Route::get('/deleteDeal/{id}',[AdminController::class,'deleteDeal'])->name('deleteDeal');
-Route::get('/deleteDealProduct/{id}',[AdminController::class,'deleteDealProduct'])->name('deleteDealProduct');
+Route::get('/deleteDealProduct/{id}/{dId}',[AdminController::class,'deleteDealProduct'])->name('deleteDealProduct');
 
 /*
 |---------------------------------------------------------------|

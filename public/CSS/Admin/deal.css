@@ -155,8 +155,25 @@ table tbody tr td:last-child a:last-child:hover {
     z-index: 1000;
 }
 
-.editdeal{
-    min-width: 50vw;
+.editdeal {
+    width: 50vw;
+    max-height: 90vh;
+}
+
+#product_details_tables {
+    width: 100%;
+    overflow-y: auto;
+}
+
+#products_table {
+    width: 90%;
+}
+
+#product_details_tables thead {
+    position: sticky;
+    top: 0;
+    background-color: #ffffff; 
+    z-index: 1000;
 }
 
 .newdeal h3,
@@ -166,6 +183,7 @@ table tbody tr td:last-child a:last-child:hover {
     padding: 1vw 2vw;
     font-family: "Poppins", sans-serif;
 }
+
 
 .dealInfo h3 {
     text-align: center;
@@ -187,7 +205,12 @@ table tbody tr td:last-child a:last-child:hover {
 
 #product_details_tables{
     width: 98%;
-    margin: 0 auto 1vw;
+    margin: 0 auto ;
+}
+
+#products_table {
+    height: 50px; /* Set fixed height */
+    overflow-y: auto; /* Add vertical scroll if content overflows */
 }
 
 .dealInfo hr {

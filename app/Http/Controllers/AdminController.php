@@ -28,6 +28,7 @@ class AdminController extends Controller
     |======================= Category Functions ====================|
     |---------------------------------------------------------------|
     */
+
     public function viewCategoryPage()
     {
         // $categories = Category::paginate(2);
@@ -133,7 +134,6 @@ class AdminController extends Controller
         $product->category_name = $categoryName;
 
         $product->save();
-        // dd($product->category->id);
 
 
         return redirect()->route('viewProductPage');
@@ -191,7 +191,7 @@ class AdminController extends Controller
 
     public function viewDealPage()
     {
-        $deals = Deal::all();
+        $deals = Deal::with('products')->get();
         return view('Admin.Deal')->with(['dealsData' => $deals]);
     }
 
@@ -201,8 +201,9 @@ class AdminController extends Controller
         return view('Admin.DealProducts')->with(['Products' => $product]);
     }
 
-    public function viewUpdateDealProductsPage()
+    public function viewUpdateDealProductsPage($id)
     {
+        dd($id);
         $product = Product::all();
         return view('Admin.UpdateDealProduct')->with(['Products' => $product]);
     }
@@ -230,48 +231,34 @@ class AdminController extends Controller
 
     public function createDealProducts(Request $request)
     {
-        dd($request->all());
-        $productNames = '';
-        $productVariations = '';
-        $productQuantities = '';
-        $productPrices = '';
-
+        $productDetails = [];
         $index = 0;
-
         while ($request->has("product_name_{$index}")) {
-            $productName = $request->input("product_name_{$index}");
-            $productVariation = $request->input("product_variation_{$index}");
-            $productQuantity = $request->input("product_quantity_{$index}");
-            $productPrice = $request->input("product_total_price_{$index}");
-
-            $productNames .= $productName . ',';
-            $productVariations .= $productVariation . ',';
-            $productQuantities .= $productQuantity . ',';
-            $productPrices .= $productPrice . ',';
-
+            $productDetails[] = [
+                'product_id' => $request->input("product_id{$index}"),
+                'quantity' => $request->input("product_quantity_{$index}"),
+                'total_price' => $request->input("product_total_price_{$index}"),
+            ];
             $index++;
         }
 
-        $productNames = rtrim($productNames, ',');
-        $productVariations = rtrim($productVariations, ',');
-        $productQuantities = rtrim($productQuantities, ',');
-        $productPrices = rtrim($productPrices, ',');
-
-        $currentDealPrice = $request->input('currentDealPrice');
-        $dealFinalPrice = $request->input('dealFinalPrice') . " " . "Pkr";
-
         $deal = Deal::find($request->id);
-        $deal->dealProductName = $productNames;
-        $deal->dealProductVariation = $productVariations;
-        $deal->dealProductQuantity = $productQuantities;
-        $deal->dealProductPrice = $productPrices;
-        $deal->dealActualPrice = $currentDealPrice;
-        $deal->dealDiscountedPrice = $dealFinalPrice;
 
+        // Attach each product to the deal and set pivot data
+        foreach ($productDetails as $productDetail) {
+            $deal->products()->attach($productDetail['product_id'], [
+                'product_quantity' => $productDetail['quantity'],
+                'product_total_price' => $productDetail['total_price'],
+            ]);
+        }
+
+        $deal->dealActualPrice = $request->input('currentDealPrice');
+        $deal->dealDiscountedPrice = $request->input('dealFinalPrice') . " " . "Pkr";
         $deal->save();
 
         return redirect()->route('viewDealPage');
     }
+
 
     public function updateDeal(Request $request)
     {
@@ -358,16 +345,24 @@ class AdminController extends Controller
         return redirect()->route('viewDealPage');
     }
 
-    public function deleteDealProduct($id)
+    public function deleteDealProduct($productId, $dealId)
     {
-        dd($id);
-        $deal = Deal::find($id);
-        $deal->delete();
-        $imagePath = public_path('Images/DealImages') . '/' . $deal->dealImage;
-        if (File::exists($imagePath)) {
-            File::delete($imagePath);
+        $deal = Deal::find($dealId);
+        $product = $deal->products()->find($productId);
+
+        if (!$deal || !$product) {
+            return redirect()->route('viewDealPage')->with('error', 'Deal or product not found.');
         }
-        return redirect()->route('viewDealPage');
+
+        $productPrice = intval($product->productPrice);
+        $dealDiscountedPrice = intval(str_replace(' Pkr', '', $deal->dealDiscountedPrice));
+        $updatedDealPrice = ($dealDiscountedPrice - $productPrice) . " Pkr";
+        $deal->dealDiscountedPrice = $updatedDealPrice;
+        $deal->save();
+
+        $product->delete();
+
+        return redirect()->route('viewDealPage')->with('success', 'Product deleted successfully.');
     }
 
     /*

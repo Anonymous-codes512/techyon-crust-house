@@ -13,15 +13,12 @@ return new class extends Migration
     {
         Schema::create('deals', function (Blueprint $table) {
             $table->id();
-
+            
             $table->string('dealImage')->nullable();
-            $table->string('dealTitle')->nullable();
-            $table->string('dealStatus')->nullable();
-            $table->string('dealProductName')->nullable();
-            $table->string('dealProductQuantity')->nullable();
-            $table->string('dealProductPrice')->nullable();
-            $table->string('dealActualPrice')->nullable();
-            $table->string('dealDiscountedPrice')->nullable();
+            $table->string('dealTitle');
+            $table->string('dealStatus');
+            $table->string('dealActualPrice');
+            $table->string('dealDiscountedPrice');
             $table->string('dealEndDate')->nullable();
             
             $table->timestamps();
@@ -31,6 +28,7 @@ return new class extends Migration
     /**
      * Reverse the migrations.
      */
+
     public function down(): void
     {
         Schema::dropIfExists('deals');
