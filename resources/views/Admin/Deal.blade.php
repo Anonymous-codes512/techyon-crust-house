@@ -5,6 +5,12 @@
 
 @section('main')
     <main id="deal">
+
+        @php
+            $allDealProducts = $dealProducts;
+
+        @endphp
+
         <div class="path">
             <p>Dashboard > Deals</p>
         </div>
@@ -28,24 +34,26 @@
             <tbody>
                 @foreach ($dealsData as $deal)
                     <tr>
-                        <td onclick="showDealInfo({{ json_encode($deal) }})">
+                        <td onclick="showDealInfo(  , {{ json_encode($allDealProducts) }} )">
                             <img src={{ asset('Images/DealImages/' . $deal->dealImage) }} alt=" Deal Image">
                         </td>
-                        <td onclick="showDealInfo({{ json_encode($deal) }})">{{ $deal->dealTitle }}</td>
+                        <td onclick="showDealInfo({{ json_encode($deal) }}, {{ json_encode($allDealProducts) }})">
+                            {{ $deal->dealTitle }}</td>
 
-                        <td onclick="showDealInfo({{ json_encode($deal) }})">
+                        <td onclick="showDealInfo({{ json_encode($deal) }}, {{ json_encode($allDealProducts) }})">
                             <p class="status">{{ $deal->dealStatus }}</p>
                         </td>
 
-                        {{-- <td onclick="showDealInfo({{ json_encode($deal) }})" class="ellipsis" style="max-width: 100px;">
-                            {{ $deal->dealProductName }}</td> --}}
-                        <td onclick="showDealInfo({{ json_encode($deal) }})">{{ $deal->dealDiscountedPrice }}</td>
+                        <td onclick="showDealInfo({{ json_encode($deal) }}, {{ json_encode($allDealProducts) }})">
+                            {{ $deal->dealDiscountedPrice }}</td>
 
-                        <td onclick="showDealInfo({{ json_encode($deal) }})">{{ $deal->dealEndDate }}</td>
+                        <td onclick="showDealInfo({{ json_encode($deal) }}, {{ json_encode($allDealProducts) }})">
+                            {{ $deal->dealEndDate }}</td>
 
                         <td>
-                            <a onclick= "editDeal({{ json_encode($deal) }})"><i class='bx bxs-edit-alt'></i></a>
-                            {{-- <a href= "{{ route('editDeal', $deal->id) }}" ><i class='bx bxs-edit-alt'></i></a> --}}
+                            <a id="editButton"
+                                onclick= "editDeal({{ json_encode($deal) }}, {{ json_encode($allDealProducts) }})"><i
+                                    class='bx bxs-edit-alt'></i></a>
                             <a href= "{{ route('deleteDeal', $deal->id) }}"><i class='bx bxs-trash-alt'></i></a>
                         </td>
                     </tr>
@@ -107,6 +115,15 @@
             |---------------------------------------------------------------|
             --}}
 
+
+        @if (session('editAfterDelete'))
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    document.getElementById('editButton').click();
+                });
+            </script>
+        @endif
+
         <div id="editOverlay"></div>
         <form class="editdeal" id="editDeal" action="{{ route('updateDeal') }}" method="POST"
             enctype="multipart/form-data">
@@ -157,6 +174,7 @@
                         <tr id="header-row">
                             <th class="header-row-headings">Products</th>
                             <th class="header-row-headings">Variation</th>
+                            <th class="header-row-headings">Product Price</th>
                             <th class="header-row-headings">Quantity</th>
                             <th class="header-row-headings">Action</th>
                         </tr>
@@ -167,6 +185,7 @@
             </div>
 
             <div class="btns">
+                <p id="priceTag">Deal Price: <span id="price"></span></p>
                 <button type="button" id="cancel" onclick="closeEditCatogry()">Cancel</button>
                 <a id="add-product-link" style="text-decoration: none;"><input type="button" value="Add Product"></a>
                 <input type="submit" value="Edit">
@@ -226,7 +245,7 @@
             popup.style.display = 'none';
         }
 
-        function editDeal(Deal) {
+        function editDeal(Deal, dealProducts) {
             let overlay = document.getElementById('editOverlay');
             let popup = document.getElementById('editDeal');
             overlay.style.display = 'block';
@@ -238,6 +257,7 @@
             document.getElementById('deal-Status').value = Deal.dealStatus;
             document.getElementById('deal-End-Date').value = Deal.dealEndDate;
 
+            let totalProductPrice = 0;
             let dealId = Deal.id;
             let route = `{{ route('viewUpdateDealProductsPage', ':dealId') }}`;
             addroute = route.replace(':dealId', dealId);
@@ -245,46 +265,56 @@
 
             let tbody = document.getElementById('body');
             tbody.innerHTML = '';
+            dealProducts.forEach(product => {
+                if (Deal.id === product.deal_id) {
+                    
+                    let newRow = document.createElement('tr');
+                    newRow.setAttribute('id', 'body-row');
 
-            Deal.products.forEach(product => {
-                let newRow = document.createElement('tr');
-                newRow.setAttribute('id', 'body-row');
+                    let productNameCell = document.createElement('td');
+                    productNameCell.setAttribute('class', 'body-row-data');
+                    productNameCell.textContent = product.productName;
+                    newRow.appendChild(productNameCell);
 
-                let productNameCell = document.createElement('td');
-                productNameCell.setAttribute('class', 'body-row-data');
-                productNameCell.textContent = product.productName;
-                newRow.appendChild(productNameCell);
+                    let variationCell = document.createElement('td');
+                    variationCell.setAttribute('class', 'body-row-data');
+                    variationCell.textContent = product.productSize;
+                    newRow.appendChild(variationCell);
 
-                let variationCell = document.createElement('td');
-                variationCell.setAttribute('class', 'body-row-data');
-                variationCell.textContent = product.productSize;
-                newRow.appendChild(variationCell);
+                    let priceCell = document.createElement('td');
+                    priceCell.setAttribute('class', 'body-row-data');
+                    priceCell.textContent = product.product_total_price;
+                    newRow.appendChild(priceCell);
 
-                let quantityCell = document.createElement('td');
-                quantityCell.setAttribute('class', 'body-row-data');
-                quantityCell.textContent = product.pivot.product_quantity;
-                newRow.appendChild(quantityCell);
+                    let productPrice = parseInt(product.product_total_price.replace(' Pkr', ''));
+                    totalProductPrice += productPrice;
 
-                let actionCell = document.createElement('td');
-                actionCell.setAttribute('class', 'body-row-data');
-                let deleteLink = document.createElement('a');
+                    let quantityCell = document.createElement('td');
+                    quantityCell.setAttribute('class', 'body-row-data');
+                    quantityCell.textContent = product.product_quantity;
+                    newRow.appendChild(quantityCell);
 
-                let productId = product.pivot.product_id;
-                let dealId = Deal.id; // Assuming Deal is the variable containing your deal data
-                let route = `{{ route('deleteDealProduct', [':productId', ':dealId']) }}`;
-                route = route.replace(':productId', productId).replace(':dealId', dealId);
-                deleteLink.setAttribute('href', route);
+                    let actionCell = document.createElement('td');
+                    actionCell.setAttribute('class', 'body-row-data');
+                    let deleteLink = document.createElement('a');
 
+                    let productId = product.handler_id;
+                    let dealId = Deal.id;
+                    let route = `{{ route('deleteDealProduct', [':productId', ':dealId']) }}`;
+                    route = route.replace(':productId', productId).replace(':dealId', dealId);
+                    deleteLink.setAttribute('href', route);
 
-                let trashIcon = document.createElement('i');
-                trashIcon.setAttribute('class', 'bx bxs-trash-alt');
+                    let trashIcon = document.createElement('i');
+                    trashIcon.setAttribute('class', 'bx bxs-trash-alt');
 
-                deleteLink.appendChild(trashIcon);
-                actionCell.appendChild(deleteLink);
-                newRow.appendChild(actionCell);
+                    deleteLink.appendChild(trashIcon);
+                    actionCell.appendChild(deleteLink);
+                    newRow.appendChild(actionCell);
 
-                tbody.appendChild(newRow);
+                    tbody.appendChild(newRow);
+                }
             });
+            document.getElementById('price').textContent = totalProductPrice + " Pkr";
         }
 
         function closeEditCatogry() {
@@ -295,13 +325,15 @@
             popup.style.display = 'none';
         }
 
-        function showDealInfo(deal) {
+        function showDealInfo(deal, dealProducts) {
             let overlay = document.getElementById('dealInfoOverlay');
             let popup = document.getElementById('dealInfo');
 
             let productsInfo = '';
-            deal.products.forEach(product => {
-                productsInfo += `${product.pivot.product_quantity} ${product.productName}, `;
+            dealProducts.forEach(product => {
+                if (deal.id === product.deal_id) {
+                    productsInfo += `${product.product_quantity} ${product.productName}, `;
+                }
             });
 
             productsInfo = productsInfo.trim().replace(/,+$/, "");
@@ -317,7 +349,7 @@
             popup.style.display = 'flex';
         }
 
-        function hideDealInfo(deal) {
+        function hideDealInfo() {
             let overlay = document.getElementById('dealInfoOverlay');
             let popup = document.getElementById('dealInfo');
 

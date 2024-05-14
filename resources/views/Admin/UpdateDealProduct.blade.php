@@ -4,42 +4,44 @@
 @endpush
 
 @section('main')
-    <main id="dealProducts">
+    <main id="deal_Products">
         <div class="path">
             <h2>Add New products to Deal</h2>
         </div>
+        @php
+            $dealId = $dealId;
+            $dealProducts = $dealproducts;
+        @endphp
 
         <section class="products">
             @foreach ($Products as $product)
-            <div class="imgbox" onclick="toggleProductSelection(this)">
-                <img src="{{ asset('Images/ProductImages/' . $product->productImage) }}" alt="Product">
-                <p class="category_name">{{ $product->category_name }}</p>
-                <p class="product_id">{{ $product->id }}</p>
-                <p class="product_name">{{ $product->productName }}</p>
-                <p class="product_size">{{ $product->productSize }}</p>
-                <p class="product_price">{{ $product->productPrice }} Pkr</p>
-            </div>
-        @endforeach
+                <div class="imgbox" onclick="toggleProductSelection(this)">
+                    <img src="{{ asset('Images/ProductImages/' . $product->productImage) }}" alt="Product">
+                    <p class="category_name">{{ $product->category_name }}</p>
+                    <p class="product_id">{{ $product->id }}</p>
+                    <p class="product_name">{{ $product->productName }}</p>
+                    <p class="product_size">{{ $product->productSize }}</p>
+                    <p class="product_price">{{ $product->productPrice }} Pkr</p>
+                </div>
+            @endforeach
         </section>
-        @php
-            $id = session('id');
-        @endphp
         <div id="data">
             <input type="hidden" id="productIds" required>
             <input type="hidden" id="products" required>
             <input type="hidden" id="size">
             <input type="hidden" id="price">
-            <input type="button" id="adddeal" value="Add Product to Deal" onclick="dealDetails()">
+            <input type="button" id="adddeal" value="Add Product to Deal"
+                onclick="dealDetails({{ json_encode($dealProducts) }})">
         </div>
 
         <div id="dealProductInfoOverlay"></div>
-        <form class="dealProdInfo" id="dealProdInfo" action="{{ route('updateDealProducts') }}" method="POST"
+        <form class="dealProdInfo" id="dealProdInfo" action="{{ route('addDealProduct') }}" method="POST"
             enctype="multipart/form-data">
             @csrf
             <h3>Deal Details</h3>
             <hr>
 
-            <input type="hidden" name="id" value="{{ $id }}">
+            <input type="hidden" name="id" value="{{ $dealId }}">
 
             <div class="inputdivs" id="productsNames">
             </div>
@@ -62,8 +64,8 @@
     </main>
 
     <script>
-
         function toggleProductSelection(element) {
+
             let productId = element.querySelector('.product_id').textContent;
             let productName = element.querySelector('.product_name').textContent;
             let productSize = element.querySelector('.product_size').textContent;
@@ -94,7 +96,8 @@
 
         let dealPrice = 0;
 
-        function dealDetails() {
+        function dealDetails(dealProducts) {
+            console.log(dealProducts)
             let products = document.getElementById('products').value;
             if (products.trim() === '') {
                 alert("Select a Product First");
@@ -144,20 +147,20 @@
                 const RowData2 = document.createElement('p');
                 RowData2.display = 'flex';
                 RowData2.style.margin = '5px';
-                RowData2.style.width = '184px';
+                RowData2.style.width = '180px';
                 RowData2.textContent = "Product Variation";
 
                 const RowData3 = document.createElement('p');
                 RowData3.display = 'flex';
-                RowData3.style.margin = '5px';
+                // RowData3.style.margin = '5px';
                 RowData3.textContent = "Quantity";
-                RowData3.style.width = '184px';
+                RowData3.style.width = '180px';
 
                 const RowData4 = document.createElement('p');
                 RowData4.display = 'flex';
-                RowData4.style.margin = '5px';
+                // RowData4.style.margin = '5px';
                 RowData4.textContent = "Total Price";
-                RowData4.style.width = '184px';
+                RowData4.style.width = '180px';
 
                 div.appendChild(RowData1);
                 div.appendChild(RowData2);
@@ -256,6 +259,5 @@
             overlay.style.display = 'none';
             prompt.style.display = 'none';
         }
-
     </script>
 @endsection

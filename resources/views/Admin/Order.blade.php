@@ -17,33 +17,13 @@
                     <th>Product Name</th>
                     <th>Product Quantity</th>
                     <th>Price</th>
+                    <th>Salesman</th>
+                    <th>Chef</th>
                     <th>Status</th>
-                    {{-- <th>Action</th> --}}
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td>Fries</td>
-                    <td>Loaded Fries</td>
-                    <td>2 Large</td>
-                    <td>400 Pkr</td>
-                    <td class="status">Accept</td>
-                    {{-- <td class="order-status">
-                        <a href="">Accept</a>
-                        <a href="">Reject</a>
-                    </td> --}}
-                </tr>
-                <tr>
-                    <td>Pizza</td>
-                    <td>Crown Crust</td>
-                    <td>1 Jumbo</td>
-                    <td>2500 Pkr</td>
-                    <td class="status">Reject</td>
-                    {{-- <td class="order-status">
-                        <a href="">Accept</a>
-                        <a href="">Reject</a>
-                    </td> --}}
-                </tr>
+               
             </tbody>
         </table>
     </main>

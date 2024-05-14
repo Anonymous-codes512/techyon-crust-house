@@ -1,11 +1,12 @@
 function showAddToCart(product, allProducts) {
+    console.log(product);
     let overlay = document.getElementById('overlay');
     let popup = document.getElementById('addToCart');
     document.getElementById('drinkFlavour').style.display = 'none'
 
     if (product.category_name) {
-
         let name = document.getElementById('prodName');
+        document.getElementById('selectedProductPrice').value = product.id;
         name.textContent = product.productSize + " " + product.productName;
         document.getElementById('price').textContent = 'Rs. ' + product.productPrice;
         document.getElementById('totalprice').textContent = 'Rs. ' + product.productPrice;
@@ -24,6 +25,7 @@ function showAddToCart(product, allProducts) {
             document.getElementById("prodVariation").style.display = 'none';
             document.getElementById('prodVariationLabel').style.display = 'none'
         }
+        console.log(document.getElementById('selectedProductPrice').value)
 
     } else {
 
@@ -69,7 +71,7 @@ function closeAddToCart() {
     popup.style.display = 'none';
 }
 
-/*
+/* 
 |---------------------------------------------------------------|
 |================ Deal's DropdownFunctions =====================|
 |---------------------------------------------------------------|
@@ -238,6 +240,7 @@ function updateProductSizeDropdown(product, allProducts) {
             }
             if (element.productName.toLowerCase() === product.productName.toLowerCase()) {
                 productVariations.push(`${element.productSize} (Rs. ${element.productPrice})`);
+                
             }
         });
         addOnsDropdown(addOnsArray, drinkFlavourDropdown);
@@ -472,6 +475,7 @@ function add(allProducts) {
     let productPrice = parseFloat(document.getElementById('totalprice').textContent.replace('Rs. ', ''));
     let quantity = document.getElementById('prodQuantity').value;
 
+    console.log(allProducts, productName);
     let extractedText;
 
     let pTag = document.createElement('p');

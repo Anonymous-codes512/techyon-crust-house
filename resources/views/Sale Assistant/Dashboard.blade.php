@@ -68,7 +68,7 @@
 
         <div id="overlay"></div>
         <div id="addToCart" action="" method="POST" enctype="multipart/form-data">
-           
+            <input type="hidden" id="selectedProductPrice">
             <p class="head1">Customize Item</p>
             <p id="prodName"></p>
             <p id="prodPrice">Product Price <span id="price"></span></p>

@@ -209,8 +209,8 @@ table tbody tr td:last-child a:last-child:hover {
 }
 
 #products_table {
-    height: 50px; /* Set fixed height */
-    overflow-y: auto; /* Add vertical scroll if content overflows */
+    height: 50px; 
+    overflow-y: auto;
 }
 
 .dealInfo hr {
@@ -297,6 +297,10 @@ table tbody tr td:last-child a:last-child:hover {
     align-items: center;
     margin: 01vw auto;
     width: 85%;
+}
+#priceTag{
+    margin-right: 1vw;
+
 }
 
 .btns button,

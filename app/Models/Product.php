@@ -16,9 +16,13 @@ class Product extends Model
         return $this->belongsTo(Category::class);
     }
 
+    public function handlers()
+    {
+        return $this->hasMany(handler::class);
+    }
+
     public function deals()
     {
-        return $this->belongsToMany(Deal::class, 'deal_product')
-            ->withPivot('product_quantity', 'product_total_price');
+        return $this->belongsToMany(Deal::class, 'handlers')->withPivot('product_quantity', 'product_total_price');
     }
 }

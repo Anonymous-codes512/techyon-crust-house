@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Models\Deal;
+use App\Models\DealProduct;
+use App\Models\handler;
 use App\Models\Product;
 use App\Models\Recipe;
 use App\Models\Stock;
@@ -139,7 +141,6 @@ class AdminController extends Controller
         return redirect()->route('viewProductPage');
     }
 
-
     public function updateProduct(Request $request)
     {
         $validatedData = $request->validate([
@@ -189,11 +190,49 @@ class AdminController extends Controller
     |---------------------------------------------------------------|
     */
 
+
     public function viewDealPage()
     {
-        $deals = Deal::with('products')->get();
-        return view('Admin.Deal')->with(['dealsData' => $deals]);
+        $handlers = Handler::with('deal')->get();
+        $deals = $handlers->pluck('deal')->unique();
+        $handlersAndProducts = Handler::join('products', 'handlers.product_id', '=', 'products.id')
+            ->select('handlers.id as handler_id', 'handlers.*', 'products.*')
+            ->get();
+        return view('Admin.Deal')->with(['dealsData' => $deals, 'dealProducts' => $handlersAndProducts]);
     }
+
+    // public function viewDealPage(){
+    //     $deals = Deal::all();
+    //     $dealsProducts = handler::all();
+    //     // dd($dealsProducts->product);
+    // return view('Admin.Deal')->with(['dealsData' => $deals, 'dealProducts'=>$dealsProducts]);
+    // }
+
+    // public function viewDealPage()
+    // {
+    //     $deals = handler::->get();
+
+    //     foreach ($deals as $deal) {
+    //         $totalPrice = 0;
+
+    //         foreach ($deal->products as $product) {
+    //             $pivotPrice = intval(str_replace(' Pkr', '', $product->pivot->product_total_price));
+    //             $totalPrice += $pivotPrice;  
+    //         }
+
+    //         $deal->dealDiscountedPrice = $totalPrice . " Pkr";
+    //         $deal->save();
+
+    //         // Get IDs of associated products
+    //         $productIds = $deal->products->pluck('id')->toArray();
+
+    //         // Sync only product IDs
+    //         $deal->products()->sync($productIds);
+    //     }
+
+    //     return view('Admin.Deal')->with(['dealsData' => $deals]);
+    // }
+
 
     public function viewDealProductsPage()
     {
@@ -203,9 +242,9 @@ class AdminController extends Controller
 
     public function viewUpdateDealProductsPage($id)
     {
-        dd($id);
         $product = Product::all();
-        return view('Admin.UpdateDealProduct')->with(['Products' => $product]);
+        $handler = handler::find($id);
+        return view('Admin.UpdateDealProduct')->with(['Products' => $product, 'dealId'=>$id, 'dealproducts'=>$handler]);
     }
 
     public function createDeal(Request $request)
@@ -244,7 +283,6 @@ class AdminController extends Controller
 
         $deal = Deal::find($request->id);
 
-        // Attach each product to the deal and set pivot data
         foreach ($productDetails as $productDetail) {
             $deal->products()->attach($productDetail['product_id'], [
                 'product_quantity' => $productDetail['quantity'],
@@ -254,11 +292,11 @@ class AdminController extends Controller
 
         $deal->dealActualPrice = $request->input('currentDealPrice');
         $deal->dealDiscountedPrice = $request->input('dealFinalPrice') . " " . "Pkr";
+
         $deal->save();
 
         return redirect()->route('viewDealPage');
     }
-
 
     public function updateDeal(Request $request)
     {
@@ -285,49 +323,49 @@ class AdminController extends Controller
         return redirect()->route('viewDealPage');
     }
 
-    public function editDeal($id)
+    // public function editDeal($id)
+    // {
+    //     dd($id);
+    //     $deals = Deal::all();
+    //     return view('Admin.Deal')->with(['dealsData' => $deals]);
+    // }
+
+    public function addDealProduct(Request $request)
     {
-        dd($id);
-        $deals = Deal::all();
-        return view('Admin.Deal')->with(['dealsData' => $deals]);
-    }
-
-    public function updateDealProducts(Request $request)
-    {
-        dd($request->all());
-
-        $productNames = '';
-        $productQuantities = '';
-        $productPrices = '';
-
+        $productDetails = [];
         $index = 0;
-
+        
         while ($request->has("product_name_{$index}")) {
-            $productName = $request->input("product_name_{$index}");
-            $productQuantity = $request->input("product_quantity_{$index}");
-            $productPrice = $request->input("product_total_price_{$index}");
-
-            $productNames .= $productName . ', ';
-            $productQuantities .= $productQuantity . ', ';
-            $productPrices .= $productPrice . ', ';
+            $productDetails[] = [
+                'product_id' => $request->input("product_id{$index}"),
+                'quantity' => $request->input("product_quantity_{$index}"),
+                'total_price' => $request->input("product_total_price_{$index}"),
+            ];
             $index++;
         }
 
-        $productNames = rtrim($productNames, ', ');
-        $productQuantities = rtrim($productQuantities, ', ');
-        $productPrices = rtrim($productPrices, ', ');
-
-
-        $currentDealPrice = $request->input('currentDealPrice');
-        $dealFinalPrice = $request->input('dealFinalPrice');
-
         $deal = Deal::find($request->id);
+        
+        $dealActualPrice = intval(str_replace(' Pkr', '', $deal->dealActualPrice));
+        $dealPrice = intval(str_replace(' Pkr', '', $deal->dealDiscountedPrice));
+        
+        $dealActualPrice = $dealActualPrice + intval(str_replace(' Pkr', '', $request->currentDealPrice));
+        $dealPrice = $dealPrice + intval($request->dealFinalPrice);
 
-        $deal->dealProductName = $productNames;
-        $deal->dealProductQuantity = $productQuantities;
-        $deal->dealProductPrice = $productPrices;
-        $deal->dealActualPrice = $currentDealPrice;
-        $deal->dealDiscountedPrice = $dealFinalPrice;
+        $deal->dealActualPrice = $dealActualPrice . " Pkr";
+        $deal->dealDiscountedPrice = $dealPrice . " Pkr";
+        // dd($request->all());
+        
+        foreach ($productDetails as $productDetail) {
+            $handler = new handler();
+            
+            $handler->deal_id = $request->id;
+            $handler->product_id = $productDetail['product_id'];
+            $handler->product_quantity = $productDetail['quantity'];
+            $handler->product_total_price = $productDetail['total_price'];
+            
+            $handler->save();
+        }
 
         $deal->save();
 
@@ -345,25 +383,36 @@ class AdminController extends Controller
         return redirect()->route('viewDealPage');
     }
 
-    public function deleteDealProduct($productId, $dealId)
+    public function deleteDealProduct($id, $dId)
     {
-        $deal = Deal::find($dealId);
-        $product = $deal->products()->find($productId);
+        $handler = Handler::find($id);
 
-        if (!$deal || !$product) {
-            return redirect()->route('viewDealPage')->with('error', 'Deal or product not found.');
+        if (!$handler) {
+            return redirect()->route('viewDealPage')->with('error', 'Handler not found.');
+        }
+        $deal = $handler->deal;
+
+        if (!$deal) {
+            return redirect()->route('viewDealPage')->with('error', 'Deal not found.');
         }
 
-        $productPrice = intval($product->productPrice);
+        $productPrice = intval($handler->product_total_price);
+        
+        $dealActualPrice = intval(str_replace(' Pkr', '', $deal->dealActualPrice));
         $dealDiscountedPrice = intval(str_replace(' Pkr', '', $deal->dealDiscountedPrice));
-        $updatedDealPrice = ($dealDiscountedPrice - $productPrice) . " Pkr";
-        $deal->dealDiscountedPrice = $updatedDealPrice;
+        
+        $updatedDealActualPrice = ($dealActualPrice - $productPrice) . " Pkr";
+        $updatedDealDiscountedPrice = ($dealDiscountedPrice - $productPrice) . " Pkr";
+        
+        $deal->dealActualPrice = $updatedDealActualPrice;
+        $deal->dealDiscountedPrice = $updatedDealDiscountedPrice;
+        
         $deal->save();
+        $handler->delete();
 
-        $product->delete();
-
-        return redirect()->route('viewDealPage')->with('success', 'Product deleted successfully.');
+        return redirect()->route('viewDealPage')->with('editAfterDelete', true);
     }
+
 
     /*
     |---------------------------------------------------------------|

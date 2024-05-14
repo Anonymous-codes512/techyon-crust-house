@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
-use App\Models\Deal;
+use App\Models\Deal; 
 use App\Models\Order;
 use App\Models\Product;
 use Illuminate\Http\Request;
@@ -60,6 +60,7 @@ class SalesmanController extends Controller
     }
     public function placeOrder(Request $request)
     {
+        dd($request->all());
         $productName = '';
         $productVariation = '';
         $addons = '';
