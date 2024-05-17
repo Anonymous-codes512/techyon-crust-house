@@ -26,7 +26,7 @@ main {
     padding: 0.5vw 1vw;
 }
 
-.newCategory button{
+.newCategory button {
     background-color: #ffbb00;
     border: none;
     padding: 0.81vw 1.2vw;
@@ -36,43 +36,43 @@ main {
     border-radius: 10px;
     cursor: pointer;
 }
-.newCategory button:hover{
+.newCategory button:hover {
     background-color: #bc9017;
 }
 
-table{
+table {
     border-collapse: collapse;
     width: 85%;
     margin: 1vw auto;
     margin-bottom: 2vw;
 }
 
-table thead tr{
+table thead tr {
     border-bottom: 2px solid #000;
 }
 
-table thead tr th:first-child{
+table thead tr th:first-child {
     text-align: left;
 }
 
-table thead tr th{
+table thead tr th {
     text-align: center;
 }
 
-table tbody tr{
+table tbody tr {
     border-bottom: 1px solid #898989;
 }
 
-table tbody tr td:first-child{
+table tbody tr td:first-child {
     text-align: left;
 }
 
-table tbody tr td{
+table tbody tr td {
     text-align: center;
     padding: 1vw 0;
 }
 
-table tbody tr td:last-child a{
+table tbody tr td:last-child a {
     padding: 0.3vw 0.5vw;
     text-decoration: none;
     color: #fff;
@@ -80,23 +80,25 @@ table tbody tr td:last-child a{
     font-size: 1.3vw;
 }
 
-table tbody tr td:last-child a:first-child{
-    background-color: #3FC28A;
+table tbody tr td:last-child a:first-child {
+    background-color: #3fc28a;
 }
 
-table tbody tr td:last-child a:last-child{
-    background-color: #F45B69;
+table tbody tr td:last-child a:last-child {
+    background-color: #f45b69;
 }
 
-table tbody tr td:last-child a:first-child:hover{
+table tbody tr td:last-child a:first-child:hover {
     background-color: #2da571;
 }
 
-table tbody tr td:last-child a:last-child:hover{
-    background-color: #f84857;;
+table tbody tr td:last-child a:last-child:hover {
+    background-color: #f84857;
 }
 
-#overlay, #editOverlay {
+#overlay,
+#editOverlay,
+#notificationOverlay {
     position: fixed;
     top: 0;
     left: 0;
@@ -104,13 +106,15 @@ table tbody tr td:last-child a:last-child:hover{
     height: 100%;
     background: rgba(0, 0, 0, 0.5);
     display: none;
-    z-index: 999; 
+    z-index: 999;
 }
 
-.newstock , .editstock{
+.newstock,
+.editstock,
+#notification {
     display: none;
     flex-direction: column;
-    background-color: #ffffff; 
+    background-color: #ffffff;
     position: absolute;
     border-radius: 10px;
     width: 30vw;
@@ -120,12 +124,50 @@ table tbody tr td:last-child a:last-child:hover{
     z-index: 1000;
 }
 
-.newstock h3, .editstock h3{
+#notification {
+    width: auto;
+}
+
+#notification p {
+    margin: 1vw 1vw 0;
+    font-size: 1vw;
+    font-weight: bold;
+    word-spacing: 1px;
+    padding: 10px;
+}
+
+#notification div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 1vw 1vw;
+    padding: 10px;
+}
+
+#notification div button{
+    display: flex;
+    font-family: "Poppins", sans-serif;
+    font-size: 1.2vw;
+    font-weight: 600;
+    padding: 0.5vw 2vw;
+    border-radius: 10px;
+    background-color: #ffbb00;
+    color: #fff;
+    border: none;
+}
+
+#notification div button:hover{
+    background-color: #bc9017;
+}
+
+.newstock h3,
+.editstock h3 {
     margin: 0;
     padding: 1vw 2vw;
-    font-family: "Poppins", sans-serif;    
+    font-family: "Poppins", sans-serif;
 }
-.newstock hr, .editstock hr{
+.newstock hr,
+.editstock hr {
     border: 1px solid #9b9b9b;
     width: 98%;
     margin: 0 auto 1vw;
@@ -138,7 +180,7 @@ table tbody tr td:last-child a:last-child:hover{
     text-align: center;
     border-radius: 10px;
 }
-  
+
 .choose-file-btn input[type="file"] {
     display: none;
 }
@@ -157,7 +199,7 @@ table tbody tr td:last-child a:last-child:hover{
     padding: 0.5vw;
 }
 
-.inputdivs{
+.inputdivs {
     margin: 0.4vw auto;
     width: 85%;
     display: flex;
@@ -166,7 +208,7 @@ table tbody tr td:last-child a:last-child:hover{
     font-size: 1vw;
 }
 
-#unitsDiv{
+#unitsDiv {
     display: flex;
     flex-direction: row;
     margin: 0.4vw auto;
@@ -175,33 +217,36 @@ table tbody tr td:last-child a:last-child:hover{
     font-size: 1vw;
 }
 
-#unitsDiv select, #unitsDiv input{
+#unitsDiv select,
+#unitsDiv input {
     border: none;
-    border-radius: 10px; 
+    border-radius: 10px;
     padding: 0.71vw 0.5vw;
     background-color: #e2e2e2;
 }
 
-#unitsDiv input{
+#unitsDiv input {
     width: 80%;
     margin-right: 1vw;
 }
 
-.inputdivs input, .inputdivs select {
+.inputdivs input,
+.inputdivs select {
     border: none;
-    border-radius: 10px; 
+    border-radius: 10px;
     padding: 0.71vw 0.5vw;
     background-color: #e2e2e2;
 }
 
-.btns{
+.btns {
     display: flex;
     justify-content: flex-end;
     margin: 01vw auto;
     width: 85%;
 }
 
-.btns button , .btns input{
+.btns button,
+.btns input {
     display: flex;
     font-family: "Poppins", sans-serif;
     font-size: 1.2vw;
@@ -211,26 +256,26 @@ table tbody tr td:last-child a:last-child:hover{
     border: none;
 }
 
-#cancel{
+#cancel {
     background-color: #e2e2e2;
 }
 
-.btns input{
+.btns input {
     background-color: #ffbb00;
     color: #fff;
 }
 
-#cancel:hover{
+#cancel:hover {
     background-color: #d3d3d3;
 }
 
-.btns input:hover{
+.btns input:hover {
     background-color: #d4a011;
 }
 
-.error-message{
-    color:#F45B69;
+.error-message {
+    color: #f45b69;
     font-size: 0.8rem;
-    margin:0px 05px;
+    margin: 0px 05px;
     font-family: "Poppins", sans-serif;
 }

@@ -9,25 +9,21 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up(): void
+    public function up()
     {
-        Schema::create('stocks', function (Blueprint $table) {
+        Schema::create('notifications', function (Blueprint $table) {
             $table->id();
-
-            $table->string('itemName');
-            $table->string('itemQuantity');
-            $table->string('mimimumItemQuantity');
-            $table->string('unitPrice');
-            
+            $table->string('message');
+            $table->boolean('is_read')->default(false);
             $table->timestamps();
         });
     }
 
-    /** 
+    /**
      * Reverse the migrations.
      */
     public function down(): void
     {
-        Schema::dropIfExists('stocks');
+        Schema::dropIfExists('notifications');
     }
 };

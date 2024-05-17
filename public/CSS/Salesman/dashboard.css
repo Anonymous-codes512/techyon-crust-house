@@ -50,7 +50,7 @@
     flex-direction: row;
     flex-wrap: wrap;
     padding: 0.21vw;
-    margin: 0 1vw;
+    margin: 0 1vw; 
     overflow: scroll;
     scrollbar-width: none;
 }

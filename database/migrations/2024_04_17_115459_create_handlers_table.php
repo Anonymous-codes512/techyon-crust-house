@@ -18,7 +18,7 @@ return new class extends Migration
             $table->unsignedBigInteger('product_id');
             
             $table->integer('product_quantity')->nullable();
-            $table->decimal('product_total_price', 10, 2)->nullable();
+            $table->string('product_total_price')->nullable();
             $table->foreign('deal_id')->references('id')->on('deals')->onDelete('cascade');
             $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
             

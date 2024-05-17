@@ -240,7 +240,6 @@ function updateProductSizeDropdown(product, allProducts) {
             }
             if (element.productName.toLowerCase() === product.productName.toLowerCase()) {
                 productVariations.push(`${element.productSize} (Rs. ${element.productPrice})`);
-                
             }
         });
         addOnsDropdown(addOnsArray, drinkFlavourDropdown);

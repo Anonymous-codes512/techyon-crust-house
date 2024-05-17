@@ -123,8 +123,8 @@
             <hr>
 
             <div class="inputdivs">
-                <select name="categoryId" id="pCategory">
-                    <option value="none" disabled>Select Product Category</option>
+                <select name="editcategoryId" id="editcategory" onclick="updateProductSizeToEditDropdown()">
+                    <option value="none" selected disabled>Select Product Category</option>
                     @foreach ($categoryData as $category)
                         <option value="{{ $category->id }},{{ $category->categoryName }}">{{ $category->categoryName }}
                         </option>
@@ -146,15 +146,9 @@
             @enderror
 
             <div class="inputdivs">
-                <select name="productSize" id="pSize">
-                    <option value="none" selected disabled>Select Product Size</option>
-                    <option value="Small">Small</option>
-                    <option value="Medium">Medium</option>
-                    <option value="Large">Large</option>
-                    <option value="XLarge">Extra Large</option>
-                    <option value="jombo">Jombo</option>
-                </select>
+                <select name="editProductSize" id="editProductSize"></select>
             </div>
+
             @error('productSize')
                 <span class="error-message">{{ $message }}</span>
             @enderror
@@ -204,23 +198,31 @@
             popup.style.display = 'none';
         }
 
-        const uploadFile = document.getElementById('upload-file');
-        const filenameSpan = document.getElementById('filename');
-
-        uploadFile.addEventListener('change', function(e) {
-            const fileName = this.value.split('\\').pop();
-            filenameSpan.textContent = fileName ? fileName : 'No file chosen';
-        });
-
         function editProduct(Product) {
             console.log(Product);
             let overlay = document.getElementById('editOverlay');
             let popup = document.getElementById('editProduct');
+
             document.getElementById('pId').value = Product.id;
             document.getElementById('pName').value = Product.productName;
-            document.getElementById('pSize').value = Product.productSize;
             document.getElementById('pPrice').value = Product.productPrice;
-            document.getElementById('pCategory').value = Product.category_id;
+
+            let categoryDropdown = document.getElementById('editcategory');
+            for (let i = 0; i < categoryDropdown.options.length; i++) {
+                if (categoryDropdown.options[i].text === Product.category_name) {
+                    categoryDropdown.selectedIndex = i;
+                    break;
+                }
+            }
+
+            let productSizeDropdown = document.getElementById('editProductSize');
+            for (let i = 0; i < productSizeDropdown.options.length; i++) {
+                if (productSizeDropdown.options[i].text === Product.productSize) {
+                    productSizeDropdown.selectedIndex = i;
+                    break;
+                }
+            }
+
             overlay.style.display = 'block';
             popup.style.display = 'flex';
         }
@@ -233,49 +235,78 @@
             popup.style.display = 'none';
         }
 
-        const uploadUpdatedFile = document.getElementById('upload-update-file');
-        const filenamSpan = document.getElementById('namefile');
-
-        uploadUpdatedFile.addEventListener('change', function(e) {
-            const fileNam = this.value.split('\\').pop();
-            filenamSpan.textContent = fileNam ? fileNam : 'No file chosen';
-        });
-
 
         function updateProductSizeDropdown() {
-
-            let categoryField = document.getElementById("category").value;
+            let categoryField = document.getElementById("category").value.trim();
             let productSizeDropdown = document.getElementById("productSize");
             productSizeDropdown.innerHTML = "";
 
-            category = categoryField.split(',');
+            let category = categoryField.split(',');
 
+            if (category.length > 1 && category[1]) {
+                if (category[1].trim().toLowerCase() === "drinks") {
+                    productSizeDropdown.style.display = "block";
+                    let drinkProductSizes = ["Regular", "1 Liter", "1.5 Liter"];
+                    addOptionsToDropdown(drinkProductSizes, productSizeDropdown);
+                } else if (category[1].trim().toLowerCase() === "appetizer") {
+                    productSizeDropdown.style.display = "block";
+                    let foodProductSizes = ["3 Pieces", "6 Pieces", "12 Pieces"];
+                    addOptionsToDropdown(foodProductSizes, productSizeDropdown);
+                } else if (category[1].trim().toLowerCase() === "fries") {
+                    productSizeDropdown.style.display = "block";
+                    let foodProductSizes = ["Regular", "Large"];
+                    addOptionsToDropdown(foodProductSizes, productSizeDropdown);
+                } else if (category[1].trim().toLowerCase() === "pizza") {
+                    productSizeDropdown.style.display = "block";
+                    let foodProductSizes = ["Small", "Regular", "Large", "Party"];
+                    addOptionsToDropdown(foodProductSizes, productSizeDropdown);
+                } else if (category[1].trim().toLowerCase() === "burger") {
+                    productSizeDropdown.style.display = "block";
+                    let foodProductSizes = ["Burger", "Fries + Reg Drink"];
+                    addOptionsToDropdown(foodProductSizes, productSizeDropdown);
+                } else if (category[1].trim().toLowerCase() === "others") {
+                    productSizeDropdown.style.display = "none";
+                } else {
+                    let foodProductSizes = ["Small", "Medium", "Large", "Extra Large", "Jumbo"];
+                    addOptionsToDropdown(foodProductSizes, productSizeDropdown);
+                }
+            }
+        }
 
-            if (category[1].toLowerCase() === "drinks") {
-                productSizeDropdown.style.display = "block";
-                let drinkProductSizes = ["Regular", "1 Liter", "1.5 Liter"];
-                addOptionsToDropdown(drinkProductSizes, productSizeDropdown);
-            } else if (category[1].toLowerCase() === "appetizer") {
-                productSizeDropdown.style.display = "block";
-                let foodProductSizes = ["3 Pieces", "6 Pieces", "12 Pieces"];
-                addOptionsToDropdown(foodProductSizes, productSizeDropdown);
-            } else if (category[1].toLowerCase() === "fries") {
-                productSizeDropdown.style.display = "block";
-                let foodProductSizes = ["Regular", "Large"];
-                addOptionsToDropdown(foodProductSizes, productSizeDropdown);
-            } else if (category[1].toLowerCase() === "pizza") {
-                productSizeDropdown.style.display = "block";
-                let foodProductSizes = ["Small", "Regular", "Large","Party"];
-                addOptionsToDropdown(foodProductSizes, productSizeDropdown);
-            } else if (category[1].toLowerCase() === "burger") {
-                productSizeDropdown.style.display = "block";
-                let foodProductSizes = ["Burger", "Fries + Reg Drink"];
-                addOptionsToDropdown(foodProductSizes, productSizeDropdown);
-            } else if (category[1].toLowerCase() === "others") {
-                productSizeDropdown.style.display = "none";
-            } else {
-                let foodProductSizes = ["Small", "Medium", "Large", "Extra Large", "Jumbo"];
-                addOptionsToDropdown(foodProductSizes, productSizeDropdown);
+        function updateProductSizeToEditDropdown() {
+            let categoryField = document.getElementById("editcategory").value.trim();
+            let productSizeDropdown = document.getElementById("editProductSize");
+            productSizeDropdown.innerHTML = "";
+
+            let category = categoryField.split(',');
+
+            if (category.length > 1 && category[1]) {
+                if (category[1].trim().toLowerCase() === "drinks") {
+                    productSizeDropdown.style.display = "block";
+                    let drinkProductSizes = ["Regular", "1 Liter", "1.5 Liter"];
+                    addOptionsToDropdown(drinkProductSizes, productSizeDropdown);
+                } else if (category[1].trim().toLowerCase() === "appetizer") {
+                    productSizeDropdown.style.display = "block";
+                    let foodProductSizes = ["3 Pieces", "6 Pieces", "12 Pieces"];
+                    addOptionsToDropdown(foodProductSizes, productSizeDropdown);
+                } else if (category[1].trim().toLowerCase() === "fries") {
+                    productSizeDropdown.style.display = "block";
+                    let foodProductSizes = ["Regular", "Large"];
+                    addOptionsToDropdown(foodProductSizes, productSizeDropdown);
+                } else if (category[1].trim().toLowerCase() === "pizza") {
+                    productSizeDropdown.style.display = "block";
+                    let foodProductSizes = ["Small", "Regular", "Large", "Party"];
+                    addOptionsToDropdown(foodProductSizes, productSizeDropdown);
+                } else if (category[1].trim().toLowerCase() === "burger") {
+                    productSizeDropdown.style.display = "block";
+                    let foodProductSizes = ["Burger", "Fries + Reg Drink"];
+                    addOptionsToDropdown(foodProductSizes, productSizeDropdown);
+                } else if (category[1].trim().toLowerCase() === "others") {
+                    productSizeDropdown.style.display = "none";
+                } else {
+                    let foodProductSizes = ["Small", "Medium", "Large", "Extra Large", "Jumbo"];
+                    addOptionsToDropdown(foodProductSizes, productSizeDropdown);
+                }
             }
         }
 
@@ -293,5 +324,21 @@
                 dropdown.add(option);
             }
         }
+
+
+        const uploadUpdatedFile = document.getElementById('upload-update-file');
+        const filenamSpan = document.getElementById('namefile');
+        uploadUpdatedFile.addEventListener('change', function(e) {
+            const fileNam = this.value.split('\\').pop();
+            filenamSpan.textContent = fileNam ? fileNam : 'No file chosen';
+        });
+
+
+        const uploadFile = document.getElementById('upload-file');
+        const filenameSpan = document.getElementById('filename');
+        uploadFile.addEventListener('change', function(e) {
+            const fileName = this.value.split('\\').pop();
+            filenameSpan.textContent = fileName ? fileName : 'No file chosen';
+        });
     </script>
 @endsection

@@ -26,7 +26,7 @@ Route::get('/dashboard', [OwnerController::class, 'viewOwnerDashboard'])->name('
 
 // Route::get('/dashboard2', function () {
 //     return view('Owner.Dashboard2');
-// });
+// }); 
 
 Route::get('/addnewbranch', [OwnerController ::class, 'addNewBranchIndex'])->name('addNewBranch');
 Route::post('/storeNewBranchData',[OwnerController::class,'newBranch'])->name('storeNewBranchData');
@@ -118,13 +118,14 @@ Route::get('/deleteStock/{id}',[AdminController::class,'deleteStock'])->name('de
 
 /*
 |---------------------------------------------------------------|
-|========================= Stock Routes ========================|
+|========================= Recipe Routes =======================|
 |---------------------------------------------------------------|
 */
 
 Route::get('/viewRecipePage', [AdminController::class,'viewRecipePage'])->name('viewRecipePage');
 Route::post('/createRecipe', [AdminController::class,'createRecipe'])->name('createRecipe');
-// Route::get('/deleteRecipe/{id}',[AdminController::class,'deleteRecipe'])->name('deleteRecipe');
+Route::get('/viewProductRecipe/{category_id}/{product_id}', [AdminController::class,'viewProductRecipe'])->name('viewProductRecipe');
+Route::get('/deleteStockFromRecipe/{id}/{cid}/{pId}', [AdminController::class, 'deleteStockFromRecipe'])->name('deleteStockFromRecipe');
 // Route::post('/updateStock',[AdminController::class,'updateStock'])->name('updateStock');
 
 /*
@@ -144,7 +145,6 @@ Route::get('/deleteStaff/{id}', [AdminController::class,'deleteStaff'])->name('d
 |==================== Sales Man Routes =========================|
 |---------------------------------------------------------------|
 */
-
 
 Route::get('salesman/dashboard', [SalesmanController::class,'viewSalesmanDashboard'])->name('salesman_dashboard');
 Route::get('salesman/dashboard/{categoryName}', [SalesmanController::class,'salesmanCategoryDashboard'])->name('salesman_dash');

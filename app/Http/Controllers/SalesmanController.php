@@ -52,7 +52,7 @@ class SalesmanController extends Controller
             }
         }
     }
-
+    
     public function deals()
     {
         $deals = Deal::all();

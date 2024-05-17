@@ -50,7 +50,11 @@
                 </div>
                 <div class="disc">
                     <p>Total Stock</p>
-                    <h3>150</h3>
+                    @if (session('totalStocks'))
+                        <h3>{{ session('totalStocks') }}</h3>
+                    @else
+                        <h3>Nil</h3>
+                    @endif
                 </div>
             </a>
 
@@ -60,7 +64,11 @@
                 </div>
                 <div class="disc">
                     <p>Branch Revenue</p>
-                    <h3>$120,530</h3>
+                    @if (session('totalRevenue'))
+                        <h3>{{ session('totalRevenue') }}</h3>
+                    @else
+                        <h3>Nil</h3>
+                    @endif
                 </div>
             </a>
 
@@ -78,13 +86,17 @@
                             type: 'line',
                             data: {
                                 labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-                                datasets: [{
-                                    label: 'Total Revenue',
-                                    data: [300, 100, 200, 300, 50, 250, 750, 150, 200, 67, 10, 400],
-                                    backgroundColor: '#ffbb00',
-                                    borderColor: '#ffbb00',
-                                    borderWidth: 2
-                                }]
+                                datasets: [
+                                    @foreach ($branchRevenueArray as $branchName => $revenues)
+                                        {
+                                            // label: '{{ $branchName }}',
+                                            data: [{{ implode(',', $revenues) }}],
+                                            backgroundColor: '#ffbb00',
+                                            borderColor: '#ffbb00',
+                                            borderWidth: 2
+                                        },
+                                    @endforeach
+                                ]
                             },
                             options: {
                                 scales: {
@@ -126,13 +138,17 @@
                             type: 'line',
                             data: {
                                 labels: ['Week1', 'Week2', 'Week3', 'Week4'],
-                                datasets: [{
-                                    label: 'Monthly Revenue',
-                                    data: [300, 100, 500, 10],
-                                    backgroundColor: '#ffbb00',
-                                    borderColor: '#ffbb00',
-                                    borderWidth: 2
-                                }]
+                                datasets: [
+                                    @foreach ($branchRevenueArray as $branchName => $revenues)
+                                        {
+                                            // label: '{{ $branchName }}',
+                                            data: [{{ implode(',', $revenues) }}],
+                                            backgroundColor: '#ffbb00',
+                                            borderColor: '#ffbb00',
+                                            borderWidth: 2
+                                        },
+                                    @endforeach
+                                ]
                             },
                             options: {
                                 scales: {

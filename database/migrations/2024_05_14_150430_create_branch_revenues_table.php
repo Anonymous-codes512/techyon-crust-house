@@ -11,15 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('deals', function (Blueprint $table) {
+        Schema::create('branch_revenues', function (Blueprint $table) {
             $table->id();
             
-            $table->string('dealImage')->nullable();
-            $table->string('dealTitle');
-            $table->string('dealStatus');
-            $table->string('dealActualPrice')->nullable();
-            $table->string('dealDiscountedPrice')->nullable();
-            $table->string('dealEndDate')->nullable();
+            $table->string('branch_name');
+            $table->string('month-name');
+            $table->string('monthly_revenue');
             
             $table->timestamps();
         });
@@ -28,9 +25,8 @@ return new class extends Migration
     /**
      * Reverse the migrations.
      */
-
     public function down(): void
     {
-        Schema::dropIfExists('deals');
+        Schema::dropIfExists('branch_revenues');
     }
 };

@@ -14,15 +14,21 @@ return new class extends Migration
         Schema::create('recipes', function (Blueprint $table) {
             $table->id();
             
-            $table->String('productCategory');
-            $table->String('productSize');
-            $table->String('productName');
-            $table->String('productRecipe');
+            $table->unsignedBigInteger('category_id')->nullable();
+            $table->foreign('category_id')->references('id')->on('categories')->onDelete('cascade');
+
+            $table->unsignedBigInteger('product_id')->nullable();
+            $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
+
+            $table->unsignedBigInteger('stock_id')->nullable();
+            $table->foreign('stock_id')->references('id')->on('stocks')->onDelete('cascade');
+
+            $table->string('quantity');
 
             $table->timestamps();
         });
     }
-
+ 
     /**
      * Reverse the migrations.
      */

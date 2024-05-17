@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\BranchRevenue;
 use App\Models\Category;
 use App\Models\Deal;
-use App\Models\DealProduct;
-use App\Models\handler;
+use App\Models\Handler;
 use App\Models\Product;
 use App\Models\Recipe;
 use App\Models\Stock;
@@ -21,8 +21,19 @@ class AdminController extends Controller
     {
         $totalCategories = $this->totalCategories();
         $totalProducts = $this->totalProducts();
+        $totalstocks = $this->totalstocks();
 
-        return view('Admin.AdminDashboard')->with(['totalCategories' => $totalCategories, 'totalProducts' => $totalProducts]);
+        $totalBranchRevenueData = $this->totalBranchRevenue();
+        $branchRevenueArray = $totalBranchRevenueData['branchRevenueArray'];
+        $totalRevenue = $totalBranchRevenueData['totalRevenue'];
+
+        return view('Admin.AdminDashboard')->with([
+            'totalCategories' => $totalCategories,
+            'totalProducts' => $totalProducts,
+            'totalStocks' => $totalstocks,
+            'branchRevenueArray' => $branchRevenueArray,
+            'totalRevenue' => $totalRevenue
+        ]);
     }
 
     /*
@@ -107,8 +118,7 @@ class AdminController extends Controller
     public function viewProductPage()
     {
         $categories = Category::all();
-        $products = Product::all();
-
+        $products = Product::orderBy('category_id')->get();
         if ($categories->isEmpty()) {
             return view('Admin.Product');
         }
@@ -143,31 +153,29 @@ class AdminController extends Controller
 
     public function updateProduct(Request $request)
     {
+
         $validatedData = $request->validate([
-            'categoryId' => 'required|exists:categories,id',
             'productName' => 'required|string|max:255',
-            'productSize' => 'required|string|max:255',
+            'editProductSize' => 'required|string|max:255',
             'productPrice' => 'required|string|max:255',
-            'productImage' => 'required|image|mimes:jpeg,png,jpg|max:2048',
         ]);
         $product = Product::find($request->pId);
-        $imageName = null;
 
         if ($request->hasFile('productImage')) {
 
             $existingImagePath = public_path('Images/ProductImages') . '/' .  $product->productImage;
             File::delete($existingImagePath);
 
+            $imageName = null;
             $image = $request->file('productImage');
             $imageName = time() . '.' . $image->getClientOriginalExtension();
             $image->move(public_path('Images/ProductImages'), $imageName);
+            $product->productImage = $imageName;
         }
 
-        $product->productImage = $imageName;
         $product->productName = $validatedData['productName'];
-        $product->productSize = $validatedData['productSize'];
+        $product->productSize = $validatedData['editProductSize'];
         $product->productPrice = $validatedData['productPrice'];
-        $product->category_id = $validatedData['categoryId'];
         $product->save();
 
         return redirect()->route('viewProductPage');
@@ -201,50 +209,17 @@ class AdminController extends Controller
         return view('Admin.Deal')->with(['dealsData' => $deals, 'dealProducts' => $handlersAndProducts]);
     }
 
-    // public function viewDealPage(){
-    //     $deals = Deal::all();
-    //     $dealsProducts = handler::all();
-    //     // dd($dealsProducts->product);
-    // return view('Admin.Deal')->with(['dealsData' => $deals, 'dealProducts'=>$dealsProducts]);
-    // }
-
-    // public function viewDealPage()
-    // {
-    //     $deals = handler::->get();
-
-    //     foreach ($deals as $deal) {
-    //         $totalPrice = 0;
-
-    //         foreach ($deal->products as $product) {
-    //             $pivotPrice = intval(str_replace(' Pkr', '', $product->pivot->product_total_price));
-    //             $totalPrice += $pivotPrice;  
-    //         }
-
-    //         $deal->dealDiscountedPrice = $totalPrice . " Pkr";
-    //         $deal->save();
-
-    //         // Get IDs of associated products
-    //         $productIds = $deal->products->pluck('id')->toArray();
-
-    //         // Sync only product IDs
-    //         $deal->products()->sync($productIds);
-    //     }
-
-    //     return view('Admin.Deal')->with(['dealsData' => $deals]);
-    // }
-
-
     public function viewDealProductsPage()
     {
-        $product = Product::all();
-        return view('Admin.DealProducts')->with(['Products' => $product]);
+        $products = Product::orderBy('category_id')->get();
+        return view('Admin.DealProducts')->with(['Products' => $products]);
     }
 
     public function viewUpdateDealProductsPage($id)
     {
-        $product = Product::all();
-        $handler = handler::find($id);
-        return view('Admin.UpdateDealProduct')->with(['Products' => $product, 'dealId'=>$id, 'dealproducts'=>$handler]);
+        $products = Product::orderBy('category_id')->get();
+        $handler = Handler::find($id);
+        return view('Admin.UpdateDealProduct')->with(['Products' => $products, 'dealId' => $id, 'dealproducts' => $handler]);
     }
 
     public function createDeal(Request $request)
@@ -323,18 +298,11 @@ class AdminController extends Controller
         return redirect()->route('viewDealPage');
     }
 
-    // public function editDeal($id)
-    // {
-    //     dd($id);
-    //     $deals = Deal::all();
-    //     return view('Admin.Deal')->with(['dealsData' => $deals]);
-    // }
-
     public function addDealProduct(Request $request)
     {
         $productDetails = [];
         $index = 0;
-        
+
         while ($request->has("product_name_{$index}")) {
             $productDetails[] = [
                 'product_id' => $request->input("product_id{$index}"),
@@ -345,25 +313,24 @@ class AdminController extends Controller
         }
 
         $deal = Deal::find($request->id);
-        
+
         $dealActualPrice = intval(str_replace(' Pkr', '', $deal->dealActualPrice));
         $dealPrice = intval(str_replace(' Pkr', '', $deal->dealDiscountedPrice));
-        
+
         $dealActualPrice = $dealActualPrice + intval(str_replace(' Pkr', '', $request->currentDealPrice));
         $dealPrice = $dealPrice + intval($request->dealFinalPrice);
 
         $deal->dealActualPrice = $dealActualPrice . " Pkr";
         $deal->dealDiscountedPrice = $dealPrice . " Pkr";
-        // dd($request->all());
-        
+
         foreach ($productDetails as $productDetail) {
             $handler = new handler();
-            
+
             $handler->deal_id = $request->id;
             $handler->product_id = $productDetail['product_id'];
             $handler->product_quantity = $productDetail['quantity'];
             $handler->product_total_price = $productDetail['total_price'];
-            
+
             $handler->save();
         }
 
@@ -397,16 +364,16 @@ class AdminController extends Controller
         }
 
         $productPrice = intval($handler->product_total_price);
-        
+
         $dealActualPrice = intval(str_replace(' Pkr', '', $deal->dealActualPrice));
         $dealDiscountedPrice = intval(str_replace(' Pkr', '', $deal->dealDiscountedPrice));
-        
+
         $updatedDealActualPrice = ($dealActualPrice - $productPrice) . " Pkr";
         $updatedDealDiscountedPrice = ($dealDiscountedPrice - $productPrice) . " Pkr";
-        
+
         $deal->dealActualPrice = $updatedDealActualPrice;
         $deal->dealDiscountedPrice = $updatedDealDiscountedPrice;
-        
+
         $deal->save();
         $handler->delete();
 
@@ -422,8 +389,26 @@ class AdminController extends Controller
 
     public function viewStockPage()
     {
-        $stockData = Stock::all();
-        return view('Admin.Stock')->with(['stockData' => $stockData]);
+        $stocks = Stock::all();
+
+        foreach($stocks as $stock){
+            $quantity = (int)preg_replace('/[^0-9]/', '', $stock->itemQuantity);
+            $unit = preg_replace('/[0-9\s]/', '', $stock->itemQuantity);
+            $minimumQuantity = (int)preg_replace('/[^0-9]/', '', $stock->mimimumItemQuantity); 
+            $minimumUnit = preg_replace('/[0-9\s]/', '', $stock->mimimumItemQuantity); 
+
+            $quantity = $unit === "Kg" ? $quantity * 1000: $quantity;
+            $minimumQuantity = $minimumUnit === "Kg" ? $minimumQuantity * 1000: $minimumQuantity;
+
+            if($quantity <= $minimumQuantity) {
+                $notification = "Quantity of {$stock->itemName} is below or equal to the minimum level";
+            }
+            else{
+                $notification = null;
+            }
+        }
+
+        return view('Admin.Stock')->with(['stockData' => $stocks, 'notification'=>$notification]);
     }
 
     public function createStock(Request $request)
@@ -432,38 +417,19 @@ class AdminController extends Controller
 
         if ($existingStock) {
 
-            $ESIQ = floatval($existingStock->itemQuantity) < 1000 ? floatval($existingStock->itemQuantity) * 1000 : floatval($existingStock->itemQuantity);         // $ESIQ ==> Existing Stock Item Quantity
-            // $ESMIQ = floatval($existingStock->mimimumItemQuantity) ? floatval($existingStock->mimimumItemQuantity) : floatval($existingStock->mimimumItemQuantity);  // $ESMIQ ==> Existing Stock Minimun Item Quantity
-
-            if ($request->unit === "g") {
-                $itemQuantity = ($ESIQ + $request->stockQuantity) >= 1000 ? ($ESIQ + $request->stockQuantity) / 1000 . 'kg' : ($ESIQ + $request->stockQuantity) . 'g';
-                $mimimumItemQuantity = ($request->minStockQuantity) >= 1000 ? ($request->minStockQuantity) / 1000 . 'kg' : ($request->minStockQuantity) . 'g';
-            } else if ($request->unit === "ml") {
-                $itemQuantity = ($ESIQ + $request->stockQuantity) >= 1000 ? ($ESIQ + $request->stockQuantity) / 1000 . 'ltr' : ($ESIQ + $request->stockQuantity) . 'ml';
-                $mimimumItemQuantity = (+$request->minStockQuantity) >= 1000 ? ($request->minStockQuantity) / 1000 . 'ltr' : ($request->minStockQuantity) . 'ml';
-            }
-
+            $ESIQ = floatval($existingStock->itemQuantity);
             $existingStock->itemName = $request->itemName;
-            $existingStock->itemQuantity = $itemQuantity;
-            $existingStock->mimimumItemQuantity = $mimimumItemQuantity;
+            $existingStock->itemQuantity = ($ESIQ + $request->stockQuantity) . $request->unit1;
+            $existingStock->mimimumItemQuantity = $request->minStockQuantity . $request->unit2;
             $existingStock->unitPrice = $request->unitPrice . ' Pkr';
 
             $existingStock->save();
             return redirect()->route('viewStockPage');
         } else {
             $newStock = new Stock();
-
-            if ($request->unit === "g") {
-                $itemQuantity = $request->stockQuantity >= 1000 ? ($request->stockQuantity / 1000) . 'kg' : $request->stockQuantity . 'g';
-                $mimimumItemQuantity = $request->minStockQuantity >= 1000 ? ($request->minStockQuantity / 1000) . 'kg' : $request->minStockQuantity . 'g';
-            } else if ($request->unit === "ml") {
-                $itemQuantity = $request->stockQuantity >= 1000 ? ($request->stockQuantity / 1000) . 'ltr' : $request->stockQuantity . 'ml';
-                $mimimumItemQuantity = $request->minStockQuantity >= 1000 ? ($request->minStockQuantity / 1000) . 'ltr' : $request->minStockQuantity . 'ml';
-            }
-
             $newStock->itemName = $request->itemName;
-            $newStock->itemQuantity = $itemQuantity;
-            $newStock->mimimumItemQuantity = $mimimumItemQuantity;
+            $newStock->itemQuantity = $request->stockQuantity . $request->unit1;
+            $newStock->mimimumItemQuantity = $request->minStockQuantity . $request->unit2;
             $newStock->unitPrice = $request->unitPrice . ' Pkr';
 
             $newStock->save();
@@ -475,17 +441,9 @@ class AdminController extends Controller
     {
         $stockData = Stock::find($request->sId);
 
-        if ($request->unit === "g") {
-            $itemQuantity = $request->stockQuantity >= 1000 ? ($request->stockQuantity / 1000) . 'kg' : $request->stockQuantity . 'g';
-            $mimimumItemQuantity = $request->minStockQuantity >= 1000 ? ($request->minStockQuantity / 1000) . 'kg' : $request->minStockQuantity . 'g';
-        } else if ($request->unit === "ml") {
-            $itemQuantity = $request->stockQuantity >= 1000 ? ($request->stockQuantity / 1000) . 'ltr' : $request->stockQuantity . 'ml';
-            $mimimumItemQuantity = $request->minStockQuantity >= 1000 ? ($request->minStockQuantity / 1000) . 'ltr' : $request->minStockQuantity . 'ml';
-        }
-
         $stockData->itemName = $request->itemName;
-        $stockData->itemQuantity = $itemQuantity;
-        $stockData->mimimumItemQuantity = $mimimumItemQuantity;
+        $stockData->itemQuantity = $request->stockQuantity . $request->unit1;
+        $stockData->mimimumItemQuantity = $request->minStockQuantity . $request->unit2;
         $stockData->unitPrice = $request->unitPrice . ' Pkr';
 
         $stockData->save();
@@ -508,35 +466,66 @@ class AdminController extends Controller
 
     public function viewRecipePage()
     {
-        $products = Product::all();
+        $products = Product::with('category')->get();
+        $categories = $products->pluck('category')->unique();
         $stocks = Stock::all();
-        return view('Admin.Recipe')->with(['products' => $products, 'stocks' => $stocks]);
+        session(['showproductRecipe' => false]);
+
+        return view('Admin.Recipe')->with(['products' => $products, 'categories' => $categories, 'stocks' => $stocks, 'recipes' => null]);
     }
 
     public function createRecipe(Request $request)
     {
-        $recipe = new Recipe();
-        $product = Product::find($request->pId);
+        $requestData = $request->all();
 
-        $productRecipe = $request->input('productRecipe');
-        $formattedRecipe = str_replace("\n", "", trim($productRecipe));
+        $category_id = $requestData['cId'];
+        $product_id = $requestData['pId'];
 
-        $recipe->productCategory = $product->category_name;
-        $recipe->productSize = $product->productSize;
-        $recipe->productName = $product->productName;
-        $recipe->productRecipe = $formattedRecipe;
+        $recipeItems = explode(',', $requestData['recipeItems']);
 
-        $recipe->save();
+        foreach ($recipeItems as $item) {
+            $itemParts = explode('~', $item);
+            $quantity = $itemParts[0];
+            $stockId = $itemParts[1];
+
+            $newRecipe = new Recipe();
+
+            $newRecipe->category_id = $category_id;
+            $newRecipe->product_id = $product_id;
+            $newRecipe->stock_id = $stockId;
+            $newRecipe->quantity = $quantity;
+
+            $newRecipe->save();
+        }
 
         return redirect()->route('viewRecipePage');
     }
 
-    public function deleteRecipe($id)
+    public function viewProductRecipe($category_id, $product_id)
+    {
+        $recipes = Recipe::where('product_id', $product_id)->where('category_id', $category_id)->with('stock', 'product')->get();
+
+        $products = Product::with('category')->get();
+        $categories = $products->pluck('category')->unique();
+        $stocks = Stock::all();
+        session(['showproductRecipe' => true]);
+
+        return view('Admin.Recipe')->with([
+            'products' => $products,
+            'categories' => $categories,
+            'stocks' => $stocks,
+            'recipes' => $recipes
+        ]);
+    }
+
+    public function deleteStockFromRecipe($id, $cId, $pId)
     {
         $recipe = Recipe::find($id);
-        $recipe->delete();
+        if ($recipe) {
+            $recipe->delete();
+        }
 
-        return redirect()->route('viewRecipePage');
+        return redirect()->route('viewProductRecipe', ['category_id' => $cId, 'product_id' => $pId]);
     }
 
     /*
@@ -599,5 +588,35 @@ class AdminController extends Controller
         $Products = Product::count();
         session(['totalProducts' => $Products]);
         return $Products;
+    }
+
+    public function totalstocks()
+    {
+        $Stocks = Stock::count();
+        session(['totalStocks' => $Stocks]);
+        return $Stocks;
+    }
+
+    public function totalBranchRevenue()
+    {
+        $branchRevenues = BranchRevenue::all();
+        $branchRevenueArray = [];
+        $totalRevenue = 0;
+        foreach ($branchRevenues as $revenue) {
+            $branchName = $revenue->branch_name;
+            $revenueValue = (int)str_replace(' Pkr', '', $revenue->monthly_revenue);
+            if (isset($branchRevenueArray[$branchName])) {
+                $branchRevenueArray[$branchName][] = $revenueValue;
+            } else {
+                $branchRevenueArray[$branchName] = [$revenueValue];
+            }
+            $totalRevenue += $revenueValue;
+        }
+        session(['totalRevenue' => $totalRevenue . ' Pkr']);
+
+        return [
+            'branchRevenueArray' => $branchRevenueArray,
+            'totalRevenue' => $totalRevenue
+        ];
     }
 }

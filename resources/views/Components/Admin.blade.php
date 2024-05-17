@@ -92,7 +92,19 @@
 
                     <div class="notification">
                         <i class='bx bx-bell' title="notifications"></i>
+                        @if(count($notifications) > 0)
+                            <span class="badge">{{ count($notifications) }}</span>
+                            <div class="notification-dropdown">
+                                <ul>
+                                    @foreach($notifications as $notification)
+                                        <li>{{ $notification }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
                     </div>
+                    
+
 
                     <a href="{{ route('logout') }}" class="logout">
                         <i class='bx bx-log-out-circle' title="logout"></i>

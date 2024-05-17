@@ -34,7 +34,7 @@
             <tbody>
                 @foreach ($dealsData as $deal)
                     <tr>
-                        <td onclick="showDealInfo(  , {{ json_encode($allDealProducts) }} )">
+                        <td onclick="showDealInfo({{ json_encode($deal) }}, {{ json_encode($allDealProducts) }} )">
                             <img src={{ asset('Images/DealImages/' . $deal->dealImage) }} alt=" Deal Image">
                         </td>
                         <td onclick="showDealInfo({{ json_encode($deal) }}, {{ json_encode($allDealProducts) }})">

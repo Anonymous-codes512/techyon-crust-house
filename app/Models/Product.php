@@ -25,4 +25,9 @@ class Product extends Model
     {
         return $this->belongsToMany(Deal::class, 'handlers')->withPivot('product_quantity', 'product_total_price');
     }
+    
+    public function recipe()
+    {
+        return $this->hasOne(Recipe::class);
+    }
 }
