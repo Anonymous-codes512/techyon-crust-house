@@ -14,17 +14,16 @@
         </div>
 
         @php
-            $notification = $notification;
+            $notifications = $notification;
         @endphp
 
-        @if ($notification)
+        @if (!empty($notifications))
             <script>
                 document.addEventListener('DOMContentLoaded', function() {
                     document.getElementById('shownotify').click();
                 });
             </script>
         @endif
-
 
         <table>
             <thead>
@@ -81,7 +80,9 @@
                     <option value="Kg">Kilogram</option>
                     <option value="ml">Milliliter</option>
                     <option value="l">Liter</option>
-                    <option value="Gallan">Gallan</option>
+                    <option value="lbs">Pound</option>
+                    <option value="gal">Gallan</option>
+                    <option value="oz">Ounce</option>
                 </select>
             </div>
 
@@ -95,7 +96,9 @@
                     <option value="Kg">Kilogram</option>
                     <option value="ml">Milliliter</option>
                     <option value="l">Liter</option>
-                    <option value="Gallan">Gallan</option>
+                    <option value="lbs">Pound</option>
+                    <option value="gal">Gallan</option>
+                    <option value="oz">Ounce</option>
                 </select>
             </div>
 
@@ -138,7 +141,9 @@
                     <option value="Kg">Kilogram</option>
                     <option value="ml">Milliliter</option>
                     <option value="l">Liter</option>
-                    <option value="Gallan">Gallan</option>
+                    <option value="gal">Gallan</option>
+                    <option value="lbs">Pound</option>
+                    <option value="oz">Ounce</option>
                 </select>
             </div>
 
@@ -151,7 +156,9 @@
                     <option value="Kg">Kilogram</option>
                     <option value="ml">Milliliter</option>
                     <option value="l">Liter</option>
-                    <option value="Gallan">Gallan</option>
+                    <option value="gal">Gallan</option>
+                    <option value="lbs">Pound</option>
+                    <option value="oz">Ounce</option>
                 </select>
             </div>
 
@@ -171,14 +178,18 @@
             |---------------------------------------------------------------|
         --}}
 
-        <div id="notificationOverlay"></div>
-        <div id="notification">
-            <p>{{ $notification }}</p>
-            <div>
-                <button id="shownotify" type="button" style="display: none" onclick="showNotification()"></button>
-                <button type="button" onclick="closeNotification()">Ok</button>
+        @if ($notifications || !$notifications == null)
+            <div id="notificationOverlay"></div>
+            <div id="notification">
+                @foreach ($notifications as $notify)
+                    <p>{{ $notify }}</p>
+                @endforeach
+                <div>
+                    <button id="shownotify" type="button" style="display: none" onclick="showNotification()"></button>
+                    <button type="button" onclick="closeNotification()">Ok</button>
+                </div>
             </div>
-        </div>
+        @endif
 
     </main>
 
@@ -265,24 +276,3 @@
         }
     </script>
 @endsection
-
-
-{{-- let iQUnit = stock.itemQuantity.replace(/[0-9.]/g, '');
-    let mQUnit = stock.mimimumItemQuantity.replace(/[0-9.]/g, '');
-
-    if (iQUnit == 'kg') {
-        let itemQuantity = (parseFloat(stock.itemQuantity) < 1000) ? (parseFloat(stock.itemQuantity) * 1000): (parseFloat(stock.itemQuantity));
-        document.getElementById('iQuantity').value = itemQuantity;
-        document.getElementById('iQUnit').value = itemQuantity <= 1000 ? "Kg" : "g";
-        let mimimumItemQuantity = (parseFloat(stock.mimimumItemQuantity) > 1000) ? (parseFloat(stock.mimimumItemQuantity) * 1000) : (parseFloat(stock.mimimumItemQuantity));
-        document.getElementById('mQuantity').value = mimimumItemQuantity;
-        document.getElementById('mQUnit').value = mimimumItemQuantity >= 1000 ? "kg" : "g";
-        
-    } else if (iQUnit == 'ltr') {
-        let itemQuantity = (parseFloat(stock.itemQuantity) < 1000) ? (parseFloat(stock.itemQuantity) * 1000): (parseFloat(stock.itemQuantity));
-        document.getElementById('iQuantity').value = itemQuantity;
-        document.getElementById('iQUnit').value = itemQuantity <= 1000 ? "ltr" : "ml";
-        let mimimumItemQuantity = (parseFloat(stock.mimimumItemQuantity) > 1000) ? (parseFloat(stock.mimimumItemQuantity) * 1000) : (parseFloat(stock.mimimumItemQuantity));
-        document.getElementById('mQuantity').value = mimimumItemQuantity;
-        document.getElementById('mQUnit').value = mimimumItemQuantity >= 1000 ? "ltr" : "ml";            
-} --}}

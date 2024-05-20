@@ -64,6 +64,9 @@ Route::get('/diningtable', function(){
 */
 
 Route::get('/admindashboard',[AdminController::class,'viewAdminDashboard'])->name('admindashboard');
+Route::get('/readNotification/{id}',[AdminController::class,'readNotification'])->name('readNotification');
+Route::get('/deleteNotification/{id}',[AdminController::class,'deleteNotification'])->name('deleteNotification');
+Route::get('/redirectNotification',[AdminController::class,'redirectNotification'])->name('redirectNotification');
 
 /*
 |---------------------------------------------------------------|
@@ -126,7 +129,6 @@ Route::get('/viewRecipePage', [AdminController::class,'viewRecipePage'])->name('
 Route::post('/createRecipe', [AdminController::class,'createRecipe'])->name('createRecipe');
 Route::get('/viewProductRecipe/{category_id}/{product_id}', [AdminController::class,'viewProductRecipe'])->name('viewProductRecipe');
 Route::get('/deleteStockFromRecipe/{id}/{cid}/{pId}', [AdminController::class, 'deleteStockFromRecipe'])->name('deleteStockFromRecipe');
-// Route::post('/updateStock',[AdminController::class,'updateStock'])->name('updateStock');
 
 /*
 |---------------------------------------------------------------|
@@ -138,7 +140,6 @@ Route::get('/viewOrdersPage', [AdminController::class,'viewOrdersPage'])->name('
 Route::get('/viewStaffPage', [AdminController::class,'viewStaffPage'])->name('viewStaffPage');
 Route::get('/updateStaff', [AdminController::class,'updateStaff'])->name('updateStaff');
 Route::get('/deleteStaff/{id}', [AdminController::class,'deleteStaff'])->name('deleteStaff');
-
 
 /*
 |---------------------------------------------------------------|

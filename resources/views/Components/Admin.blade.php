@@ -86,25 +86,51 @@
                         <div class="profilepic">
                             <img src="{{ asset('Images/Rectangle 3463281.png') }}" alt="Profile Picture">
                         </div>
-                        <p class="profilename">{{ session('username') }}</p>
-                    </div>
 
-
-                    <div class="notification">
-                        <i class='bx bx-bell' title="notifications"></i>
-                        @if(count($notifications) > 0)
-                            <span class="badge">{{ count($notifications) }}</span>
-                            <div class="notification-dropdown">
-                                <ul>
-                                    @foreach($notifications as $notification)
-                                        <li>{{ $notification }}</li>
-                                    @endforeach
-                                </ul>
-                            </div>
+                        @if (session('username'))
+                            <p class="profilename">{{ session('username') }}</p>
                         @endif
-                    </div>
-                    
 
+                    </div>
+
+                    @php
+                        $notifications = session('Notifications');
+                    @endphp
+
+                    @if (!$notifications || $notifications->isEmpty())
+                        <div class="notification">
+                            <i class='bx bxs-bell' title="notifications" onclick="toggleNotification()"></i>
+                            <div id="notificationBox" class="notificationBox">
+                                <p id="heading">Notifications</p>
+                                <div class="message">
+                                    <p>No new notifications</p>
+                                </div>
+                            </div>
+                        </div>
+                    @else
+                        <div class="notification">
+                            <i class='bx bxs-bell-ring bx-tada' title="notifications"
+                                onclick="toggleNotification()"></i>
+                            <div id="notificationBox" class="notificationBox">
+                                <p id="heading">Notifications</p>
+
+                                @foreach ($notifications as $notification)
+                                    <div class="message">
+                                        <a href="{{ route('redirectNotification') }}"
+                                            style="text-decoration:none; color:black;">
+                                            <p>{{ $notification->message }}</p>
+                                        </a>
+                                        <div class="buttons">
+                                            <a href="{{ route('readNotification', $notification->id) }}"><i
+                                                    class='bx bxs-book-reader' title="Read"></i></a>
+                                            <a href="{{ route('deleteNotification', $notification->id) }}"><i
+                                                    class='bx bxs-trash' title="Delete"></i></a>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endif
 
                     <a href="{{ route('logout') }}" class="logout">
                         <i class='bx bx-log-out-circle' title="logout"></i>
@@ -121,6 +147,16 @@
         </div>
     </div>
     <script src="{{ asset('JavaScript/index.js') }}"></script>
+    <script>
+        function toggleNotification() {
+            const notificationBox = document.getElementById('notificationBox');
+            if (notificationBox.style.display === "flex") {
+                notificationBox.style.display = "none";
+            } else {
+                notificationBox.style.display = "flex";
+            }
+        }
+    </script>
 </body>
 
 </html>

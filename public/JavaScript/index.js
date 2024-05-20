@@ -18,7 +18,7 @@ function updateActiveMenuItem() {
         setActiveMenuItem(targetElement.id);
     }
 }
-    
+
 let options = document.querySelectorAll('.menuItems');
 
 options.forEach(element => {
@@ -41,6 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     updateActiveMenuItem();
 });
+
 
 window.addEventListener('popstate', updateActiveMenuItem);
 
@@ -138,8 +139,7 @@ let texts = document.getElementsByClassName('status');
 Array.from(texts).forEach(text => {
     if (text.textContent.toLowerCase() === "active") {
         text.style.color = '#3FC28A';
-    }
-    else if(text.textContent.toLowerCase() === "inactive"){
+    } else if (text.textContent.toLowerCase() === "inactive") {
         text.style.color = '#F45B69';
     }
 });
@@ -183,8 +183,7 @@ let avaliable = document.getElementsByClassName('table-avaliablity');
 Array.from(avaliable).forEach(avaliablity => {
     if (avaliablity.textContent.toLowerCase() === "avaliable") {
         avaliablity.style.color = '#3FC28A';
-    }
-    else if(avaliablity.textContent.toLowerCase() === "not avaliable"){
+    } else if (avaliablity.textContent.toLowerCase() === "not avaliable") {
         avaliablity.style.color = '#F45B69';
     }
 });
@@ -200,10 +199,9 @@ function showAndHidePswd() {
 
 function showAndHideCnfrmPswd() {
     let cnfrmPswd = document.getElementById('cnfrmPswd');
-    if(cnfrmPswd.type === 'password') {
+    if (cnfrmPswd.type === 'password') {
         cnfrmPswd.type = 'text';
     } else {
         cnfrmPswd.type = 'password';
     }
 }
-

@@ -6,6 +6,7 @@ use App\Models\BranchRevenue;
 use App\Models\Category;
 use App\Models\Deal;
 use App\Models\Handler;
+use App\Models\Notification;
 use App\Models\Product;
 use App\Models\Recipe;
 use App\Models\Stock;
@@ -34,6 +35,27 @@ class AdminController extends Controller
             'branchRevenueArray' => $branchRevenueArray,
             'totalRevenue' => $totalRevenue
         ]);
+    }
+
+    public function readNotification($id)
+    {
+        $notification = Notification::find($id);
+        $notification->is_read = true;
+        $notification->save();
+        return Redirect()->route('viewStockPage');
+    }
+
+    public function deleteNotification($id)
+    {
+        $notification = Notification::find($id);
+        $notification->delete();
+        return Redirect()->route('viewStockPage');
+    }
+
+    public function redirectNotification()
+    {
+        $stocks = Stock::all();
+        return view('Admin.Stock')->with(['stockData' => $stocks, 'notification' => null]);
     }
 
     /*
@@ -389,26 +411,52 @@ class AdminController extends Controller
 
     public function viewStockPage()
     {
+        $conversionMap = [
+            'g' => 1,           //grams
+            'kg' => 1000,       //kilograms
+            'mg' => 0.001,      //miligrams
+            'lbs' => 453.592,   //pounds
+            'oz' => 28.3495,    //ounce
+            'ml' => 1,          //mililiter
+            'l' => 1000,        //liter
+            'gal' => 3785.41,   //gallan
+        ];
+
         $stocks = Stock::all();
+        $notifications = [];
 
-        foreach($stocks as $stock){
+        foreach ($stocks as $stock) {
             $quantity = (int)preg_replace('/[^0-9]/', '', $stock->itemQuantity);
-            $unit = preg_replace('/[0-9\s]/', '', $stock->itemQuantity);
-            $minimumQuantity = (int)preg_replace('/[^0-9]/', '', $stock->mimimumItemQuantity); 
-            $minimumUnit = preg_replace('/[0-9\s]/', '', $stock->mimimumItemQuantity); 
+            $unit = strtolower(preg_replace('/[0-9\s]/', '', $stock->itemQuantity));
+            $minimumQuantity = (int)preg_replace('/[^0-9]/', '', $stock->mimimumItemQuantity);
+            $minimumUnit = strtolower(preg_replace('/[0-9\s]/', '', $stock->mimimumItemQuantity));
 
-            $quantity = $unit === "Kg" ? $quantity * 1000: $quantity;
-            $minimumQuantity = $minimumUnit === "Kg" ? $minimumQuantity * 1000: $minimumQuantity;
+            $isLiquidUnit = in_array($unit, ['ml', 'l', 'fl oz', 'pt', 'qt', 'gal']);
+            $isMinimumLiquidUnit = in_array($minimumUnit, ['ml', 'l', 'fl oz', 'pt', 'qt', 'gal']);
 
-            if($quantity <= $minimumQuantity) {
-                $notification = "Quantity of {$stock->itemName} is below or equal to the minimum level";
+            if (isset($conversionMap[$unit])) {
+                $quantity *= $conversionMap[$unit];
+            } else {
+                $quantity *= $isLiquidUnit ? $conversionMap['ml'] : $conversionMap['g'];
             }
-            else{
-                $notification = null;
+
+            if (isset($conversionMap[$minimumUnit])) {
+                $minimumQuantity *= $conversionMap[$minimumUnit];
+            } else {
+                $minimumQuantity *= $isMinimumLiquidUnit ? $conversionMap['ml'] : $conversionMap['g'];
+            }
+
+            if ($quantity <= $minimumQuantity) {
+                $notificationMessage = "Quantity of {$stock->itemName} is below or equal to the minimum level";
+                Notification::create(['message' => $notificationMessage]);
+                $notifications[] = $notificationMessage;
             }
         }
 
-        return view('Admin.Stock')->with(['stockData' => $stocks, 'notification'=>$notification]);
+        $notify = Notification::where('is_read', false)->get();
+        session(['Notifications' => $notify]);
+
+        return view('Admin.Stock')->with(['stockData' => $stocks, 'notification' => $notifications]);
     }
 
     public function createStock(Request $request)
@@ -620,3 +668,34 @@ class AdminController extends Controller
         ];
     }
 }
+
+
+
+
+
+
+
+    /* public function viewStockPage()
+    {
+        $stocks = Stock::all();
+        $notifications = [];
+        foreach ($stocks as $stock) {
+            $quantity = (int)preg_replace('/[^0-9]/', '', $stock->itemQuantity);
+            $unit = preg_replace('/[0-9\s]/', '', $stock->itemQuantity);
+            $minimumQuantity = (int)preg_replace('/[^0-9]/', '', $stock->mimimumItemQuantity);
+            $minimumUnit = preg_replace('/[0-9\s]/', '', $stock->mimimumItemQuantity);
+
+            $quantity = $unit === "Kg" ? $quantity * 1000 : $quantity;
+            $minimumQuantity = $minimumUnit === "Kg" ? $minimumQuantity * 1000 : $minimumQuantity;
+            
+            if ($quantity <= $minimumQuantity) {
+                $notificationMessage = "Quantity of {$stock->itemName} is below or equal to the minimum level";
+                Notification::create(['message' => $notificationMessage]);
+                $notifications[] = $notificationMessage;
+            }
+        }
+  
+        $notify = Notification::where('is_read', false)->get();
+        session(['Notifications' => $notify]);
+        return view('Admin.Stock')->with(['stockData' => $stocks, 'notification' => $notifications]);
+    }*/
