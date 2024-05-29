@@ -77,16 +77,24 @@ main {
 .graph {
     display: flex;
     flex-direction: row;
+    flex-wrap: wrap;
     justify-content: space-between;
     margin: 0 1vw 1vw;
+    padding: 10px;
 }
 
 .monthlyRevenuegraph,
-.totalRevenueGraph {
+.totalRevenueGraph,
+.dailyRevenueGraph {
     position: relative;
     width: 49%;
     background-color: #fff;
     border-radius: 10px;
+}
+
+.dailyRevenueGraph {
+    width: 100%;
+    margin-top: 1vw;
 }
 
 .info {

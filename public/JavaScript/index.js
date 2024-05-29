@@ -12,10 +12,12 @@ function updateActiveMenuItem() {
     if (activeElement) {
         activeElement.classList.remove('active');
     }
-    let targetElement = document.getElementById('menu1');
-    if (targetElement && targetElement.id !== 'menu1') {
-        targetElement.classList.add('active');
-        setActiveMenuItem(targetElement.id);
+    let activeMenuItem = getActiveMenuItem();
+    if (activeMenuItem) {
+        let targetElement = document.getElementById(activeMenuItem);
+        if (targetElement) {
+            targetElement.classList.add('active');
+        }
     }
 }
 
@@ -44,8 +46,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 window.addEventListener('popstate', updateActiveMenuItem);
-
-// Menu hide and show
 function toggleMenu() {
     let menu = document.getElementById('menu')
     let icon = document.getElementById('menuIcon')

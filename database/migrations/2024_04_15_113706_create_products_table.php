@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id(); 
             $table->string('productImage');
             $table->string('productName');
-            $table->string('productSize')->nullable();
+            $table->string('productVariation')->nullable();
             $table->string('productPrice');
             $table->unsignedBigInteger('category_id')->nullable();
             $table->string('category_name')->nullable(); 

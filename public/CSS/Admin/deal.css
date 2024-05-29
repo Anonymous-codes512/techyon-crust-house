@@ -81,6 +81,9 @@ table tbody tr td:first-child {
 
 table tbody tr td:first-child img {
     width: 100px;
+    height: 70px;
+    padding: 5px;
+    border-radius: 15px;
 }
 
 table tbody tr td {
@@ -299,7 +302,7 @@ table tbody tr td:last-child a:last-child:hover {
     width: 85%;
 }
 #priceTag{
-    margin-right: 1vw;
+    margin-right: 0;
 
 }
 

@@ -60,7 +60,9 @@ class AuthController extends Controller
                 return redirect()->route('admindashboard');
             } else if ($user->role === 'salesman') {
                 session(['username' => $user->name]);
-                return redirect()->route('salesman_dashboard');
+                // dd($user->id);
+                return redirect()->route('salesman_dashboard', ['id' => $user->id]);
+
             }
         } else {
             return redirect()->back()->withErrors(['email' => 'Invalid credentials']);

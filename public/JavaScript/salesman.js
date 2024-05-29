@@ -1,60 +1,38 @@
-function showAddToCart(product, allProducts) {
-    console.log(product);
-    let overlay = document.getElementById('overlay');
-    let popup = document.getElementById('addToCart');
+function showAddToCart(product, deals, allProducts) {
+    const overlay = document.getElementById('overlay');
+    const popup = document.getElementById('addToCart');
+
     document.getElementById('drinkFlavour').style.display = 'none'
 
     if (product.category_name) {
-        let name = document.getElementById('prodName');
-        document.getElementById('selectedProductPrice').value = product.id;
-        name.textContent = product.productSize + " " + product.productName;
+
+        const name = document.getElementById('prodName');
+        document.getElementById('product_id').value = product.id;
+        name.textContent = product.productVariation + " " + product.productName;
         document.getElementById('price').textContent = 'Rs. ' + product.productPrice;
         document.getElementById('totalprice').textContent = 'Rs. ' + product.productPrice;
 
         if (product.category_name.toLowerCase() != 'others') {
+
             document.getElementById("prodVariation").style.display = 'block';
             document.getElementById('addons').style.display = 'block';
             updateProductSizeDropdown(product, allProducts);
 
         } else {
 
-            let name = document.getElementById("prodName");
-            name.textContent = product.productName;
+            document.getElementById("prodName").textContent = product.productName;
             document.getElementById('addons').style.display = 'none';
             document.getElementById('addOnsLabel').style.display = 'none'
             document.getElementById("prodVariation").style.display = 'none';
             document.getElementById('prodVariationLabel').style.display = 'none'
-        }
-        console.log(document.getElementById('selectedProductPrice').value)
 
+        }
     } else {
-
-        let productname = product.dealProductName.split(',');
-        let productquantity = product.dealProductQuantity.split(',');
-        let productvariation = product.dealProductVariation.split(',');
-        let deal_products = [];
-
-        for (let i = 0; i < productname.length; i++) {
-            if (productname[i].includes(productvariation[i])) {
-                deal_products.push(productquantity[i] + " " + productname[i]);
-            } else {
-                deal_products.push(productquantity[i] + " " + productvariation[i] + " " + productname[i]);
-
-            }
-        }
-
-        const uniqueItems = [...new Set(deal_products)];
-        const order = uniqueItems.join(', ');
-
-        document.getElementById('prodName').textContent = order;
-        document.getElementById('price').textContent = 'Rs. ' + product.dealDiscountedPrice;
-        document.getElementById('totalprice').textContent = 'Rs. ' + product.dealDiscountedPrice;
+        document.getElementById('prodName').textContent = product.deal.dealTitle;
+        document.getElementById('price').textContent = 'Rs. ' + product.deal.dealDiscountedPrice;
+        document.getElementById('totalprice').textContent = 'Rs. ' + product.deal.dealDiscountedPrice;
         document.getElementById('drinkFlavour').style.display = 'block'
-
-        // document.getElementById('addbtn').setAttribute('onclick', 'add(' + JSON.stringify(product) + ', ' + JSON.stringify(allProducts) + ')');
-
-        updateDealsDropdown(product, allProducts);
-
+        updateDealsDropdown(product, deals, allProducts);
     }
 
     overlay.style.display = 'block';
@@ -77,7 +55,7 @@ function closeAddToCart() {
 |---------------------------------------------------------------|
 */
 
-function updateDealsDropdown(deals, allProducts) {
+function updateDealsDropdown(deal, deals, allProducts) {
     let pizzaFlavourDropdown = document.getElementById("addons");
     let addOnsDropdown = document.getElementById("drinkFlavour");
     let drinkFlavourDropdown = document.getElementById("prodVariation");
@@ -89,51 +67,52 @@ function updateDealsDropdown(deals, allProducts) {
     let addOnsArray = [];
     let pizzaFlavour = [];
     let drinkFlavour = [];
+    let dealProductName = [];
+    let dealProductVariations = [];
 
-    let dealProducts = deals.dealProductName.split(',');
-    let dealProductVariations = deals.dealProductVariation.split(',');
+    deals.forEach(element => {
+        if (element.deal_id === deal.deal_id) {
+            dealProductName.push(element.product.productName);
+            dealProductVariations.push(element.product.productVariation);
+        }
+    });
 
     allProducts.forEach(element => {
-        if (element.category_name.toLowerCase() == 'addons') {
-            if (element.productName.includes('Topping')) {
-                addOnsArray.push(`${element.productName} (Rs. ${element.productPrice})`);
-            }
+        if (element.category_name.toLowerCase() === 'addons' && element.productName.includes('Topping')) {
+            addOnsArray.push(`${element.productName} (Rs. ${element.productPrice})`);
         }
-    })
+    });
 
     let pizza_name;
-
-    for (let i = 0; i < dealProducts.length; i++) {
-        allProducts.forEach(element => {
-            if (element.category_name.toLowerCase() === 'pizza') {
-                if (element.productSize === dealProductVariations[i]) {
-                    pizza_name = dealProducts[i];
-                    pizzaFlavour.push(`${element.productName}`);
-                }
-            }
-        });
-        break;
-    }
-
-    let drink_name;
-    for (let i = 0; i < dealProducts.length; i++) {
+    for (let i = 0; i < dealProductName.length; i++) {
         let found = false;
         allProducts.forEach(element => {
-            if (element.category_name.toLowerCase() === 'drinks' && element.productSize === dealProductVariations[i]) {
-                drink_name = dealProducts[i];
-                drinkFlavour.push(element.productName);
+            if (element.category_name.toLowerCase() === 'pizza' && element.productVariation === dealProductVariations[i]) {
+                pizza_name = dealProductName[i];
+                pizzaFlavour.push(element.productName);
                 found = true;
             }
         });
-        if (found) {
-            break;
-        }
+        if (found) break;
     }
 
+    let drink_name;
+    for (let i = 0; i < dealProductName.length; i++) {
+        let found = false;
+        allProducts.forEach(element => {
+            if (element.category_name.toLowerCase() === 'drinks' && element.productVariation === dealProductVariations[i]) {
+                if (element.productName === dealProductName[i]) {
+                    drink_name = dealProductName[i];
+                    drinkFlavour.push(element.productName);
+                    found = true;
+                }
+            }
+        });
+        if (found) break;
+    }
 
     PizzaFlavourDropdown(pizzaFlavour, pizzaFlavourDropdown, pizza_name);
     DrinkFlavourDropdown(drinkFlavour, drinkFlavourDropdown, drink_name);
-
     addOnsDealDropdown(addOnsArray, addOnsDropdown);
 }
 
@@ -239,7 +218,7 @@ function updateProductSizeDropdown(product, allProducts) {
                 }
             }
             if (element.productName.toLowerCase() === product.productName.toLowerCase()) {
-                productVariations.push(`${element.productSize} (Rs. ${element.productPrice})`);
+                productVariations.push(`${element.productVariation} (Rs. ${element.productPrice})`);
             }
         });
         addOnsDropdown(addOnsArray, drinkFlavourDropdown);
@@ -256,7 +235,7 @@ function updateProductSizeDropdown(product, allProducts) {
                 uniqueDrinkFlavours.add(element.productName);
             }
             if (element.productName.toLowerCase() === product.productName.toLowerCase()) {
-                productVariations.push(`${element.productSize} (Rs. ${element.productPrice})`);
+                productVariations.push(`${element.productVariation} (Rs. ${element.productPrice})`);
             }
         });
 
@@ -270,7 +249,7 @@ function updateProductSizeDropdown(product, allProducts) {
 
             if (filteredVariations.length > 0) {
                 let selectedProduct = filteredVariations[0];
-                let variationOptions = filteredVariations.map(product => `${product.productSize} (Rs. ${product.productPrice})`);
+                let variationOptions = filteredVariations.map(product => `${product.productVariation} (Rs. ${product.productPrice})`);
                 document.getElementById('price').textContent = 'Rs. ' + selectedProduct.productPrice;
                 document.getElementById('totalprice').textContent = 'Rs. ' + selectedProduct.productPrice;
                 addOptionsToDropdown(variationOptions, productVariationDropdown);
@@ -288,7 +267,7 @@ function updateProductSizeDropdown(product, allProducts) {
                 }
             }
             if (element.productName.toLowerCase() === product.productName.toLowerCase()) {
-                productVariations.push(`${element.productSize} (Rs. ${element.productPrice})`);
+                productVariations.push(`${element.productVariation} (Rs. ${element.productPrice})`);
             }
         });
         addOnsDropdownBurger(addOnsArray, drinkFlavourDropdown)
@@ -300,7 +279,7 @@ function updateProductSizeDropdown(product, allProducts) {
 
         allProducts.forEach(element => {
             if (element.productName.toLowerCase() === product.productName.toLowerCase()) {
-                productVariations.push(`${element.productSize} (Rs. ${element.productPrice})`);
+                productVariations.push(`${element.productVariation} (Rs. ${element.productPrice})`);
                 drinkFlavour.push(element.productName);
             }
         });
@@ -1185,7 +1164,7 @@ function updateProductSizeDropdown(Product) {
 
     if (category.toLowerCase() === "drinks") {
         addons.style.display = 'block';
-        let drinkProductSizes = ["Regular", "1 Liter Drink", "1.5 Liter Drink"];
+        let drinkProductSizes = ["Regular", "1 liter Drink", "1.5 liter Drink"];
         addOptionsToDropdown(drinkProductSizes, productVariationDropdown);
         let drinkProductvariations = ["Pepsi", "Coco Cola", "Fanta", "7up", "Dew", "Sprite"];
         addOnsDropdown(drinkProductvariations, addons);
@@ -1222,7 +1201,7 @@ function updateProductSizeDropdown(Product) {
 
         allProducts.forEach(element => {
             if (element.productName.toLowerCase() === product.productName.toLowerCase()) {
-                productVariations.push(`${element.productSize} (Rs. ${element.productPrice})`);
+                productVariations.push(`${element.productVariation} (Rs. ${element.productPrice})`);
                 drinkFlavour.push(element.productName);
             }
         });

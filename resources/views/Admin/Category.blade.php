@@ -8,7 +8,7 @@
         <div class="path">
             <p>Dashboard > Categories</p>
         </div>
-
+ 
         <div class="newCategory">
             <button onclick="addCategory()">Add New Category</button>
         </div>
@@ -66,10 +66,11 @@
             @enderror
 
             <div class="inputdivs">
+                <label for="categoryname">Category Name</label>
                 <input type="text" id="categoryname" name="categoryName" placeholder="Category Name" required>
             </div>
             @error('categoryName')
-                <span class="error-message">{{ $message }}</span>
+            <span class="error-message">{{ $message }}</span>
             @enderror
             <div class="btns">
                 <button id="cancel" onclick="closeAddCatogry()">Cancel</button>
@@ -104,6 +105,7 @@
             @enderror
 
             <div class="inputdivs">
+                <label for="categorynam">Category Name</label>
                 <input type="text" id="categorynam" name="categoryName"placeholder="Category Name" required>
             </div>
             @error('categoryName')

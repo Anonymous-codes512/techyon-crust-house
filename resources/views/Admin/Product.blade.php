@@ -2,7 +2,9 @@
 @push('styles')
     <link rel="stylesheet" href="{{ asset('CSS/Admin/product.css') }}">
 @endpush
-
+@push('scripts')
+    <script src="{{ asset('JavaScript\product.js') }}"></script>
+@endpush
 @section('main')
     <main id="product">
         <div class="path">
@@ -18,7 +20,7 @@
                 <tr>
                     <th>Product Image</th>
                     <th>Product Name</th>
-                    <th>Product Quantity</th>
+                    <th>Product Variation</th>
                     <th>Product Price</th>
                     <th>Product Category</th>
                     <th>Action</th>
@@ -29,7 +31,7 @@
                     <tr>
                         <td><img src={{ asset('Images/ProductImages/' . $product->productImage) }} alt="Image"></td>
                         <td>{{ $product->productName }}</td>
-                        <td>{{ $product->productSize }}</td>
+                        <td>{{ $product->productVariation }}</td>
                         <td>{{ $product->productPrice }} Pkr</td>
                         <td>{{ $product->category_name }}</td>
                         <td>
@@ -58,7 +60,8 @@
             <hr>
 
             <div class="inputdivs">
-                <select name="categoryId" id="category" onclick="updateProductSizeDropdown()">
+                <label for="category">Select category</label>
+                <select name="categoryId" id="category">
                     <option value="none" selected disabled>Select Product Category</option>
                     @foreach ($categoryData as $category)
                         <option value="{{ $category->id }},{{ $category->categoryName }}">{{ $category->categoryName }}
@@ -66,30 +69,21 @@
                     @endforeach
                 </select>
             </div>
-            @error('category')
-                <span class="error-message">{{ $message }}</span>
-            @enderror
 
-            <div class="inputdivs">
-                <input type="text" id="productName" name="productName" placeholder="Product Name" required>
+            <div class="inputdivs inputProductName">
+                <div class="ProductName">
+                    <label for="productName">Product Name</label>
+                    <input type="text" id="productName" name="productName" placeholder="Product Name" required>
+                </div>
+                <div class="ProductVariation">
+                    <label for="noOfVariations">Variations</label>
+                    <input type="number" id="noOfVariations" name="noOfVariations" oninput="updateVariationFields(this.value)" placeholder="Ex 4 etc">    
+                </div>
             </div>
-            @error('productName')
-                <span class="error-message">{{ $message }}</span>
-            @enderror
 
-            <div class="inputdivs">
-                <select name="productSize" id="productSize"></select>
-            </div>
-            @error('productSize')
-                <span class="error-message">{{ $message }}</span>
-            @enderror
+            <div id="variationsGroup">
 
-            <div class="inputdivs">
-                <input type="number" id="price" name="productPrice" placeholder="Product Price" required>
             </div>
-            @error('price')
-                <span class="error-message">{{ $message }}</span>
-            @enderror
 
             <div class="inputdivs">
                 <label for="upload-file" class="choose-file-btn">
@@ -98,9 +92,6 @@
                     <p id="filename"></p>
                 </label>
             </div>
-            @error('productImage')
-                <span class="error-message">{{ $message }}</span>
-            @enderror
 
             <div class="btns">
                 <button id="cancel" onclick="closeAddProduct()">Cancel</button>
@@ -123,222 +114,46 @@
             <hr>
 
             <div class="inputdivs">
-                <select name="editcategoryId" id="editcategory" onclick="updateProductSizeToEditDropdown()">
+                <label for="editcategory">Select Category</label>
+                <select name="editcategoryId" id="editcategory">
                     <option value="none" selected disabled>Select Product Category</option>
                     @foreach ($categoryData as $category)
-                        <option value="{{ $category->id }},{{ $category->categoryName }}">{{ $category->categoryName }}
-                        </option>
+                        <option value="{{ $category->id }},{{ $category->categoryName }}">{{ $category->categoryName }}</option>
                     @endforeach
-                </select>
+                </select>                
             </div>
-
-            @error('category')
-                <span class="error-message">{{ $message }}</span>
-            @enderror
 
             <input type="hidden" id="pId" name="pId">
 
             <div class="inputdivs">
+                <label for="pName">Product Name</label>
                 <input type="text" id="pName" name="productName" placeholder="Product Name" required>
             </div>
-            @error('productName')
-                <span class="error-message">{{ $message }}</span>
-            @enderror
 
-            <div class="inputdivs">
-                <select name="editProductSize" id="editProductSize"></select>
+            <div class="inputdivs inputProductName">
+                <div class="ProductName">
+                    <label for="editproductName">Product Variation</label>
+                    <input type="text" id="editProductVariation" name="productVariation" required>
+                </div>
+                <div class="ProductVariation">
+                    <label for="editVariationPrice">Price</label>
+                    <input type="number" id="editVariationPrice" name="Price">    
+                </div>
             </div>
-
-            @error('productSize')
-                <span class="error-message">{{ $message }}</span>
-            @enderror
-
-            <div class="inputdivs">
-                <input type="number" id="pPrice" name="productPrice" placeholder="Product Price" required>
-            </div>
-            @error('price')
-                <span class="error-message">{{ $message }}</span>
-            @enderror
 
             <div class="inputdivs">
                 <label for="upload-update-file" class="choose-file-btn">
                     <span>Choose File</span>
-                    <input type="file" id="upload-update-file" name="productImage" accept=".jpg,.jpeg,.png" required>
+                    <input type="file" id="upload-update-file" name="productImage" accept=".jpg,.jpeg,.png" >
                     <p id="namefile"></p>
                 </label>
             </div>
 
-            @error('productImage')
-                <span class="error-message">{{ $message }}</span>
-            @enderror
             <div class="btns">
-                <button id="cancel" onclick="closeEditCatogry()">Cancel</button>
+                <button type="button" id="cancel" onclick="closeEditCatogry()">Cancel</button>
                 <input type="submit" value="Update">
             </div>
         </form>
 
     </main>
-
-    <script>
-        function addProduct() {
-            let overlay = document.getElementById('overlay');
-            let popup = document.getElementById('newProduct');
-            let productSizeDropdown = document.getElementById("productSize");
-            productSizeDropdown.style.display = "none";
-
-            overlay.style.display = 'block';
-            popup.style.display = 'flex';
-        }
-
-        function closeAddProduct() {
-            let overlay = document.getElementById('overlay');
-            let popup = document.getElementById('newProduct');
-
-            overlay.style.display = 'none';
-            popup.style.display = 'none';
-        }
-
-        function editProduct(Product) {
-            console.log(Product);
-            let overlay = document.getElementById('editOverlay');
-            let popup = document.getElementById('editProduct');
-
-            document.getElementById('pId').value = Product.id;
-            document.getElementById('pName').value = Product.productName;
-            document.getElementById('pPrice').value = Product.productPrice;
-
-            let categoryDropdown = document.getElementById('editcategory');
-            for (let i = 0; i < categoryDropdown.options.length; i++) {
-                if (categoryDropdown.options[i].text === Product.category_name) {
-                    categoryDropdown.selectedIndex = i;
-                    break;
-                }
-            }
-
-            let productSizeDropdown = document.getElementById('editProductSize');
-            for (let i = 0; i < productSizeDropdown.options.length; i++) {
-                if (productSizeDropdown.options[i].text === Product.productSize) {
-                    productSizeDropdown.selectedIndex = i;
-                    break;
-                }
-            }
-
-            overlay.style.display = 'block';
-            popup.style.display = 'flex';
-        }
-
-        function closeEditCatogry() {
-            let overlay = document.getElementById('editOverlay');
-            let popup = document.getElementById('editProduct');
-
-            overlay.style.display = 'none';
-            popup.style.display = 'none';
-        }
-
-
-        function updateProductSizeDropdown() {
-            let categoryField = document.getElementById("category").value.trim();
-            let productSizeDropdown = document.getElementById("productSize");
-            productSizeDropdown.innerHTML = "";
-
-            let category = categoryField.split(',');
-
-            if (category.length > 1 && category[1]) {
-                if (category[1].trim().toLowerCase() === "drinks") {
-                    productSizeDropdown.style.display = "block";
-                    let drinkProductSizes = ["Regular", "1 Liter", "1.5 Liter"];
-                    addOptionsToDropdown(drinkProductSizes, productSizeDropdown);
-                } else if (category[1].trim().toLowerCase() === "appetizer") {
-                    productSizeDropdown.style.display = "block";
-                    let foodProductSizes = ["3 Pieces", "6 Pieces", "12 Pieces"];
-                    addOptionsToDropdown(foodProductSizes, productSizeDropdown);
-                } else if (category[1].trim().toLowerCase() === "fries") {
-                    productSizeDropdown.style.display = "block";
-                    let foodProductSizes = ["Regular", "Large"];
-                    addOptionsToDropdown(foodProductSizes, productSizeDropdown);
-                } else if (category[1].trim().toLowerCase() === "pizza") {
-                    productSizeDropdown.style.display = "block";
-                    let foodProductSizes = ["Small", "Regular", "Large", "Party"];
-                    addOptionsToDropdown(foodProductSizes, productSizeDropdown);
-                } else if (category[1].trim().toLowerCase() === "burger") {
-                    productSizeDropdown.style.display = "block";
-                    let foodProductSizes = ["Burger", "Fries + Reg Drink"];
-                    addOptionsToDropdown(foodProductSizes, productSizeDropdown);
-                } else if (category[1].trim().toLowerCase() === "others") {
-                    productSizeDropdown.style.display = "none";
-                } else {
-                    let foodProductSizes = ["Small", "Medium", "Large", "Extra Large", "Jumbo"];
-                    addOptionsToDropdown(foodProductSizes, productSizeDropdown);
-                }
-            }
-        }
-
-        function updateProductSizeToEditDropdown() {
-            let categoryField = document.getElementById("editcategory").value.trim();
-            let productSizeDropdown = document.getElementById("editProductSize");
-            productSizeDropdown.innerHTML = "";
-
-            let category = categoryField.split(',');
-
-            if (category.length > 1 && category[1]) {
-                if (category[1].trim().toLowerCase() === "drinks") {
-                    productSizeDropdown.style.display = "block";
-                    let drinkProductSizes = ["Regular", "1 Liter", "1.5 Liter"];
-                    addOptionsToDropdown(drinkProductSizes, productSizeDropdown);
-                } else if (category[1].trim().toLowerCase() === "appetizer") {
-                    productSizeDropdown.style.display = "block";
-                    let foodProductSizes = ["3 Pieces", "6 Pieces", "12 Pieces"];
-                    addOptionsToDropdown(foodProductSizes, productSizeDropdown);
-                } else if (category[1].trim().toLowerCase() === "fries") {
-                    productSizeDropdown.style.display = "block";
-                    let foodProductSizes = ["Regular", "Large"];
-                    addOptionsToDropdown(foodProductSizes, productSizeDropdown);
-                } else if (category[1].trim().toLowerCase() === "pizza") {
-                    productSizeDropdown.style.display = "block";
-                    let foodProductSizes = ["Small", "Regular", "Large", "Party"];
-                    addOptionsToDropdown(foodProductSizes, productSizeDropdown);
-                } else if (category[1].trim().toLowerCase() === "burger") {
-                    productSizeDropdown.style.display = "block";
-                    let foodProductSizes = ["Burger", "Fries + Reg Drink"];
-                    addOptionsToDropdown(foodProductSizes, productSizeDropdown);
-                } else if (category[1].trim().toLowerCase() === "others") {
-                    productSizeDropdown.style.display = "none";
-                } else {
-                    let foodProductSizes = ["Small", "Medium", "Large", "Extra Large", "Jumbo"];
-                    addOptionsToDropdown(foodProductSizes, productSizeDropdown);
-                }
-            }
-        }
-
-        function addOptionsToDropdown(optionsArray, dropdown) {
-            let defaultOption = document.createElement("option");
-            defaultOption.disabled = true;
-            defaultOption.selected = true;
-            defaultOption.text = "Select Product Size";
-            dropdown.add(defaultOption);
-
-            for (let i = 0; i < optionsArray.length; i++) {
-                let option = document.createElement("option");
-                option.text = optionsArray[i];
-                option.value = optionsArray[i];
-                dropdown.add(option);
-            }
-        }
-
-
-        const uploadUpdatedFile = document.getElementById('upload-update-file');
-        const filenamSpan = document.getElementById('namefile');
-        uploadUpdatedFile.addEventListener('change', function(e) {
-            const fileNam = this.value.split('\\').pop();
-            filenamSpan.textContent = fileNam ? fileNam : 'No file chosen';
-        });
-
-
-        const uploadFile = document.getElementById('upload-file');
-        const filenameSpan = document.getElementById('filename');
-        uploadFile.addEventListener('change', function(e) {
-            const fileName = this.value.split('\\').pop();
-            filenameSpan.textContent = fileName ? fileName : 'No file chosen';
-        });
-    </script>
 @endsection

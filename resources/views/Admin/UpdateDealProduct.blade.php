@@ -20,7 +20,7 @@
                     <p class="category_name">{{ $product->category_name }}</p>
                     <p class="product_id">{{ $product->id }}</p>
                     <p class="product_name">{{ $product->productName }}</p>
-                    <p class="product_size">{{ $product->productSize }}</p>
+                    <p class="product_size">{{ $product->productVariation }}</p>
                     <p class="product_price">{{ $product->productPrice }} Pkr</p>
                 </div>
             @endforeach
@@ -47,7 +47,7 @@
             </div>
 
             <div class="inputdiv">
-                <label for="dealPrice">Deal Price:</label>
+                <label for="dealPrice">Deal Actual Price:</label>
                 <input type="text" name="currentDealPrice" id="currentDealPrice" required>
 
                 <label for="dealFinalPrice">Deal Final Price:</label>
@@ -68,7 +68,7 @@
 
             let productId = element.querySelector('.product_id').textContent;
             let productName = element.querySelector('.product_name').textContent;
-            let productSize = element.querySelector('.product_size').textContent;
+            let productVariation = element.querySelector('.product_size').textContent;
             let productPrice = element.querySelector('.product_price').textContent;
 
             let productIdField = document.getElementById('productIds');
@@ -81,7 +81,7 @@
 
                 productIdField.value = productIdField.value.replace(productId + ',', '');
                 productNameField.value = productNameField.value.replace(productName + ',', '');
-                productSizeField.value = productSizeField.value.replace(productSize + ',', '');
+                productSizeField.value = productSizeField.value.replace(productVariation + ',', '');
                 productPriceField.value = productPriceField.value.replace(productPrice + ',', '');
 
             } else {
@@ -89,7 +89,7 @@
 
                 productIdField.value += productId + ',';
                 productNameField.value += productName + ',';
-                productSizeField.value += productSize + ',';
+                productSizeField.value += productVariation + ',';
                 productPriceField.value += productPrice + ',';
             }
         }

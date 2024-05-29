@@ -78,6 +78,12 @@
             <div class="totalRevenueGraph">
                 <div class="info">
                     <p class="ttle">Total Branch Revenue</p>
+                    <select class="filter" name="months">
+                        <option value="January">2021</option>
+                        <option value="Feburary">2022</option>
+                        <option value="March">2023</option>
+                        <option value="April">2024</option>
+                    </select>
                 </div>
                 <canvas id="myChart">
                     <script>
@@ -89,7 +95,7 @@
                                 datasets: [
                                     @foreach ($branchRevenueArray as $branchName => $revenues)
                                         {
-                                            // label: '{{ $branchName }}',
+                                            label: 'Yearly Revenue',
                                             data: [{{ implode(',', $revenues) }}],
                                             backgroundColor: '#ffbb00',
                                             borderColor: '#ffbb00',
@@ -141,7 +147,7 @@
                                 datasets: [
                                     @foreach ($branchRevenueArray as $branchName => $revenues)
                                         {
-                                            // label: '{{ $branchName }}',
+                                            label: 'Monthly Revenue',
                                             data: [{{ implode(',', $revenues) }}],
                                             backgroundColor: '#ffbb00',
                                             borderColor: '#ffbb00',
@@ -163,6 +169,40 @@
                     </script>
                 </canvas>
             </div>
+            <div class="dailyRevenueGraph">
+                <div class="info">
+                    <p class="ttle">Daily Revenue</p>
+                </div>
+                <canvas id="dailyChart"></canvas>
+                <script>
+                    var ctx = document.getElementById('dailyChart').getContext('2d');
+                    var dailyChart = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: [
+                                '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18',
+                                '19', '20', '21', '22', '23', '24', '25', '26', '27', '28', '29', '30'
+                            ],
+                            datasets: [{
+                                label: 'Daily Revenue',
+                                data: [12, 19, 3, 5, 2, 3],
+                                borderWidth: 1,
+                                backgroundColor: '#ffbb00',
+                                borderColor: '#ffbb00',
+                                fill: false
+                            }]
+                        },
+                        options: {
+                            scales: {
+                                y: {
+                                    beginAtZero: true
+                                }
+                            }
+                        }
+                    });
+                </script>
+            </div>
+
         </div>
 
         <div class="map">

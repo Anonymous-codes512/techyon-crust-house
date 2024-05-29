@@ -66,7 +66,7 @@ Route::get('/diningtable', function(){
 Route::get('/admindashboard',[AdminController::class,'viewAdminDashboard'])->name('admindashboard');
 Route::get('/readNotification/{id}',[AdminController::class,'readNotification'])->name('readNotification');
 Route::get('/deleteNotification/{id}',[AdminController::class,'deleteNotification'])->name('deleteNotification');
-Route::get('/redirectNotification',[AdminController::class,'redirectNotification'])->name('redirectNotification');
+Route::get('/redirectNotification/{id}',[AdminController::class,'redirectNotification'])->name('redirectNotification');
 
 /*
 |---------------------------------------------------------------|
@@ -147,7 +147,7 @@ Route::get('/deleteStaff/{id}', [AdminController::class,'deleteStaff'])->name('d
 |---------------------------------------------------------------|
 */
 
-Route::get('salesman/dashboard', [SalesmanController::class,'viewSalesmanDashboard'])->name('salesman_dashboard');
-Route::get('salesman/dashboard/{categoryName}', [SalesmanController::class,'salesmanCategoryDashboard'])->name('salesman_dash');
+Route::get('salesman/dashboard/{id}', [SalesmanController::class,'viewSalesmanDashboard'])->name('salesman_dashboard');
+Route::get('salesman/dashboard/{categoryName}/{id}', [SalesmanController::class,'salesmanCategoryDashboard'])->name('salesman_dash');
 Route::get('salesman/deals/', [SalesmanController::class,'deals'])->name('deals');
 Route::post('salesman/placeOrder', [SalesmanController::class,'placeOrder'])->name('placeOrder');

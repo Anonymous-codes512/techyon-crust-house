@@ -72,30 +72,32 @@
             </div>
 
             <div class="inputdivs" id="unitsDiv">
-                <input type="number" id="quantity" name="stockQuantity" placeholder="Stock Quantity" required>
+                <input type="number" id="quantity" name="stockQuantity" placeholder="Stock Quantity" step="any"
+                    required>
                 <select name="unit1" id="stockunit">
                     <option value="" selected disabled>Select unit</option>
                     <option value="mg">Milligram</option>
                     <option value="g">Gram</option>
-                    <option value="Kg">Kilogram</option>
+                    <option value="kg">Kilogram</option>
                     <option value="ml">Milliliter</option>
-                    <option value="l">Liter</option>
+                    <option value="liter">liter</option>
                     <option value="lbs">Pound</option>
                     <option value="gal">Gallan</option>
                     <option value="oz">Ounce</option>
                 </select>
+
             </div>
 
             <div class="inputdivs" id="unitsDiv">
-                <input type="number" id="minquantity" name="minStockQuantity" placeholder="Minimum Stock Quantity"
-                    required>
+                <input type="number" id="minquantity" name="minStockQuantity" placeholder="Minimum Stock Quantity "
+                    step="any" required>
                 <select name="unit2" id="minStockUnit">
                     <option value="" selected disabled>Select unit</option>
                     <option value="mg">Milligram</option>
                     <option value="g">Gram</option>
                     <option value="Kg">Kilogram</option>
                     <option value="ml">Milliliter</option>
-                    <option value="l">Liter</option>
+                    <option value="liter">liter</option>
                     <option value="lbs">Pound</option>
                     <option value="gal">Gallan</option>
                     <option value="oz">Ounce</option>
@@ -133,30 +135,30 @@
             </div>
 
             <div class="inputdivs" id="unitsDiv">
-                <input type="number" id="iQuantity" name="stockQuantity" required>
+                <input type="number" id="iQuantity" name="stockQuantity" step="any" required>
                 <select name="unit1" id="iQUnit">
                     <option value="" selected disabled>Select unit</option>
                     <option value="mg">Milligram</option>
                     <option value="g">Gram</option>
-                    <option value="Kg">Kilogram</option>
+                    <option value="kg">Kilogram</option>
                     <option value="ml">Milliliter</option>
-                    <option value="l">Liter</option>
-                    <option value="gal">Gallan</option>
+                    <option value="liter">Liter</option>
+                    <option value="gal">Gallon</option>
                     <option value="lbs">Pound</option>
                     <option value="oz">Ounce</option>
                 </select>
             </div>
 
             <div class="inputdivs" id="unitsDiv">
-                <input type="number" id="mQuantity" name="minStockQuantity" required>
+                <input type="number" id="mQuantity" name="minStockQuantity" step="any" required>
                 <select name="unit2" id="mQUnit">
                     <option value="" selected disabled>Select unit</option>
                     <option value="mg">Milligram</option>
                     <option value="g">Gram</option>
-                    <option value="Kg">Kilogram</option>
+                    <option value="kg">Kilogram</option>
                     <option value="ml">Milliliter</option>
-                    <option value="l">Liter</option>
-                    <option value="gal">Gallan</option>
+                    <option value="liter">Liter</option>
+                    <option value="gal">Gallon</option>
                     <option value="lbs">Pound</option>
                     <option value="oz">Ounce</option>
                 </select>
@@ -236,30 +238,46 @@
             let quantity = '';
             let quantityUnit = '';
             if (stock.itemQuantity) {
-                const quantityAndUnit = stock.itemQuantity.match(/(\d+)(\D+)/);
+                const quantityAndUnit = stock.itemQuantity.match(/([\d.]+)\s*(\D+)/);
                 if (quantityAndUnit && quantityAndUnit.length > 1) {
                     quantity = parseFloat(quantityAndUnit[1]);
                 }
                 if (quantityAndUnit && quantityAndUnit.length > 2) {
-                    quantityUnit = quantityAndUnit[2];
+                    quantityUnit = quantityAndUnit[2].trim();
                 }
             }
             document.getElementById('iQuantity').value = quantity;
-            document.getElementById('iQUnit').value = quantityUnit;
+
+            // Set selected unit in the unit select field
+            let unitSelect = document.getElementById('iQUnit');
+            for (let i = 0; i < unitSelect.options.length; i++) {
+                if (unitSelect.options[i].value === quantityUnit.toLowerCase()) {
+                    unitSelect.options[i].selected = true;
+                    break;
+                }
+            }
 
             let minQuantity = '';
             let minQuantityUnit = '';
             if (stock.mimimumItemQuantity) {
-                const minQuantityAndUnit = stock.mimimumItemQuantity.match(/(\d+)(\D+)/);
+                const minQuantityAndUnit = stock.mimimumItemQuantity.match(/([\d.]+)\s*(\D+)/);
                 if (minQuantityAndUnit && minQuantityAndUnit.length > 1) {
                     minQuantity = parseFloat(minQuantityAndUnit[1]);
                 }
                 if (minQuantityAndUnit && minQuantityAndUnit.length > 2) {
-                    minQuantityUnit = minQuantityAndUnit[2];
+                    minQuantityUnit = minQuantityAndUnit[2].trim();
                 }
             }
             document.getElementById('mQuantity').value = minQuantity;
-            document.getElementById('mQUnit').value = minQuantityUnit;
+
+            // Set selected unit in the minimum quantity unit select field
+            let minUnitSelect = document.getElementById('mQUnit');
+            for (let i = 0; i < minUnitSelect.options.length; i++) {
+                if (minUnitSelect.options[i].value === minQuantityUnit.toLowerCase()) {
+                    minUnitSelect.options[i].selected = true;
+                    break;
+                }
+            }
 
             document.getElementById('UPrice').value = parseFloat(stock.unitPrice);
 

@@ -23,7 +23,7 @@
                 <i class='bx bx-menu' id="menuIcon" onclick="toggleMenu()"></i>
 
                 <div class="menu" id="menu">
-                    <div class="menuItems active" id="menu1">
+                    <div class="menuItems" id="menu1">
                         <i class='bx bxs-dashboard'></i>
                         <a href="{{ route('admindashboard') }}" style="text-decoration: none;">
                             <p class="link">Dashboard</p>
@@ -35,31 +35,31 @@
                             <p class="link">Categories</p>
                         </a>
                     </div>
-                    <div class="menuItems" id="menu2">
+                    <div class="menuItems" id="menu3">
                         <i class='bx bx-package'></i>
                         <a href="{{ route('viewProductPage') }}" style="text-decoration: none;">
                             <p class="link">Products</p>
                         </a>
                     </div>
-                    <div class="menuItems" id="menu3">
+                    <div class="menuItems" id="menu4">
                         <i class='bx bxs-dock-bottom bx-rotate-180'></i>
                         <a href="{{ route('viewDealPage') }}" style="text-decoration: none;">
                             <p class="link">Deals</p>
                         </a>
                     </div>
-                    <div class="menuItems" id="menu4">
+                    <div class="menuItems" id="menu5">
                         <i class='bx bxs-store'></i>
                         <a href="{{ route('viewStockPage') }}" style="text-decoration: none;">
                             <p class="link">Stock</p>
                         </a>
                     </div>
-                    <div class="menuItems" id="menu4">
+                    <div class="menuItems" id="menu6">
                         <i class='bx bx-cookie'></i>
                         <a href="{{ route('viewRecipePage') }}" style="text-decoration: none;">
                             <p class="link">Recipe</p>
                         </a>
                     </div>
-                    <div class="menuItems" id="menu5">
+                    <div class="menuItems" id="menu7">
                         <i class='bx bxs-file-import'></i>
                         <a href="{{ route('viewOrdersPage') }}" style="text-decoration: none;">
                             <p class="link">Orders</p>
@@ -109,14 +109,14 @@
                         </div>
                     @else
                         <div class="notification">
-                            <i class='bx bxs-bell-ring bx-tada' title="notifications"
+                            <i class='bx bxs-bell-ring bx-tada' style="color: #ffbb00;" title="notifications"
                                 onclick="toggleNotification()"></i>
                             <div id="notificationBox" class="notificationBox">
                                 <p id="heading">Notifications</p>
 
                                 @foreach ($notifications as $notification)
                                     <div class="message">
-                                        <a href="{{ route('redirectNotification') }}"
+                                        <a href="{{ route('redirectNotification', $notification->id) }}"
                                             style="text-decoration:none; color:black;">
                                             <p>{{ $notification->message }}</p>
                                         </a>
@@ -157,6 +157,7 @@
             }
         }
     </script>
+    @stack('scripts')
 </body>
 
 </html>

@@ -14,6 +14,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 
 class AdminController extends Controller
 {
@@ -52,8 +53,12 @@ class AdminController extends Controller
         return Redirect()->route('viewStockPage');
     }
 
-    public function redirectNotification()
+    public function redirectNotification($id)
     {
+        $notification = Notification::find($id);
+        $notification->is_read = true;
+        $notification->save();
+
         $stocks = Stock::all();
         return view('Admin.Stock')->with(['stockData' => $stocks, 'notification' => null]);
     }
@@ -140,7 +145,7 @@ class AdminController extends Controller
     public function viewProductPage()
     {
         $categories = Category::all();
-        $products = Product::orderBy('category_id')->get();
+        $products = Product::orderBy('category_name')->get();
         if ($categories->isEmpty()) {
             return view('Admin.Product');
         }
@@ -152,35 +157,43 @@ class AdminController extends Controller
     {
         [$categoryId, $categoryName] = explode(',', $request->categoryId);
 
-        $imageName = null;
+        $total_variations = intval($request->noOfVariations);
+
+        $imageContent = null;
         if ($request->hasFile('productImage')) {
-            $image = $request->file('productImage');
-            $imageName = time() . '.' . $image->getClientOriginalExtension();
-            $image->move(public_path('Images/ProductImages'), $imageName);
+            $uploadedImage = $request->file('productImage');
+            $imageContent = file_get_contents($uploadedImage->getRealPath());
         }
 
-        $product = new Product();
-        $product->productImage = $imageName;
-        $product->productName = $request->productName;
-        $product->productSize = $request->productSize;
-        $product->productPrice = $request->productPrice;
-        $product->category_id = $categoryId;
-        $product->category_name = $categoryName;
+        for ($i = 0; $i < $total_variations; $i++) {
+            $product = new Product();
+            $product->productName = $request->productName;
+            $product->productVariation = $request->{"productVariation" . ($i + 1)};
+            $product->productPrice = $request->{"price" . ($i + 1)};
+            $product->category_id = $categoryId;
+            $product->category_name = $categoryName;
 
-        $product->save();
+            if ($imageContent) {
+                $uniqueImageName = time() . '_' . $i . '_' . mt_rand(1000, 9999) . '.' . $uploadedImage->getClientOriginalExtension();
+                $destinationPath = public_path('Images/ProductImages/' . $uniqueImageName);
 
+                try {
+                    file_put_contents($destinationPath, $imageContent);
+                    $product->productImage = $uniqueImageName;
+                } catch (\Exception $e) {
 
+                    Log::error('File upload error: ' . $e->getMessage());
+                    return response()->json(['error' => 'File upload error: ' . $e->getMessage()], 500);
+                }
+            }
+
+            $product->save();
+        }
         return redirect()->route('viewProductPage');
     }
 
     public function updateProduct(Request $request)
     {
-
-        $validatedData = $request->validate([
-            'productName' => 'required|string|max:255',
-            'editProductSize' => 'required|string|max:255',
-            'productPrice' => 'required|string|max:255',
-        ]);
         $product = Product::find($request->pId);
 
         if ($request->hasFile('productImage')) {
@@ -195,9 +208,9 @@ class AdminController extends Controller
             $product->productImage = $imageName;
         }
 
-        $product->productName = $validatedData['productName'];
-        $product->productSize = $validatedData['editProductSize'];
-        $product->productPrice = $validatedData['productPrice'];
+        $product->productName = $request->productName;
+        $product->productVariation = $request->productVariation;
+        $product->productPrice = $request->Price;
         $product->save();
 
         return redirect()->route('viewProductPage');
@@ -412,41 +425,39 @@ class AdminController extends Controller
     public function viewStockPage()
     {
         $conversionMap = [
-            'g' => 1,           //grams
-            'kg' => 1000,       //kilograms
-            'mg' => 0.001,      //miligrams
-            'lbs' => 453.592,   //pounds
-            'oz' => 28.3495,    //ounce
-            'ml' => 1,          //mililiter
-            'l' => 1000,        //liter
-            'gal' => 3785.41,   //gallan
+            'g' => 1,           // grams
+            'kg' => 1000,       // kilograms
+            'mg' => 0.001,      // milligrams
+            'lbs' => 453.592,   // pounds
+            'oz' => 28.3495,    // ounces
+            'ml' => 1,          // milliliters
+            'l' => 1000,        // liters
+            'liter' => 1000,    // liters
+            'gal' => 3785.41,   // gallons
         ];
 
         $stocks = Stock::all();
         $notifications = [];
 
         foreach ($stocks as $stock) {
-            $quantity = (int)preg_replace('/[^0-9]/', '', $stock->itemQuantity);
-            $unit = strtolower(preg_replace('/[0-9\s]/', '', $stock->itemQuantity));
-            $minimumQuantity = (int)preg_replace('/[^0-9]/', '', $stock->mimimumItemQuantity);
-            $minimumUnit = strtolower(preg_replace('/[0-9\s]/', '', $stock->mimimumItemQuantity));
-
-            $isLiquidUnit = in_array($unit, ['ml', 'l', 'fl oz', 'pt', 'qt', 'gal']);
-            $isMinimumLiquidUnit = in_array($minimumUnit, ['ml', 'l', 'fl oz', 'pt', 'qt', 'gal']);
-
-            if (isset($conversionMap[$unit])) {
-                $quantity *= $conversionMap[$unit];
+            if (preg_match('/([0-9.]+)\s*([a-zA-Z]+)/', $stock->itemQuantity, $matches)) {
+                $quantity = (float)$matches[1];
+                $unit = strtolower($matches[2]);
             } else {
-                $quantity *= $isLiquidUnit ? $conversionMap['ml'] : $conversionMap['g'];
+                continue;
             }
 
-            if (isset($conversionMap[$minimumUnit])) {
-                $minimumQuantity *= $conversionMap[$minimumUnit];
+            if (preg_match('/([0-9.]+)\s*([a-zA-Z]+)/', $stock->mimimumItemQuantity, $minMatches)) {
+                $minimumQuantity = (float)$minMatches[1];
+                $minimumUnit = strtolower($minMatches[2]);
             } else {
-                $minimumQuantity *= $isMinimumLiquidUnit ? $conversionMap['ml'] : $conversionMap['g'];
+                continue;
             }
 
-            if ($quantity <= $minimumQuantity) {
+            $quantityInBaseUnit = isset($conversionMap[$unit]) ? $quantity * $conversionMap[$unit] : $quantity;
+            $minimumQuantityInBaseUnit = isset($conversionMap[$minimumUnit]) ? $minimumQuantity * $conversionMap[$minimumUnit] : $minimumQuantity;
+
+            if ($quantityInBaseUnit <= $minimumQuantityInBaseUnit) {
                 $notificationMessage = "Quantity of {$stock->itemName} is below or equal to the minimum level";
                 Notification::create(['message' => $notificationMessage]);
                 $notifications[] = $notificationMessage;
@@ -464,16 +475,35 @@ class AdminController extends Controller
         $existingStock = Stock::where('itemName', $request->itemName)->first();
 
         if ($existingStock) {
+            preg_match('/([0-9.]+)\s*([a-zA-Z]+)/', $existingStock->itemQuantity, $matches);
+            $quantity = (float) ($matches[1] ?? 0);
+            $unit = strtolower($matches[2] ?? 'unit');
+            $conversionMap = [
+                'g' => 1,
+                'kg' => 1000,
+                'mg' => 0.001,
+                'lbs' => 453.592,
+                'oz' => 28.3495,
+                'ml' => 1,
+                'liter' => 1000,
+                'gal' => 3785.41,
+            ];
 
-            $ESIQ = floatval($existingStock->itemQuantity);
-            $existingStock->itemName = $request->itemName;
-            $existingStock->itemQuantity = ($ESIQ + $request->stockQuantity) . $request->unit1;
+            $isLiquidUnit = in_array($unit, ['ml', 'liter', 'gal']);
+            $quantityInBaseUnit = isset($conversionMap[$unit]) ? $quantity * $conversionMap[$unit] : $quantity;
+            $incomingQuantityInBaseUnit = isset($conversionMap[$request->unit1]) ? $request->stockQuantity * $conversionMap[$request->unit1] : $request->stockQuantity;
+            $totalQuantityInBaseUnit = $quantityInBaseUnit + $incomingQuantityInBaseUnit;
+
+            $updatedQuantity = $totalQuantityInBaseUnit / $conversionMap[$unit];
+
+            $existingStock->itemQuantity = $updatedQuantity . $unit;
             $existingStock->mimimumItemQuantity = $request->minStockQuantity . $request->unit2;
             $existingStock->unitPrice = $request->unitPrice . ' Pkr';
 
             $existingStock->save();
             return redirect()->route('viewStockPage');
         } else {
+            // Create new stock if it doesn't exist
             $newStock = new Stock();
             $newStock->itemName = $request->itemName;
             $newStock->itemQuantity = $request->stockQuantity . $request->unit1;
@@ -484,6 +514,7 @@ class AdminController extends Controller
             return redirect()->route('viewStockPage');
         }
     }
+
 
     public function updateStock(Request $request)
     {

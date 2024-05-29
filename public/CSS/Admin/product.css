@@ -11,7 +11,7 @@ main {
     font-family: "Poppins", sans-serif;
     font-size: 1vw;
     margin: 1vw 1vw 0 1vw;
-} 
+}
 
 .path p {
     margin: 0;
@@ -26,7 +26,7 @@ main {
     padding: 0.5vw 1vw;
 }
 
-.newCategory button{
+.newCategory button {
     background-color: #ffbb00;
     border: none;
     padding: 0.81vw 1.2vw;
@@ -36,7 +36,7 @@ main {
     border-radius: 10px;
     cursor: pointer;
 }
-.newCategory button:hover{
+.newCategory button:hover {
     background-color: #bc9017;
 }
 
@@ -55,7 +55,6 @@ table thead tr th {
     text-align: left;
 }
 
-
 table tbody tr {
     border-bottom: 1px solid #898989;
 }
@@ -66,6 +65,9 @@ table tbody tr td:first-child {
 
 table tbody tr td:first-child img {
     width: 100px;
+    height: 70px;
+    padding: 5px;
+    border-radius: 15px;
 }
 
 table tbody tr td:last-child a {
@@ -92,7 +94,8 @@ table tbody tr td:last-child a:last-child:hover {
     background-color: #f84857;
 }
 
-#overlay, #editOverlay {
+#overlay,
+#editOverlay {
     position: fixed;
     top: 0;
     left: 0;
@@ -100,13 +103,14 @@ table tbody tr td:last-child a:last-child:hover {
     height: 100%;
     background: rgba(0, 0, 0, 0.5);
     display: none;
-    z-index: 999; 
+    z-index: 999;
 }
 
-.newproduct , .editproduct{
+.newproduct,
+.editproduct {
     display: none;
     flex-direction: column;
-    background-color: #ffffff; 
+    background-color: #ffffff;
     position: absolute;
     border-radius: 10px;
     width: 30vw;
@@ -116,12 +120,14 @@ table tbody tr td:last-child a:last-child:hover {
     z-index: 1000;
 }
 
-.newproduct h3, .editproduct h3{
+.newproduct h3,
+.editproduct h3 {
     margin: 0;
     padding: 1vw 2vw;
-    font-family: "Poppins", sans-serif;    
+    font-family: "Poppins", sans-serif;
 }
-.newproduct hr, .editproduct hr{
+.newproduct hr,
+.editproduct hr {
     border: 1px solid #9b9b9b;
     width: 98%;
     margin: 0 auto 1vw;
@@ -134,7 +140,7 @@ table tbody tr td:last-child a:last-child:hover {
     text-align: center;
     border-radius: 10px;
 }
-  
+
 .choose-file-btn input[type="file"] {
     display: none;
 }
@@ -153,7 +159,7 @@ table tbody tr td:last-child a:last-child:hover {
     padding: 0.5vw;
 }
 
-.inputdivs{
+.inputdivs {
     margin: 0.4vw auto;
     width: 85%;
     display: flex;
@@ -162,21 +168,61 @@ table tbody tr td:last-child a:last-child:hover {
     font-size: 1vw;
 }
 
-.inputdivs input, .inputdivs select {
+.inputProductName {
+    display: flex;
+    flex-direction: row;
+}
+
+#variationsGroup {
+    display: flex;
+    flex-direction: column;
+}
+
+.variation-item {
+    display: flex;
+    flex-direction: row;
+    margin: 0.4vw auto;
+    width: 85%;
+    font-family: "Poppins", sans-serif;
+    font-size: 1vw;
+}
+
+.ProductName,
+.ProductVariation,
+.product-price,
+.product-variation {
+    width: 70%;
+    display: flex;
+    flex-direction: column;
+    font-family: "Poppins", sans-serif;
+    font-size: 1vw;
+}
+
+.ProductVariation,
+.product-price {
+    margin-left: 0.4vw;
+    width: 30%;
+}
+
+.inputdivs input,
+.inputdivs select,
+.product-price input,
+.product-variation input{
     border: none;
-    border-radius: 10px; 
+    border-radius: 10px;
     padding: 0.71vw 0.5vw;
     background-color: #e2e2e2;
 }
 
-.btns{
+.btns {
     display: flex;
     justify-content: flex-end;
     margin: 01vw auto;
     width: 85%;
 }
 
-.btns button , .btns input{
+.btns button,
+.btns input {
     display: flex;
     font-family: "Poppins", sans-serif;
     font-size: 1.2vw;
@@ -186,27 +232,27 @@ table tbody tr td:last-child a:last-child:hover {
     border: none;
 }
 
-#cancel{
+#cancel {
     background-color: #e2e2e2;
 }
 
-.btns input{
+.btns input {
     background-color: #ffbb00;
     color: #fff;
 }
 
-#cancel:hover{
+#cancel:hover {
     background-color: #d3d3d3;
 }
 
-.btns input:hover{
+.btns input:hover {
     background-color: #d4a011;
     color: #fff;
 }
 
-.error-message{
-    color:#F45B69;
+.error-message {
+    color: #f45b69;
     font-size: 0.8rem;
-    margin:0px 05px;
+    margin: 0px 05px;
     font-family: "Poppins", sans-serif;
 }

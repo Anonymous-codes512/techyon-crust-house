@@ -151,8 +151,8 @@
             selectedProducts.sort((a, b) => {
                 if (a.productName < b.productName) return -1;
                 if (a.productName > b.productName) return 1;
-                if (a.productSize < b.productSize) return -1;
-                if (a.productSize > b.productSize) return 1;
+                if (a.productVariation < b.productVariation) return -1;
+                if (a.productVariation > b.productVariation) return 1;
                 return 0;
             });
 
@@ -171,7 +171,7 @@
                 newRow.appendChild(productNameCell);
 
                 let variationCell = document.createElement('td');
-                variationCell.textContent = product.productSize;
+                variationCell.textContent = product.productVariation;
                 newRow.appendChild(variationCell);
 
                 let actionCell = document.createElement('td');
@@ -179,7 +179,7 @@
                 let addRecipeLink = document.createElement('a');
                 addRecipeLink.setAttribute('href', '#');
                 addRecipeLink.setAttribute('onclick',
-                    `addRecipe('${product.productSize}', '${product.productName}', '${product.id}')`);
+                    `addRecipe('${product.productVariation}', '${product.productName}', '${product.id}')`);
                 let addRecipeIcon = document.createElement('i');
                 addRecipeIcon.setAttribute('class', 'bx bx-list-plus');
                 addRecipeLink.appendChild(addRecipeIcon);

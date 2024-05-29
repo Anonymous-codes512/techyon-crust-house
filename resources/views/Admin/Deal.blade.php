@@ -87,10 +87,12 @@
             </div>
 
             <div class="inputdivs">
+                <label for="dealTitle">Deal Title</label>
                 <input type="text" id="dealTitle" name="dealTitle" placeholder="Deal title" required>
             </div>
 
             <div class="inputdivs">
+                <label for="dealStatus">Deal Status</label>
                 <select name="dealStatus" id="dealStatus">
                     <option value="" selected disabled>Select Stauts</option>
                     <option value="active">Active</option>
@@ -99,6 +101,7 @@
             </div>
 
             <div class="inputdivs">
+                <label for="dealEndDate">Deal End Date</label>
                 <input type="date" id="dealEndDate" name="dealEndDate" required>
             </div>
 
@@ -146,22 +149,26 @@
                 </div>
 
                 <div class="inputdivs">
+                    <label for="deal-Title">Deal Title</label>
                     <input type="text" id="deal-Title" name="dealTitle" required>
                 </div>
 
                 <div class="inputdivs">
+                    <label for="deal-price">Deal Discounted Price</label>
                     <input type="number" id="deal-price" name="dealprice" required>
                 </div>
-
+                
                 <div class="inputdivs">
+                    <label for="deal-Status">Deal Status</label>
                     <select name="dealStatus" id="deal-Status">
                         <option value="" selected disabled>Select Stauts</option>
                         <option value="active">Active</option>
                         <option value="not active">Not Active</option>
                     </select>
                 </div>
-
+                
                 <div class="inputdivs">
+                    <label for="deal-End-Date">Deal End Data</label>
                     <input type="date" id="deal-End-Date" name="dealEndDate" required>
                 </div>
             </div>
@@ -185,7 +192,7 @@
             </div>
 
             <div class="btns">
-                <p id="priceTag">Deal Price: <span id="price"></span></p>
+                <p id="priceTag">Actual Price: <span id="price"></span></p>
                 <button type="button" id="cancel" onclick="closeEditCatogry()">Cancel</button>
                 <a id="add-product-link" style="text-decoration: none;"><input type="button" value="Add Product"></a>
                 <input type="submit" value="Edit">
@@ -278,7 +285,7 @@
 
                     let variationCell = document.createElement('td');
                     variationCell.setAttribute('class', 'body-row-data');
-                    variationCell.textContent = product.productSize;
+                    variationCell.textContent = product.productVariation;
                     newRow.appendChild(variationCell);
 
                     let priceCell = document.createElement('td');

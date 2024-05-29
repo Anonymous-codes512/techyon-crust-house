@@ -70,7 +70,10 @@ table tbody tr td:first-child {
 }
 
 table tbody tr td:first-child img {
+    padding: 5px;
     width: 100px;
+    height: 70px;
+    border-radius: 15px;
 }
 
 table tbody tr td:last-child a {
