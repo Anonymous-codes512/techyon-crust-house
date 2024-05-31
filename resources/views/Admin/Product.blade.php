@@ -15,7 +15,11 @@
             <button onclick="addProduct()">Add New Product</button>
         </div>
 
-        <table>
+        @php
+            $productsData = $productsData;
+        @endphp
+
+        <table id="productTable">
             <thead>
                 <tr>
                     <th>Product Image</th>
@@ -77,7 +81,8 @@
                 </div>
                 <div class="ProductVariation">
                     <label for="noOfVariations">Variations</label>
-                    <input type="number" id="noOfVariations" name="noOfVariations" oninput="updateVariationFields(this.value)" placeholder="Ex 4 etc">    
+                    <input type="number" id="noOfVariations" name="noOfVariations"
+                        oninput="updateVariationFields(this.value)" placeholder="Ex 4 etc">
                 </div>
             </div>
 
@@ -118,9 +123,10 @@
                 <select name="editcategoryId" id="editcategory">
                     <option value="none" selected disabled>Select Product Category</option>
                     @foreach ($categoryData as $category)
-                        <option value="{{ $category->id }},{{ $category->categoryName }}">{{ $category->categoryName }}</option>
+                        <option value="{{ $category->id }},{{ $category->categoryName }}">{{ $category->categoryName }}
+                        </option>
                     @endforeach
-                </select>                
+                </select>
             </div>
 
             <input type="hidden" id="pId" name="pId">
@@ -137,14 +143,14 @@
                 </div>
                 <div class="ProductVariation">
                     <label for="editVariationPrice">Price</label>
-                    <input type="number" id="editVariationPrice" name="Price">    
+                    <input type="number" id="editVariationPrice" name="Price">
                 </div>
             </div>
 
             <div class="inputdivs">
                 <label for="upload-update-file" class="choose-file-btn">
                     <span>Choose File</span>
-                    <input type="file" id="upload-update-file" name="productImage" accept=".jpg,.jpeg,.png" >
+                    <input type="file" id="upload-update-file" name="productImage" accept=".jpg,.jpeg,.png">
                     <p id="namefile"></p>
                 </label>
             </div>
@@ -156,4 +162,31 @@
         </form>
 
     </main>
+
+    <script>
+        const Data = @json($productsData);
+        const productName = Data.map(product => product.$productName);
+        const SEARCHBAR = document.getElementById('search');
+
+        function searchCategory() {
+            let filter, table, tr, td, i, txtValue;
+            filter = SEARCHBAR.value.toUpperCase();
+            table = document.getElementById("productTable");
+            tr = table.getElementsByTagName("tr");
+
+            for (i = 0; i < tr.length; i++) {
+                td = tr[i].getElementsByTagName("td")[1];
+                if (td) {
+                    txtValue = td.textContent || td.innerText;
+                    if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                        tr[i].style.display = "";
+                    } else {
+                        tr[i].style.display = "none";
+                    }
+                }
+            }
+        }
+
+        SEARCHBAR.addEventListener('keyup', searchCategory);
+    </script>
 @endsection

@@ -1093,7 +1093,6 @@ function add() {
     closeAddToCart();
 }
  */
-
 /*
 window.addEventListener('beforeunload', function (event) {
     let textareaValue = document.getElementById('selectedProducts').value;

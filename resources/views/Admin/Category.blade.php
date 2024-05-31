@@ -8,12 +8,16 @@
         <div class="path">
             <p>Dashboard > Categories</p>
         </div>
- 
+
         <div class="newCategory">
             <button onclick="addCategory()">Add New Category</button>
         </div>
 
-        <table>
+        @php
+            $categories = $categories;
+        @endphp
+
+        <table id="categoryTable">
             <thead>
                 <tr>
                     <th>Category Image</th>
@@ -51,7 +55,7 @@
         <form class="newcategory" id="newCategory" action="{{ route('createCategory') }}" method="POST"
             enctype="multipart/form-data">
             @csrf
-            <h3>Add New Category</h3>
+            <h3 id="345ggbh">Add New Category</h3>
             <hr>
 
             <div class="inputdivs">
@@ -70,7 +74,7 @@
                 <input type="text" id="categoryname" name="categoryName" placeholder="Category Name" required>
             </div>
             @error('categoryName')
-            <span class="error-message">{{ $message }}</span>
+                <span class="error-message">{{ $message }}</span>
             @enderror
             <div class="btns">
                 <button id="cancel" onclick="closeAddCatogry()">Cancel</button>
@@ -79,7 +83,7 @@
         </form>
 
 
-        {{--  
+        {{--   
             |---------------------------------------------------------------|
             |================== Edit Category Overlay ======================|
             |---------------------------------------------------------------|
@@ -120,6 +124,31 @@
     </main>
 
     <script>
+        const Data = @json($categories);
+        const categoryNames = Data.map(category => category.categoryName);
+        const SEARCHBAR = document.getElementById('search');
+
+        function searchCategory() {
+            let filter, table, tr, td, i, txtValue;
+            filter = SEARCHBAR.value.toUpperCase();
+            table = document.getElementById("categoryTable");
+            tr = table.getElementsByTagName("tr");
+
+            for (i = 0; i < tr.length; i++) {
+                td = tr[i].getElementsByTagName("td")[1];
+                if (td) {
+                    txtValue = td.textContent || td.innerText;
+                    if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                        tr[i].style.display = "";
+                    } else {
+                        tr[i].style.display = "none";
+                    }
+                }
+            }
+        }
+
+        SEARCHBAR.addEventListener('keyup', searchCategory);
+
         function addCategory() {
             let overlay = document.getElementById('overlay');
             let popup = document.getElementById('newCategory');
@@ -163,6 +192,5 @@
             const fileNam = this.value.split('\\').pop();
             filenamSpan.textContent = fileNam ? fileNam : 'No file chosen';
         });
-
     </script>
 @endsection

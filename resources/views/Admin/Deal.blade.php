@@ -8,7 +8,7 @@
 
         @php
             $allDealProducts = $dealProducts;
-
+            $$dealsData = $dealsData;
         @endphp
 
         <div class="path">
@@ -19,13 +19,12 @@
             <button onclick="addDeal()">Add New Deal</button>
         </div>
 
-        <table>
+        <table id="dealsTable">
             <thead>
                 <tr>
                     <th>Deal Image</th>
                     <th>Deal Title</th>
                     <th>Deal Status</th>
-                    {{-- <th>Deal Products</th> --}}
                     <th>Deal Price</th>
                     <th>Deal End Date</th>
                     <th>Action</th>
@@ -157,7 +156,7 @@
                     <label for="deal-price">Deal Discounted Price</label>
                     <input type="number" id="deal-price" name="dealprice" required>
                 </div>
-                
+
                 <div class="inputdivs">
                     <label for="deal-Status">Deal Status</label>
                     <select name="dealStatus" id="deal-Status">
@@ -166,7 +165,7 @@
                         <option value="not active">Not Active</option>
                     </select>
                 </div>
-                
+
                 <div class="inputdivs">
                     <label for="deal-End-Date">Deal End Data</label>
                     <input type="date" id="deal-End-Date" name="dealEndDate" required>
@@ -274,7 +273,7 @@
             tbody.innerHTML = '';
             dealProducts.forEach(product => {
                 if (Deal.id === product.deal_id) {
-                    
+
                     let newRow = document.createElement('tr');
                     newRow.setAttribute('id', 'body-row');
 
@@ -388,5 +387,32 @@
             const fileName = this.value.split('\\').pop();
             filenameSpan.textContent = fileName ? fileName : 'No file chosen';
         });
+
+
+        const DATA_OBJECT = @json($dealsData);
+        const DATA_ARRAY = Object.values(DATA_OBJECT);
+        const DEAL_NAMES = DATA_ARRAY.map(deal => deal.$dealTitle);
+        const SEARCHBAR = document.getElementById('search');
+
+        function searchCategory() {
+            let filter, table, tr, td, i, txtValue;
+            filter = SEARCHBAR.value.toUpperCase();
+            table = document.getElementById("dealsTable");
+            tr = table.getElementsByTagName("tr");
+
+            for (i = 0; i < tr.length; i++) {
+                td = tr[i].getElementsByTagName("td")[1];
+                if (td) {
+                    txtValue = td.textContent || td.innerText;
+                    if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                        tr[i].style.display = "";
+                    } else {
+                        tr[i].style.display = "none";
+                    }
+                }
+            }
+        }
+
+        SEARCHBAR.addEventListener('keyup', searchCategory);
     </script>
 @endsection

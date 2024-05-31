@@ -15,6 +15,7 @@
 
         @php
             $notifications = $notification;
+            $stockData = $stockData;
         @endphp
 
         @if (!empty($notifications))
@@ -25,7 +26,7 @@
             </script>
         @endif
 
-        <table>
+        <table id="stocksTable">
             <thead>
                 <tr>
                     <th>Item Name</th>
@@ -292,5 +293,6 @@
             overlay.style.display = 'none';
             popup.style.display = 'none';
         }
+
     </script>
 @endsection

@@ -73,7 +73,7 @@ class AdminController extends Controller
     {
         // $categories = Category::paginate(2);
         $category = Category::all();
-
+        // session(['searchData' => $category]);
         return view('Admin.Category')->with(['categories' => $category]);
     }
 
@@ -150,6 +150,7 @@ class AdminController extends Controller
             return view('Admin.Product');
         }
 
+        // session(['searchData' => $products]);
         return view('Admin.Product')->with(['categoryData' => $categories, 'productsData' => $products]);
     }
 
@@ -466,7 +467,6 @@ class AdminController extends Controller
 
         $notify = Notification::where('is_read', false)->get();
         session(['Notifications' => $notify]);
-
         return view('Admin.Stock')->with(['stockData' => $stocks, 'notification' => $notifications]);
     }
 
@@ -514,7 +514,6 @@ class AdminController extends Controller
             return redirect()->route('viewStockPage');
         }
     }
-
 
     public function updateStock(Request $request)
     {
@@ -699,7 +698,7 @@ class AdminController extends Controller
         ];
     }
 }
-
+   
 
 
 

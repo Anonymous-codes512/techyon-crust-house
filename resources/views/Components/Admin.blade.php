@@ -74,11 +74,12 @@
                 </div>
             </div>
         </nav>
+
         <div class="rgtpnl">
             <header id="header">
                 <div class="searchbar">
                     <i class='bx bx-search'></i>
-                    <input type="text" id="search" placeholder="Search">
+                    <input type="text" id="search" value="" placeholder="Search">
                 </div>
 
                 <div class="profilepanel">
@@ -148,6 +149,7 @@
     </div>
     <script src="{{ asset('JavaScript/index.js') }}"></script>
     <script>
+
         function toggleNotification() {
             const notificationBox = document.getElementById('notificationBox');
             if (notificationBox.style.display === "flex") {
