@@ -65,7 +65,7 @@
 
 #recipeOverlay,
 #categoryProductOverlay,
-#productRecipeOverlay{
+#productRecipeOverlay {
     position: fixed;
     top: 0;
     left: 0;
@@ -104,7 +104,7 @@
     align-items: start;
 }
 
-#productRecipeitems{
+#productRecipeitems {
     border: 1px solid #000;
     margin: 10px auto;
     width: 95%;
@@ -141,13 +141,15 @@
     background-color: #e2e2e2;
 }
 
-table {
+#productRecipeTable {
+    border: 1px solid #000;
     border-collapse: collapse;
     width: 95%;
     margin: 1vw auto;
 }
 
 table thead {
+    border: 1px solid #000;
     position: sticky;
     top: 0;
     background-color: #ffffff;
@@ -166,7 +168,16 @@ table thead tr th:last-child {
     text-align: center;
 }
 
+table tbody {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    /* height: 100px; */
+    width: 100%;
+    border: 1px solid #000;
+}
 table tbody tr {
+    border: 1px solid #000;
     border-bottom: 1px solid #898989;
 }
 

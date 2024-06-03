@@ -32,7 +32,7 @@
         <div id="categoryProductOverlay"></div>
         <div id="categoryProducts">
             <div class="table">
-                <table>
+                <table id="productRecipeTable">
                     <thead>
                         <tr>
                             <th>Product Category</th>
@@ -65,7 +65,7 @@
         <div id="productRecipe">
             <p id="productRecipeitems"></p>
             <div class="table">
-                <table>
+                <table id="recipeTable">
                     <thead>
                         <tr>
                             <th>Recipe Item</th>
@@ -318,3 +318,4 @@
         });
     </script>
 @endsection
+ 

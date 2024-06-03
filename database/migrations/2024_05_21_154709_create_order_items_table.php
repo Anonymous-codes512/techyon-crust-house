@@ -22,6 +22,7 @@ return new class extends Migration
             $table->string('product_quantity');
             $table->string('total_price');
             $table->timestamps();
+
         });
         
     }

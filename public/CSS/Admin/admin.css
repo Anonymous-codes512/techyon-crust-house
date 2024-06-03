@@ -56,6 +56,7 @@ nav {
     flex-direction: column;
     height: 100%;
     margin: 0.6vw;
+    font-size: 1.2vw;
 }
 
 .menuItems {
@@ -204,7 +205,11 @@ header {
 .notification .notificationBox::-webkit-scrollbar {
     display: none;
 }
-
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
 /* .notification .notificationBox::before {
     content: '';
     position: absolute;

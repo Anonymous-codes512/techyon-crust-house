@@ -17,9 +17,9 @@ function showAddToCart(product, deals, allProducts) {
     if (product.category_name) {
         if (drinkFlavour) drinkFlavour.style.display = 'none';
         if (productId) productId.value = product.id;
-        if (prodName) prodName.textContent = `${product.productVariation} ${product.productName}`;
-        if (price) price.textContent = `Rs. ${product.productPrice}`;
-        if (totalPrice) totalPrice.textContent = `Rs. ${product.productPrice}`;
+        if (prodName) prodName.value = `${product.productVariation} ${product.productName}`;
+        if (price) price.value = `Rs. ${product.productPrice}`;
+        if (totalPrice) totalPrice.value = `Rs. ${product.productPrice}`;
 
         if (product.category_name.toLowerCase() != 'others') {
             if (prodVariation) prodVariation.style.display = 'block';
@@ -33,9 +33,9 @@ function showAddToCart(product, deals, allProducts) {
             if (prodVariationLabel) prodVariationLabel.style.display = 'none';
         }
     } else {
-        if (prodName) prodName.textContent = product.deal.dealTitle;
-        if (price) price.textContent = `Rs. ${product.deal.dealDiscountedPrice}`;
-        if (totalPrice) totalPrice.textContent = `Rs. ${product.deal.dealDiscountedPrice}`;
+        if (prodName) prodName.value = product.deal.dealTitle;
+        if (price) price.value = `Rs. ${product.deal.dealDiscountedPrice}`;
+        if (totalPrice) totalPrice.value = `Rs. ${product.deal.dealDiscountedPrice}`;
         if (drinkFlavour) drinkFlavour.style.display = 'block';
         updateDealsDropdown(product, deals, allProducts);
     }
@@ -200,14 +200,17 @@ function addOnsDealDropdown(optionsArray, dropdown) {
 
         if (quantityElement) quantityElement.value = '1';
 
-        let price = parseFloat(priceElement.textContent.replace('Rs. ', '')) || 0;
+        let totalPrice = 0;
         let selectedOption = dropdown.options[dropdown.selectedIndex];
         let addonPrice = parseFloat((selectedOption.value.match(/Rs\. (\d+)/) || [0, 0])[1]) || 0;
+        let variationPrice = parseFloat(priceElement.value.replace('Rs. ', '')) || 0;
 
-        const orderPrice = price + addonPrice;
-        if (totalPriceElement) totalPriceElement.textContent = 'Rs. ' + orderPrice;
-        if (priceElement) priceElement.textContent = 'Rs. ' + orderPrice;
+        totalPrice = variationPrice + addonPrice;
+
+        if (totalPriceElement) totalPriceElement.value = 'Rs. ' + totalPrice.toFixed(2) + ' Pkr';
+        if (priceElement) priceElement.value = 'Rs. ' + totalPrice.toFixed(2) + ' Pkr';
     });
+
 }
 
 /*
@@ -282,8 +285,8 @@ function handleDrinksCategory(product, allProducts, productVariationDropdown, dr
         if (filteredVariations.length > 0) {
             let selectedProduct = filteredVariations[0];
             let variationOptions = filteredVariations.map(product => `${product.productVariation} (Rs. ${product.productPrice})`);
-            document.getElementById('price').textContent = 'Rs. ' + selectedProduct.productPrice;
-            document.getElementById('totalprice').textContent = 'Rs. ' + selectedProduct.productPrice;
+            document.getElementById('price').value = 'Rs. ' + selectedProduct.productPrice;
+            document.getElementById('totalprice').value = 'Rs. ' + selectedProduct.productPrice;
             addOptionsToDropdown(variationOptions, productVariationDropdown);
         }
     });
@@ -334,8 +337,8 @@ function addOptionsToDropdown(optionsArray, dropdown) {
         }
 
         const order_price = parseFloat(price) + parseFloat(price1);
-        totalPriceElement.textContent = 'Rs. ' + order_price;
-        document.getElementById('price').textContent = 'Rs. ' + order_price;
+        totalPriceElement.value = 'Rs. ' + order_price;
+        document.getElementById('price').value = 'Rs. ' + order_price;
     });
 }
 
@@ -362,9 +365,10 @@ function addOnsDropdown(optionsArray, dropdown, labeltext) {
 
     dropdown.addEventListener('change', () => {
         document.getElementById('prodQuantity').value = '1';
+        let totalPriceElement = document.getElementById('totalprice');
+
         let selectedOption = dropdown.options[dropdown.selectedIndex];
 
-        let totalPriceElement = document.getElementById('totalprice');
         let match = selectedOption.value.match(/Rs\. (\d+)/);
         let price = match ? match[1] : 0;
 
@@ -377,8 +381,8 @@ function addOnsDropdown(optionsArray, dropdown, labeltext) {
         let price1 = match1 ? match1[1] : 0;
 
         const order_price = parseFloat(price) + parseFloat(price1);
-        totalPriceElement.textContent = 'Rs. ' + order_price;
-        document.getElementById('price').textContent = 'Rs. ' + order_price;
+        totalPriceElement.value = 'Rs. ' + order_price;
+        document.getElementById('price').value = 'Rs. ' + order_price;
     });
 }
 
@@ -388,149 +392,150 @@ function addOnsDropdown(optionsArray, dropdown, labeltext) {
 |---------------------------------------------------------------|
 */
 
-let allAddedProducts = [];
-let index = 1;
+// let allAddedProducts = [];
+// let index = 1;
 
-function add(allProducts) {
-    let productName = document.getElementById('prodName').textContent.trim();
-    let product = productName.split(" ");
-    let prod = product[0];
-    productName = productName.replace(prod, "");
+// function add(allProducts) {
+//     let productName = document.getElementById('prodName').textContent.trim();
+//     let product = productName.split(" ");
+//     let prod = product[0];
+//     productName = productName.replace(prod, "");
 
-    let productVariation = document.getElementById('prodVariation').value;
-    let addOns = document.getElementById('addons').value;
-    let productPrice = parseFloat(document.getElementById('totalprice').textContent.replace('Rs. ', ''));
-    let quantity = document.getElementById('prodQuantity').value;
+//     let productVariation = document.getElementById('prodVariation').value;
+//     let addOns = document.getElementById('addons').value;
+//     let productPrice = parseFloat(document.getElementById('totalprice').textContent.replace('Rs. ', ''));
+//     let quantity = document.getElementById('prodQuantity').value;
 
-    let extractedText;
+//     let extractedText;
 
-    let pTag = document.createElement('p');
-    pTag.style.borderBottom = '1px solid #000';
-    pTag.id = 'order' + index;
+//     let pTag = document.createElement('p');
+//     pTag.style.borderBottom = '1px solid #000';
+//     pTag.id = 'order' + index;
 
-    let textarea = document.createElement('textarea');
-    textarea.readOnly = true;
-    textarea.style.resize = 'none';
-    textarea.rows = '3';
-    textarea.cols = '4';
-    textarea.style.width = "95%";
-    textarea.style.height = "auto";
-    textarea.style.border = 'none';
+//     let textarea = document.createElement('textarea');
+//     textarea.readOnly = true;
+//     textarea.style.resize = 'none';
+//     textarea.rows = '3';
+//     textarea.cols = '4';
+//     textarea.style.width = "95%";
+//     textarea.style.height = "auto";
+//     textarea.style.border = 'none';
 
-    let divQuantity = document.createElement('div');
-    divQuantity.style.display = "flex";
-    divQuantity.style.alignItems = "center";
-    divQuantity.style.marginBottom = "5px";
+//     let divQuantity = document.createElement('div');
+//     divQuantity.style.display = "flex";
+//     divQuantity.style.alignItems = "center";
+//     divQuantity.style.marginBottom = "5px";
 
-    let quantityInput = document.createElement('input');
-    quantityInput.type = 'number';
-    quantityInput.id = 'OrderQuantity' + index;
-    quantityInput.name = 'OrderQuantity' + index;
-    quantityInput.style.width = '30px';
-    quantityInput.style.textAlign = 'center';
-    quantityInput.value = quantity;
+//     let quantityInput = document.createElement('input');
+//     quantityInput.type = 'number';
+//     quantityInput.id = 'OrderQuantity' + index;
+//     quantityInput.name = 'OrderQuantity' + index;
+//     quantityInput.style.width = '30px';
+//     quantityInput.style.textAlign = 'center';
+//     quantityInput.value = quantity;
 
-    let increaseIcon = document.createElement('i');
-    increaseIcon.style.fontSize = '2vw';
-    increaseIcon.style.color = '#d40000';
-    increaseIcon.className = 'bx bxs-plus-square';
+//     let increaseIcon = document.createElement('i');
+//     increaseIcon.style.fontSize = '2vw';
+//     increaseIcon.style.color = '#d40000';
+//     increaseIcon.className = 'bx bxs-plus-square';
 
-    let decreaseIcon = document.createElement('i');
-    decreaseIcon.style.fontSize = '2.5vw';
-    decreaseIcon.style.color = '#d40000';
-    decreaseIcon.className = 'bx bxs-checkbox-minus';
+//     let decreaseIcon = document.createElement('i');
+//     decreaseIcon.style.fontSize = '2.5vw';
+//     decreaseIcon.style.color = '#d40000';
+//     decreaseIcon.className = 'bx bxs-checkbox-minus';
 
-    divQuantity.appendChild(decreaseIcon);
-    divQuantity.appendChild(quantityInput);
-    divQuantity.appendChild(increaseIcon);
+//     divQuantity.appendChild(decreaseIcon);
+//     divQuantity.appendChild(quantityInput);
+//     divQuantity.appendChild(increaseIcon);
 
-    pTag.appendChild(textarea);
-    pTag.appendChild(divQuantity);
+//     pTag.appendChild(textarea);
+//     pTag.appendChild(divQuantity);
 
-    document.getElementById('selectedProducts').appendChild(pTag);
+//     document.getElementById('selectedProducts').appendChild(pTag);
 
-    if (!addOns) {
-        let productDetails = productVariation.replace(/\s+/g, '') + productName;
-        extractedText = productDetails.replace(/\(.*?\)/, '');
-        extractedText = extractedText.trim();
+//     if (!addOns) {
+//         let productDetails = productVariation.replace(/\s+/g, '') + productName;
+//         extractedText = productDetails.replace(/\(.*?\)/, '');
+//         extractedText = extractedText.trim();
 
-    } else {
-        let productDetails = productVariation.replace(/\s+/g, '') + productName + ' with extra ' + addOns.replace(/\s*\(Rs\.\s*\d+\)\s*/, "");
-        allProducts.forEach(element => {
-            if (element.productName == addOns) {
-                if (element.category_name.toLowerCase() == 'drinks') {
-                    productName = addOns;
-                    productDetails = productVariation.replace(/\s+/g, '') + ' ' + addOns;
-                }
-            }
-        });
-        extractedText = productDetails.replace(/\(.*?\)/, '');
-        extractedText = extractedText.trim();
-    }
+//     } else {
+//         let productDetails = productVariation.replace(/\s+/g, '') + productName + ' with extra ' + addOns.replace(/\s*\(Rs\.\s*\d+\)\s*/, "");
+//         allProducts.forEach(element => {
+//             if (element.productName == addOns) {
+//                 if (element.category_name.toLowerCase() == 'drinks') {
+//                     productName = addOns;
+//                     productDetails = productVariation.replace(/\s+/g, '') + ' ' + addOns;
+//                 }
+//             }
+//         });
+//         extractedText = productDetails.replace(/\(.*?\)/, '');
+//         extractedText = extractedText.trim();
+//     }
 
-    textarea.textContent = productName.replace(/^ /, "") + '\n' + extractedText;
-    extractedText = '';
+//     textarea.textContent = productName.replace(/^ /, "") + '\n' + extractedText;
+//     extractedText = '';
 
-    let totalSpan = document.createElement('span');
-    totalSpan.style.marginLeft = '3rem';
-    totalSpan.id = 'orderItemPrice' + index;
-    totalSpan.style.fontSize = '0.8rem';
-    totalSpan.textContent = 'Total: Rs. ' + productPrice.toFixed(2);
-    divQuantity.appendChild(totalSpan);
+//     let totalSpan = document.createElement('span');
+//     totalSpan.style.marginLeft = '3rem';
+//     totalSpan.id = 'orderItemPrice' + index;
+//     totalSpan.style.fontSize = '0.8rem';
+//     totalSpan.textContent = 'Total: Rs. ' + productPrice.toFixed(2);
+//     divQuantity.appendChild(totalSpan);
 
-    let totalBillString = document.getElementById('totalbill').value;
-    let totalBillValue;
+//     let totalBillString = document.getElementById('totalbill').value;
+//     let totalBillValue;
 
-    if (totalBillString.startsWith("Total Bill:")) {
-        totalBillValue = parseFloat(totalBillString.split("Rs. ")[1]);
-    } else {
-        totalBillValue = parseFloat(totalBillString);
-    }
+//     if (totalBillString.startsWith("Total Bill:")) {
+//         totalBillValue = parseFloat(totalBillString.split("Rs. ")[1]);
+//     } else {
+//         totalBillValue = parseFloat(totalBillString);
+//     }
 
-    let variationName = (productVariation && productVariation.match(/^[^\(]+/)) ? productVariation.match(/^[^\(]+/)[0].trim() : '';
-    let productObj = {
-        name: productName,
-        variation: variationName,
-        addons: addOns.replace(/\s*\(Rs\.\s*\d+\)\s*/, ""),
-        price: productPrice,
-        quantity: quantityInput.value.replace(/\s+/g, ' ')
-    };
+//     let variationName = (productVariation && productVariation.match(/^[^\(]+/)) ? productVariation.match(/^[^\(]+/)[0].trim() : '';
+//     let productObj = {
+//         name: productName,
+//         variation: variationName,
+//         addons: addOns.replace(/\s*\(Rs\.\s*\d+\)\s*/, ""),
+//         price: productPrice,
+//         quantity: quantityInput.value.replace(/\s+/g, ' ')
+//     };
 
-    allAddedProducts.push(productObj);
-    let hiddenInput = document.createElement('input');
-    hiddenInput.type = 'hidden';
-    hiddenInput.id = 'hidden-field ' + index;
-    hiddenInput.name = 'product' + index;
-    hiddenInput.value = JSON.stringify(productObj);
-    document.getElementById('cart').appendChild(hiddenInput);
+//     allAddedProducts.push(productObj);
+//     let hiddenInput = document.createElement('input');
+//     hiddenInput.type = 'hidden';
+//     hiddenInput.id = 'hidden-field ' + index;
+//     hiddenInput.name = 'product' + index;
+//     hiddenInput.value = JSON.stringify(productObj);
+//     document.getElementById('cart').appendChild(hiddenInput);
 
-    let productId = generateProductId();
+//     let productId = generateProductId();
 
-    let currentTotal = totalBillValue + productPrice;
-    document.getElementById('totalbill').value = "Total Bill:\t\t Rs. " + currentTotal.toFixed(2);
-    index++;
+//     let currentTotal = totalBillValue + productPrice;
+//     document.getElementById('totalbill').value = "Total Bill:\t\t Rs. " + currentTotal.toFixed(2);
+//     index++;
 
-    increaseIcon.setAttribute('onclick', `increaseWhole('${productId}', '${quantityInput.id}', '${totalSpan.id}', '${hiddenInput.id}')`);
-    decreaseIcon.setAttribute('onclick', `decreaseWhole('${pTag.id}', '${productId}', '${quantityInput.id}', '${totalSpan.id}', '${hiddenInput.id}')`);
+//     increaseIcon.setAttribute('onclick', `increaseWhole('${productId}', '${quantityInput.id}', '${totalSpan.id}', '${hiddenInput.id}')`);
+//     decreaseIcon.setAttribute('onclick', `decreaseWhole('${pTag.id}', '${productId}', '${quantityInput.id}', '${totalSpan.id}', '${hiddenInput.id}')`);
 
-    closeAddToCart();
 
-    document.getElementById('prodVariation').value = '';
-    document.getElementById('addons').value = '';
-    document.getElementById('prodQuantity').value = '1';
+//     closeAddToCart();
 
-    sessionStorage.setItem('selectedProducts', JSON.stringify(allAddedProducts));
-}
+//     document.getElementById('prodVariation').value = '';
+//     document.getElementById('addons').value = '';
+//     document.getElementById('prodQuantity').value = '1';
 
-function generateProductId() {
-    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    const length = 8;
-    let productId = '';
-    for (let i = 0; i < length; i++) {
-        productId += characters.charAt(Math.floor(Math.random() * characters.length));
-    }
-    return productId;
-}
+//     sessionStorage.setItem('selectedProducts', JSON.stringify(allAddedProducts));
+// }
+
+// function generateProductId() {
+//     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+//     const length = 8;
+//     let productId = '';
+//     for (let i = 0; i < length; i++) {
+//         productId += characters.charAt(Math.floor(Math.random() * characters.length));
+//     }
+//     return productId;
+// }
 
 /*
 |---------------------------------------------------------------|
@@ -542,15 +547,15 @@ function increase() {
     let quantityInput = document.getElementById('prodQuantity');
     let currentValue = parseInt(quantityInput.value);
     currentValue = currentValue + 1;
-    quantityInput.value = currentValue;
+    quantityInput.value = currentValue; // Update the input value
 
     let productPriceElement = document.getElementById('price');
-    let numericValue = productPriceElement.textContent.match(/\d+(\.\d+)?/);
+    let numericValue = productPriceElement.value.match(/\d+(\.\d+)?/);
     let totalPrice = parseFloat(numericValue[0]);
     totalPrice = totalPrice * currentValue;
 
     let totalPriceElement = document.getElementById('totalprice');
-    totalPriceElement.textContent = "Rs. " + totalPrice.toFixed(2);
+    totalPriceElement.value = "Rs. " + totalPrice.toFixed(2);
 }
 
 function decrease() {
@@ -564,97 +569,13 @@ function decrease() {
         quantityInput.value = currentValue;
 
         let productPriceElement = document.getElementById('price');
-        let numericValue = productPriceElement.textContent.match(/\d+(\.\d+)?/);
+        let numericValue = productPriceElement.value.match(/\d+(\.\d+)?/);
         let unitPrice = parseFloat(numericValue[0]);
 
         let totalPrice = unitPrice * currentValue;
 
         let totalPriceElement = document.getElementById('totalprice');
-        totalPriceElement.textContent = "Rs. " + totalPrice.toFixed(2);
-    }
-}
-
-let initialTotalPrices = {};
-let TotalOrderPrices = {};
-let product_details = {};
-
-function updateTotalOrderPricesSum() {
-    let totalOrderPricesSum = Object.values(TotalOrderPrices).reduce((acc, curr) => acc + curr, 0);
-    let orderPrice = document.getElementById('totalbill');
-    orderPrice.value = "Total Bill:\t\t Rs. " + totalOrderPricesSum.toFixed(2);
-    console.log("Updated total bill: ", totalOrderPricesSum);
-}
-
-function increaseWhole(productId, quantityInputId, totalSpanId, hiddenInputId) {
-    let quantityInputElement = document.getElementById(quantityInputId);
-    let totalSpanElement = document.getElementById(totalSpanId);
-    let hiddenInputElement = document.getElementById(hiddenInputId);
-    let parsedData = JSON.parse(hiddenInputElement.value);
-    let currentOrderItemQuantity = parseInt(quantityInputElement.value);
-
-    if (!(productId in initialTotalPrices)) {
-        let pattern = /\d+\.\d+/;
-        let match = totalSpanElement.textContent.match(pattern);
-        let initialPrice = match ? parseFloat(match[0]) : 0;
-        initialTotalPrices[productId] = initialPrice / currentOrderItemQuantity;
-        product_details[productId] = parsedData;
-        console.log("Initial setup for ", productId, ": ", initialTotalPrices[productId], " per unit.");
-    }
-
-    let newOrderItemQuantity = currentOrderItemQuantity + 1;
-    product_details[productId].quantity = newOrderItemQuantity;
-    quantityInputElement.value = newOrderItemQuantity;
-
-    let totalPrice = initialTotalPrices[productId] * newOrderItemQuantity;
-    product_details[productId].price = totalPrice;
-    hiddenInputElement.value = JSON.stringify(product_details[productId]);
-    totalSpanElement.textContent = "Total: Rs. " + totalPrice.toFixed(2);
-
-    TotalOrderPrices[productId] = totalPrice;
-
-    updateTotalOrderPricesSum();
-}
-
-function decreaseWhole(OrderElementId, productId, quantityInputId, totalSpanId, hiddenInputId) {
-    let quantityInputElement = document.getElementById(quantityInputId);
-    let totalSpanElement = document.getElementById(totalSpanId);
-    let hiddenInputElement = document.getElementById(hiddenInputId);
-    let parsedData = JSON.parse(hiddenInputElement.value);
-    let currentOrderItemQuantity = parseInt(quantityInputElement.value);
-
-    if (!(productId in initialTotalPrices)) {
-        return;
-    }
-
-    if (currentOrderItemQuantity > 1) {
-        let newOrderItemQuantity = currentOrderItemQuantity - 1;
-        product_details[productId].quantity = newOrderItemQuantity;
-        quantityInputElement.value = newOrderItemQuantity;
-
-        let totalPrice = initialTotalPrices[productId] * newOrderItemQuantity;
-        product_details[productId].price = totalPrice;
-        hiddenInputElement.value = JSON.stringify(product_details[productId]);
-        totalSpanElement.textContent = "Total: Rs. " + totalPrice.toFixed(2);
-
-        TotalOrderPrices[productId] = totalPrice;
-        updateTotalOrderPricesSum();
-    } else {
-        let response = confirm('Are you sure you want to remove the product?');
-        if (response) {
-            let OrderElement = document.getElementById(OrderElementId);
-            OrderElement.parentNode.removeChild(OrderElement);
-            hiddenInputElement.remove();
-
-            delete initialTotalPrices[productId];
-            delete product_details[productId];
-            delete TotalOrderPrices[productId];
-
-            updateTotalOrderPricesSum();
-
-            console.log("Removed product ", productId);
-        } else {
-            alert('Minimum quantity should be 1.');
-        }
+        totalPriceElement.value = "Rs. " + totalPrice.toFixed(2);
     }
 }
 
@@ -694,35 +615,3 @@ function closeAddToCart() {
     if (overlay) overlay.style.display = 'none';
     if (popup) popup.style.display = 'none';
 }
-
-// let reloadingPage = false;
-// window.addEventListener('beforeunload', function (event) {
-//     if (!reloadingPage) {
-//         let selectedProductsHTML = document.getElementById('selectedProducts').innerHTML;
-//         let totalBillValue = document.getElementById('totalbill').textContent;
-//         localStorage.setItem('selectedProductsHTML', selectedProductsHTML);
-//         localStorage.setItem('totalBillValue', totalBillValue);
-//     }
-// });
-// window.addEventListener('DOMContentLoaded', function (event) {
-//     let savedSelectedProductsHTML = localStorage.getItem('selectedProductsHTML');
-//     let savedTotalBillValue = localStorage.getItem('totalBillValue');
-    
-//     if (savedSelectedProductsHTML) {
-//         document.getElementById('selectedProducts').innerHTML = savedSelectedProductsHTML;
-//     }
-    
-//     if (savedTotalBillValue) {
-//         document.getElementById('totalbill').textContent = savedTotalBillValue;
-//     }
-// });
-
-// // Handle Ctrl+R or Ctrl+Shift+R to clear selected products and total bill
-// window.addEventListener('keydown', function (event) {
-//     if ((event.ctrlKey && event.shiftKey && event.keyCode === 82) || (event.ctrlKey && event.keyCode === 82)) {
-//         reloadingPage = true;
-//         localStorage.removeItem('selectedProductsHTML');
-//         localStorage.removeItem('totalBillValue');
-//     }
-// });
-

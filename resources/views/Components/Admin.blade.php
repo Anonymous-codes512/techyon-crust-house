@@ -73,7 +73,7 @@
                     </div>
                 </div>
             </div>
-        </nav>
+        </nav> 
 
         <div class="rgtpnl">
             <header id="header">

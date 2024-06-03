@@ -150,4 +150,9 @@ Route::get('/deleteStaff/{id}', [AdminController::class,'deleteStaff'])->name('d
 Route::get('salesman/dashboard/{id}', [SalesmanController::class,'viewSalesmanDashboard'])->name('salesman_dashboard');
 Route::get('salesman/dashboard/{categoryName}/{id}', [SalesmanController::class,'salesmanCategoryDashboard'])->name('salesman_dash');
 Route::get('salesman/deals/', [SalesmanController::class,'deals'])->name('deals');
-Route::post('salesman/placeOrder', [SalesmanController::class,'placeOrder'])->name('placeOrder');
+Route::get('salesman/placeOrder/{salesman_id}', [SalesmanController::class,'placeOrder'])->name('placeOrder');
+Route::post('salesman/saveToCart', [SalesmanController::class,'saveToCart'])->name('saveToCart');
+Route::get('salesman/clearCart/{salesman_id}', [SalesmanController::class,'clearCart'])->name('clearCart');
+Route::get('salesman/removeOneProduct/{id}/{salesman_id}', [SalesmanController::class,'removeOneProduct'])->name('removeOneProduct');
+Route::get('salesman/increaseQuantity/{id}/{salesman_id}', [SalesmanController::class,'increaseQuantity'])->name('increaseQuantity');
+Route::get('salesman/decreaseQuantity/{id}/{salesman_id}', [SalesmanController::class,'decreaseQuantity'])->name('decreaseQuantity');

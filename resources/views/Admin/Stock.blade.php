@@ -73,8 +73,8 @@
             </div>
 
             <div class="inputdivs" id="unitsDiv">
-                <input type="number" id="quantity" name="stockQuantity" placeholder="Stock Quantity" step="any"
-                    required>
+                <input type="number" id="quantity" name="stockQuantity" min="0" placeholder="Stock Quantity"
+                    step="any" required>
                 <select name="unit1" id="stockunit">
                     <option value="" selected disabled>Select unit</option>
                     <option value="mg">Milligram</option>
@@ -90,8 +90,8 @@
             </div>
 
             <div class="inputdivs" id="unitsDiv">
-                <input type="number" id="minquantity" name="minStockQuantity" placeholder="Minimum Stock Quantity "
-                    step="any" required>
+                <input type="number" id="minquantity" name="minStockQuantity" min="0"
+                    placeholder="Minimum Stock Quantity " step="any" required>
                 <select name="unit2" id="minStockUnit">
                     <option value="" selected disabled>Select unit</option>
                     <option value="mg">Milligram</option>
@@ -136,7 +136,7 @@
             </div>
 
             <div class="inputdivs" id="unitsDiv">
-                <input type="number" id="iQuantity" name="stockQuantity" step="any" required>
+                <input type="number" id="iQuantity" name="stockQuantity" step="any" min="0" required>
                 <select name="unit1" id="iQUnit">
                     <option value="" selected disabled>Select unit</option>
                     <option value="mg">Milligram</option>
@@ -151,7 +151,7 @@
             </div>
 
             <div class="inputdivs" id="unitsDiv">
-                <input type="number" id="mQuantity" name="minStockQuantity" step="any" required>
+                <input type="number" id="mQuantity" name="minStockQuantity" step="any" min="0" required>
                 <select name="unit2" id="mQUnit">
                     <option value="" selected disabled>Select unit</option>
                     <option value="mg">Milligram</option>
@@ -293,6 +293,5 @@
             overlay.style.display = 'none';
             popup.style.display = 'none';
         }
-
     </script>
 @endsection
