@@ -17,44 +17,25 @@ Route::get('/viewRegisterPage',[AuthController::class, 'registrationIndex'])->na
 
 Route::post('/storeRegistrationData',[AuthController::class, 'register'])->name('storeRegistrationData');
 Route::post('/login',[AuthController::class, 'login'])->name('login');
+Route::get('/logout',[AuthController::class, 'logout'])->name('logout');
 
-Route::get('/logout',function(){
-    return view('Auth.Login');
-})->name('logout');
+/*
+|---------------------------------------------------------------|
+|======================= Owner's Routes ========================|
+|---------------------------------------------------------------|
+*/
 
 Route::get('/dashboard', [OwnerController::class, 'viewOwnerDashboard'])->name('dashboard');
-
-// Route::get('/dashboard2', function () {
-//     return view('Owner.Dashboard2');
-// }); 
-
 Route::get('/addnewbranch', [OwnerController ::class, 'addNewBranchIndex'])->name('addNewBranch');
 Route::post('/storeNewBranchData',[OwnerController::class,'newBranch'])->name('storeNewBranchData');
 Route::get('/branchesDashboard', [OwnerController::class, 'viewBranchesDashboard'])->name('branchesDashboard');
 
-Route::get('/addnewbranch1', function(){
-    return view('Owner.AddNewBranch1');
-});
-
-Route::get('/addnewbranch2', function(){
-    return view('Owner.AddNewBranch2');
-});
-
-Route::get('/addnewbranch3', function(){
-    return view('Owner.AddNewBranch3');
-});
-
-Route::get('/mystaff', function(){
-    return view('Owner.MyStaff');
-})->name('staff');
-
-Route::get('/onlineorders', function(){
-    return view('Owner.OnlineOrder');
-})->name('onlineorders');
-
-Route::get('/diningtable', function(){
-    return view('Owner.DiningTable');
-})->name('diningtable');
+Route::get('/addnewbranch1', function() { return view('Owner.AddNewBranch1'); });
+Route::get('/addnewbranch2', function(){ return view('Owner.AddNewBranch2'); });
+Route::get('/addnewbranch3', function(){ return view('Owner.AddNewBranch3'); });
+Route::get('/mystaff', function(){ return view('Owner.MyStaff'); })->name('staff');
+Route::get('/onlineorders', function(){ return view('Owner.OnlineOrder'); })->name('onlineorders');
+Route::get('/diningtable', function(){ return view('Owner.DiningTable'); })->name('diningtable');
 
 
 /*
@@ -102,9 +83,7 @@ Route::get('/viewDealProductsPage', [AdminController::class,'viewDealProductsPag
 Route::post('/createDealProducts', [AdminController::class,'createDealProducts'])->name('createDealProducts');
 Route::post('/updateDeal',[AdminController::class,'updateDeal'])->name('updateDeal');
 Route::get('/viewUpdateDealProductsPage/{id}', [AdminController::class,'viewUpdateDealProductsPage'])->name('viewUpdateDealProductsPage');
-// Route::get('/viewUpdateDealProductsPage', [AdminController::class,'viewUpdateDealProductsPage'])->name('viewUpdateDealProductsPage');
 Route::post('/addDealProduct',[AdminController::class,'addDealProduct'])->name('addDealProduct');
-// Route::get('/editDeal/{id}',[AdminController::class,'editDeal'])->name('editDeal');
 Route::get('/deleteDeal/{id}',[AdminController::class,'deleteDeal'])->name('deleteDeal');
 Route::get('/deleteDealProduct/{id}/{dId}',[AdminController::class,'deleteDealProduct'])->name('deleteDealProduct');
 
@@ -129,6 +108,7 @@ Route::get('/viewRecipePage', [AdminController::class,'viewRecipePage'])->name('
 Route::post('/createRecipe', [AdminController::class,'createRecipe'])->name('createRecipe');
 Route::get('/viewProductRecipe/{category_id}/{product_id}', [AdminController::class,'viewProductRecipe'])->name('viewProductRecipe');
 Route::get('/deleteStockFromRecipe/{id}/{cid}/{pId}', [AdminController::class, 'deleteStockFromRecipe'])->name('deleteStockFromRecipe');
+Route::get('/showCategoryProducts/{category_id}', [AdminController::class, 'showCategoryProducts'])->name('showCategoryProducts');
 
 /*
 |---------------------------------------------------------------|

@@ -10,15 +10,25 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
 use finfo;
+use Dompdf\Dompdf;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\View;
 
 class SalesmanController extends Controller
 {
     public function viewSalesmanDashboard($id)
     {
+        $salesman_id = Session::get('user_id');
+
+        if (!$salesman_id) {
+            return redirect()->route('viewLoginPage');
+        }
+
         $products = Product::all();
         $categories = Category::all();
         $deals = Deal::all();
+        $deals = Handler::with('deal', 'product')->get();
         $cartproducts = Cart::where('salesman_id', $id)->get();
 
         $filteredCategories = $categories->reject(function ($category) {
@@ -41,6 +51,12 @@ class SalesmanController extends Controller
 
     public function salesmanCategoryDashboard($categoryName, $id)
     {
+        $salesman_id = Session::get('user_id');
+
+        if (!$salesman_id) {
+            return redirect()->route('viewLoginPage');
+        }
+
         $categories = Category::all();
         $allProducts = Product::all();
         $cartproducts = Cart::where('salesman_id', $id)->get();
@@ -48,15 +64,15 @@ class SalesmanController extends Controller
         $filteredCategories = $categories->reject(function ($category) {
             return $category->categoryName === 'Addons';
         });
+        $deals = $this->deals();
 
         if ($categoryName != 'Addons') {
 
             if ($categoryName == 'Deals') {
-                $deals = $this->deals();
                 return view('Sale Assistant.Dashboard')->with(['Products' => null, 'Deals' => $deals, 'Categories' => $filteredCategories, 'AllProducts' => $allProducts, 'id' => $id, 'cartProducts' => $cartproducts]);
             } else {
                 $products = Product::where('category_name', $categoryName)->get();
-                return view('Sale Assistant.Dashboard')->with(['Products' => $products, 'Categories' => $filteredCategories, 'AllProducts' => $allProducts, 'id' => $id, 'cartProducts' => $cartproducts]);
+                return view('Sale Assistant.Dashboard')->with(['Products' => $products,  'Deals' => $deals, 'Categories' => $filteredCategories, 'AllProducts' => $allProducts, 'id' => $id, 'cartProducts' => $cartproducts]);
             }
         }
     }
@@ -64,20 +80,27 @@ class SalesmanController extends Controller
     public function deals()
     {
         $deals = Handler::with('deal', 'product')->get();
+        // dd($deals);
         return $deals;
     }
 
     public function placeOrder($salesman_id)
     {
-        $order = new Order();
-        $cartedProduct = Cart::where('salesman_id', $salesman_id)->get();
-        $totalBill = 0.0;
-        $order->total_bill = $totalBill;
+        $salesman_id = Session::get('user_id');
 
+        if (!$salesman_id) {
+            return redirect()->route('viewLoginPage');
+        }
+
+        $order = new Order();
+        $cartedProducts = Cart::where('salesman_id', $salesman_id)->get();
+        $totalBill = 0.0;
+
+        $order->total_bill = $totalBill;
         $order->salesman_id = $salesman_id;
         $order->save();
 
-        foreach ($cartedProduct as $cartItem) {
+        foreach ($cartedProducts as $cartItem) {
             preg_match('/\d+(\.\d+)?/', $cartItem->totalPrice, $matches);
             $numericPart = $matches[0];
             $totalProductPrice = floatval($numericPart);
@@ -92,22 +115,36 @@ class SalesmanController extends Controller
             $orderItem->product_price = 'Rs. ' . ($totalProductPrice / $quantity);
             $orderItem->product_quantity = $quantity;
             $orderItem->total_price = $cartItem->totalPrice;
-
             $orderItem->save();
+        }
+
+        foreach ($cartedProducts as $cartItem) {
+            $cartItem->delete();
         }
 
         $order->total_bill = 'Rs. ' . $totalBill;
         $order->save();
 
-        foreach ($cartedProduct as $cartItem) {
-            $cartItem->delete();
-        }
+        $products = OrderItem::where('order_id',  $order->id)->get();
+        $html = view('reciept', ['products' => $products, 'saleman' => $order->salesman->name])->render();
+        $dompdf = new Dompdf();
+        $dompdf->loadHtml($html);
+        $height = $dompdf->getCanvas()->get_height();
+        $dompdf->setPaper([0, 0, 300, $height], 'portrait');
+        $dompdf->render();
 
+        $dompdf->stream('crust house.pdf');
         return redirect()->back();
     }
 
+
     public function saveToCart(Request $request)
     {
+        $salesman_id = Session::get('user_id');
+
+        if (!$salesman_id) {
+            return redirect()->route('viewLoginPage');
+        }
         $productOrder = new Cart();
 
         $salesman_id = $request->input('salesman_id');
@@ -134,6 +171,12 @@ class SalesmanController extends Controller
 
     public function clearCart($salesman_id)
     {
+        $salesman_id = Session::get('user_id');
+
+        if (!$salesman_id) {
+            return redirect()->route('viewLoginPage');
+        }
+
         $cartedProducts = Cart::where('salesman_id', $salesman_id)->get();
         foreach ($cartedProducts as $cartItem) {
             $cartItem->delete();
@@ -144,6 +187,12 @@ class SalesmanController extends Controller
 
     public function removeOneProduct($id, $salesman_id)
     {
+        $salesman_id = Session::get('user_id');
+
+        if (!$salesman_id) {
+            return redirect()->route('viewLoginPage');
+        }
+
         $cartedProduct = Cart::where('id', $id)->where('salesman_id', $salesman_id)->first();
         if ($cartedProduct) {
             $cartedProduct->delete();
@@ -151,9 +200,14 @@ class SalesmanController extends Controller
         return redirect()->route('salesman_dashboard', ['id' => $salesman_id]);
     }
 
-
     public function increaseQuantity($id, $salesman_id)
     {
+        $salesman_id = Session::get('user_id');
+
+        if (!$salesman_id) {
+            return redirect()->route('viewLoginPage');
+        }
+
         $cartedProduct = Cart::find($id);
         $productPrice = $cartedProduct->totalPrice;
 
@@ -171,6 +225,12 @@ class SalesmanController extends Controller
 
     public function decreaseQuantity($id, $salesman_id)
     {
+        $salesman_id = Session::get('user_id');
+
+        if (!$salesman_id) {
+            return redirect()->route('viewLoginPage');
+        }
+        
         $cartedProduct = Cart::find($id);
         if ($cartedProduct->productQuantity > 1) {
             $productPrice = $cartedProduct->totalPrice;

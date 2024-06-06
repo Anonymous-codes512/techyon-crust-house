@@ -16,6 +16,7 @@
             $id = $id;
             $cartProducts = $cartProducts;
             $totalbill = 0;
+            // dd($Deals);
         @endphp
 
         <div id="productsSide">
@@ -64,6 +65,28 @@
                     @endforeach
                 @endif
             </div>
+            <div id="deals_seperate_section">
+                <h3 id="deals_seperate_section_heading">Deals</h3>
+                <div style="display: flex;">
+                    @if ($Deals !== null)
+                        @foreach ($Deals as $deal)
+                            @if ($deal->deal !== null && !in_array($deal->deal->dealTitle, $displayedDealTitles))
+                                @php
+                                    $displayedDealTitles[] = $deal->deal->dealTitle;
+                                @endphp
+
+                                <div class="imgbox"
+                                    onclick="showAddToCart({{ json_encode($deal) }}, {{ json_encode($Deals) }}, {{ json_encode($allProducts) }})">
+                                    <img src="{{ asset('Images/DealImages/' . $deal->deal->dealImage) }}" alt="Product">
+                                    <p class="product_name">{{ $deal->deal->dealTitle }}</p>
+                                </div>
+                           @endif
+                        @endforeach
+                    @else
+                        <p class="product_name">No Deal Found</p>
+                    @endif
+                </div>
+            </div>
         </div>
 
         <div id="receipt">
@@ -85,10 +108,12 @@
                                 <p id="product-name">{{ $Value->productName . ' with ' . $Value->productAddon }}</p>
                                 <p id="product_price{{ $Value->id }}">{{ $Value->totalPrice }}</p>
                             @else
-                            <p id="product-name">{{ $Value->productName }}</p>
-                            <p id="product_price{{ $Value->id }}">{{ $Value->totalPrice }}</p>
+                                <p id="product-name">{{ $Value->productName }}</p>
+                                <p id="product_price{{ $Value->id }}">{{ $Value->totalPrice }}</p>
                             @endif
-                            <button onclick="window.location='{{ route('removeOneProduct', [$Value->id, $Value->salesman_id]) }}'" id="remove-product">remove</button>
+                            <button
+                                onclick="window.location='{{ route('removeOneProduct', [$Value->id, $Value->salesman_id]) }}'"
+                                id="remove-product">Remove</button>
 
                             <div style="display:flex; text-align:center;">
                                 <div style="display:flex; margin-right:70px;">Quantity </div>
@@ -114,12 +139,12 @@
                 <div id="buttons">
                     <a href="{{ route('placeOrder', $id) }}"><input type="button" id="proceed" value="Proceed"></a>
                     <button type="button" id="printRecipt" onclick="printReceipt()">Print Receipt</button>
-                    <button onclick="window.location='{{ route('clearCart', $id) }}'" type="button" id="clearCart">Clear Cart</button>
+                    <button onclick="window.location='{{ route('clearCart', $id) }}'" type="button" id="clearCart">Clear
+                        Cart</button>
                 </div>
             </div>
         </div>
 
-        <div id="overlay"></div>
         <div id="overlay"></div>
         <form id="addToCart" action="{{ route('saveToCart') }}" method="post" enctype="multipart/form-data">
             @csrf
@@ -157,5 +182,4 @@
         </form>
 
     </main>
-
 @endsection

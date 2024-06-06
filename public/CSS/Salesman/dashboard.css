@@ -13,11 +13,13 @@
 #receipt {
     display: flex;
     flex-direction: column;
+    justify-content: space-between;
     width: 75%;
     box-shadow: 0px 0px 10px #bbb;
     border-radius: 7px;
     margin: 0.41vw 0;
 }
+
 
 #category_bar {
     display: flex;
@@ -47,8 +49,23 @@
     color: #ffbb00;
 }
 
+#deals_seperate_section {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 1vw;
+}
+
+#deals_seperate_section_heading{
+    margin: 0;
+    padding-left: 0.5vw;
+    text-align: center;
+    font-size: 1.2vw;
+    background-color: #dadada;
+}
+
 #products {
     display: flex;
+    justify-content: center;
     flex-direction: row;
     flex-wrap: wrap;
     padding: 0.21vw;
@@ -180,8 +197,9 @@
 
 #remove-product {
     background-color: #c40e0e;
-    padding: 0.5vw 1vw;
+    padding: 0.5vw;
     margin: 0.3vw 0;
+    font-size: 0.7vw;
 }
 #remove-product:hover {
     background-color: #9e0e0e;

@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Crust - House | Admin - Dashboard</title>
     <link rel="stylesheet" href="{{ asset('CSS/Admin/admin.css') }}">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
@@ -21,59 +22,93 @@
 
             <div class="menuList">
                 <i class='bx bx-menu' id="menuIcon" onclick="toggleMenu()"></i>
-
                 <div class="menu" id="menu">
-                    <div class="menuItems" id="menu1">
+                    <div class="menuItems active" id="menu1">
                         <i class='bx bxs-dashboard'></i>
-                        <a href="{{ route('admindashboard') }}" style="text-decoration: none;">
+                        <a href="{{ route('admindashboard') }}" style="text-decoration: none;"
+                            onclick="setActiveMenu('menu1')">
                             <p class="link">Dashboard</p>
                         </a>
                     </div>
                     <div class="menuItems" id="menu2">
                         <i class='bx bxs-category'></i>
-                        <a href="{{ route('viewCategoryPage') }}" style="text-decoration: none;">
+                        <a href="{{ route('viewCategoryPage') }}" style="text-decoration: none;"
+                            onclick="setActiveMenu('menu2')">
                             <p class="link">Categories</p>
                         </a>
                     </div>
                     <div class="menuItems" id="menu3">
                         <i class='bx bx-package'></i>
-                        <a href="{{ route('viewProductPage') }}" style="text-decoration: none;">
+                        <a href="{{ route('viewProductPage') }}" style="text-decoration: none;"
+                            onclick="setActiveMenu('menu3')">
                             <p class="link">Products</p>
                         </a>
                     </div>
                     <div class="menuItems" id="menu4">
                         <i class='bx bxs-dock-bottom bx-rotate-180'></i>
-                        <a href="{{ route('viewDealPage') }}" style="text-decoration: none;">
+                        <a href="{{ route('viewDealPage') }}" style="text-decoration: none;"
+                            onclick="setActiveMenu('menu4')">
                             <p class="link">Deals</p>
                         </a>
                     </div>
                     <div class="menuItems" id="menu5">
                         <i class='bx bxs-store'></i>
-                        <a href="{{ route('viewStockPage') }}" style="text-decoration: none;">
+                        <a href="{{ route('viewStockPage') }}" style="text-decoration: none;"
+                            onclick="setActiveMenu('menu5')">
                             <p class="link">Stock</p>
                         </a>
                     </div>
                     <div class="menuItems" id="menu6">
                         <i class='bx bx-cookie'></i>
-                        <a href="{{ route('viewRecipePage') }}" style="text-decoration: none;">
+                        <a href="{{ route('viewRecipePage') }}" style="text-decoration: none;"
+                            onclick="setActiveMenu('menu6')">
                             <p class="link">Recipe</p>
                         </a>
                     </div>
                     <div class="menuItems" id="menu7">
                         <i class='bx bxs-file-import'></i>
-                        <a href="{{ route('viewOrdersPage') }}" style="text-decoration: none;">
+                        <a href="{{ route('viewOrdersPage') }}" style="text-decoration: none;"
+                            onclick="setActiveMenu('menu7')">
                             <p class="link">Orders</p>
                         </a>
                     </div>
                     <div class="menuItems" id="menu8">
                         <i class='bx bxs-group'></i>
-                        <a href="{{ route('viewStaffPage') }}" style="text-decoration: none;">
+                        <a href="{{ route('viewStaffPage') }}" style="text-decoration: none;"
+                            onclick="setActiveMenu('menu8')">
                             <p class="link">My Staff</p>
                         </a>
                     </div>
                 </div>
             </div>
-        </nav> 
+            <script>
+                function setActiveMenu(menuId) {
+                    document.cookie = "activeMenu=" + menuId + "; path=/";
+                    document.querySelectorAll('.menuItems').forEach(item => {
+                        item.classList.remove('active');
+                    });
+                    document.getElementById(menuId).classList.add('active');
+                }
+
+                document.addEventListener('DOMContentLoaded', (event) => {
+                    const activeMenu = getActiveMenu();
+                    if (activeMenu) {
+                        document.querySelectorAll('.menuItems').forEach(item => {
+                            item.classList.remove('active');
+                        });
+                        document.getElementById(activeMenu).classList.add('active');
+                    }
+                });
+
+                function getActiveMenu() {
+                    const value = `; ${document.cookie}`;
+                    const parts = value.split(`; activeMenu=`);
+                    if (parts.length === 2) return parts.pop().split(';').shift();
+                }
+            </script>
+
+
+        </nav>
 
         <div class="rgtpnl">
             <header id="header">
@@ -133,7 +168,7 @@
                         </div>
                     @endif
 
-                    <a href="{{ route('logout') }}" class="logout">
+                    <a href="{{ route('logout') }}" class="logout" onclick="clearCookies()">
                         <i class='bx bx-log-out-circle' title="logout"></i>
                     </a>
 
@@ -143,13 +178,20 @@
                 </div>
             </header>
 
+            <script>
+                function clearCookies() {
+                    document.cookie = 'activeMenu=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+                    document.cookie = 'laravel_session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+                    window.location.href = "{{ route('logout') }}";
+                }
+            </script>
+
             @yield('main')
 
         </div>
     </div>
     <script src="{{ asset('JavaScript/index.js') }}"></script>
     <script>
-
         function toggleNotification() {
             const notificationBox = document.getElementById('notificationBox');
             if (notificationBox.style.display === "flex") {

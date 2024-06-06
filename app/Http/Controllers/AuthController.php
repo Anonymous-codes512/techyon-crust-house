@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
@@ -14,7 +13,7 @@ class AuthController extends Controller
         return view('Auth.Login');
     }
 
-    public function registrationIndex() 
+    public function registrationIndex()
     {
         return view('Auth.Registration');
     }
@@ -26,7 +25,7 @@ class AuthController extends Controller
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
         ]);
-        
+
         $auth = new User();
         $auth->name = $req->name;
         $auth->email = $req->email;
@@ -34,10 +33,9 @@ class AuthController extends Controller
         $auth->password = Hash::make($req->password);
         $auth->save();
 
-        if($req->has('role')){
+        if ($req->has('role')) {
             return redirect()->route('viewStaffPage');
-        }
-        else{
+        } else {
             return redirect()->route('viewLoginPage');
         }
     }
@@ -52,20 +50,23 @@ class AuthController extends Controller
         $user = User::where('email', $request->email)->first();
 
         if ($user && Hash::check($request->password, $user->password)) {
+            session(['user_id' => $user->id]);
+            session(['username' => $user->name]);
             if ($user->role === 'owner') {
-                session(['username' => $user->name]);
                 return redirect()->route('dashboard');
             } else if ($user->role === 'admin') {
-                session(['username' => $user->name]);
                 return redirect()->route('admindashboard');
             } else if ($user->role === 'salesman') {
-                session(['username' => $user->name]);
-                // dd($user->id);
                 return redirect()->route('salesman_dashboard', ['id' => $user->id]);
-
             }
         } else {
             return redirect()->back()->withErrors(['email' => 'Invalid credentials']);
         }
+    }
+
+    public function logout()
+    {
+        session()->forget(['user_id', 'username']);
+        return redirect()->route('viewLoginPage');
     }
 }

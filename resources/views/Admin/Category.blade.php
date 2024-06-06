@@ -100,7 +100,7 @@
                 <label for="upload-update-file" class="choose-file-btn">
                     <span>Choose File</span>
                     <input type="hidden" id="upid" name="id">
-                    <input type="file" id="upload-update-file" name="CategoryImage" accept=".jpg,.jpeg,.png" required>
+                    <input type="file" id="upload-update-file" name="CategoryImage" accept=".jpg,.jpeg,.png">
                     <p id="filenam"></p>
                 </label>
             </div>

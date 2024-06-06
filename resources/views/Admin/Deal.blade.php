@@ -118,10 +118,12 @@
             --}}
 
 
-        @if (session('editAfterDelete'))
+        @if (session('deals') && session('deal'))
             <script>
                 document.addEventListener('DOMContentLoaded', function() {
-                    document.getElementById('editButton').click();
+                    let deal = {!! json_encode(session('deal')) !!};
+                    let deals = {!! json_encode($allDealProducts) !!};
+                    editDeal(deal, deals);
                 });
             </script>
         @endif
@@ -252,6 +254,7 @@
         }
 
         function editDeal(Deal, dealProducts) {
+            
             let overlay = document.getElementById('editOverlay');
             let popup = document.getElementById('editDeal');
             overlay.style.display = 'block';
@@ -262,18 +265,21 @@
             document.getElementById('deal-price').value = Deal.dealDiscountedPrice.replace(/\sPkr$/, "");
             document.getElementById('deal-Status').value = Deal.dealStatus;
             document.getElementById('deal-End-Date').value = Deal.dealEndDate;
-
+            
             let totalProductPrice = 0;
             let dealId = Deal.id;
             let route = `{{ route('viewUpdateDealProductsPage', ':dealId') }}`;
             addroute = route.replace(':dealId', dealId);
             document.getElementById('add-product-link').setAttribute('href', addroute);
-
+            
             let tbody = document.getElementById('body');
             tbody.innerHTML = '';
             dealProducts.forEach(product => {
+                // console.log(`Deals : ${dealProducts}`);
+                
                 if (Deal.id === product.deal_id) {
-
+                    console.log(product.productName);
+                    // console.log(Deal);
                     let newRow = document.createElement('tr');
                     newRow.setAttribute('id', 'body-row');
 

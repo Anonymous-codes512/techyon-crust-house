@@ -10,15 +10,14 @@
         </div>
 
         @php
-            $products = $products;
+            // $products = $products;
             $categories = $categories;
-
         @endphp
 
         <div class="productCategory">
             @foreach ($categories as $category)
                 <div class="categorydiv" id="showProductsInCategory"
-                    onclick="productCategory({{ json_encode($category) }}, {{ json_encode($products) }})">
+                    onclick="window.location='{{ route('showCategoryProducts', $category->id) }}'">
                     <div class="categoryImg">
                         <img src="{{ asset('Images/CategoryImages/' . $category->categoryImage) }}" alt="Category Image">
                     </div>
@@ -29,29 +28,44 @@
             @endforeach
         </div>
 
-        <div id="categoryProductOverlay"></div>
-        <div id="categoryProducts">
-            <div class="table">
-                <table id="productRecipeTable">
-                    <thead>
-                        <tr>
-                            <th>Product Category</th>
-                            <th>Product Name</th>
-                            <th>Product Variation</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
+        @if ($categoryProducts != null)
+            <div id="categoryProductOverlay" style="display: block;"></div>
+            <div id="categoryProducts" style="display: flex;">
+                <div class="table">
+                    <table id="productRecipeTable">
+                        <thead>
+                            <tr>
+                                <th>Product Category</th>
+                                <th>Product Name</th>
+                                <th>Product Variation</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($categoryProducts as $product)   
+                            <tr>
+                                    <td>{{ $product->category_name }}</td>
+                                    <td>{{ $product->productName }}</td>
+                                    <td>{{ $product->productVariation }}</td>
+                                    <td>
+                                        <a href="#"><i onclick="addRecipe({{ json_encode($product) }})"
+                                                class="bx bx-list-plus"></i></a>
 
-                    <tbody id="body">
-                    </tbody>
-                </table>
+                                        <a href="{{ route('viewProductRecipe', [$product->category_id , $product->id]) }}"><i
+                                                onclick="showProductRecipe()" class="bx bx-show"></i></a>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+                <div class="btns">
+                    <a href="{{route('viewRecipePage') }}"><button type="button" onclick="closeProductCategory()">Close</button></a>
+                    <button id="showproductRecipebutton" onclick="showProductRecipe()"style="display: none;"
+                        type="button"></button>
+                </div>
             </div>
-            <div class="btns">
-                <button type="button" onclick="closeProductCategory()">Close</button>
-                <button id="showproductRecipebutton" onclick="showProductRecipe()"style="display: none;"
-                    type="button"></button>
-            </div>
-        </div>
+        @endif
 
         @if (session('showproductRecipe'))
             <script>
@@ -75,7 +89,8 @@
                     </thead>
                     <tbody>
                         @if ($recipes)
-                            <script>
+                            {{-- @dd($recipes) --}}
+                            {{-- <script>
                                 document.addEventListener('DOMContentLoaded', function() {
                                     const firstRecipe = @json($recipes->first());
                                     if (firstRecipe) {
@@ -83,14 +98,16 @@
                                             `Recipe of ${firstRecipe.product.productName}`;
                                     }
                                 });
-                            </script>
+                            </script> --}}
                             @foreach ($recipes as $recipe)
                                 <tr>
                                     <td>{{ $recipe->stock->itemName }}</td>
                                     <td>{{ $recipe->quantity }}</td>
                                     <td>
-                                        <a href="{{ route('deleteStockFromRecipe', [$recipe->id, $recipe->category_id, $recipe->product_id]) }}"><i class='bx bxs-trash-alt'></i></a>
-                                        {{-- <a href="{{ route('deleteStockFromRecipe', $recipe->id) }}"><i class='bx bxs-trash-alt'></i></a> --}}
+                                        <a
+                                            href="{{ route('deleteStockFromRecipe', [$recipe->id, $recipe->category_id, $recipe->product_id]) }}">
+                                            <i class='bx bxs-trash-alt'></i>
+                                        </a>
                                     </td>
                                 </tr>
                             @endforeach
@@ -107,6 +124,7 @@
                 <button type="button" onclick="closeProductRecipe()">Close</button>
             </div>
         </div>
+
 
         <div id="recipeOverlay"></div>
         <div class="recipePopup" id="recipePopup">
@@ -137,74 +155,113 @@
             </div>
         </div>
 
+        <div id="addProductRecipeOverlay"></div>
+        <div id="addProductRecipe">
+            <h3>Add Recipe to Product</h3>
+            <hr>
+
+            <div class="inputdivs inputProductName" style="display: flex; margin:5px;">
+                <div class="stockquantity">
+                    <label for="item-quantity">Item Quantity</label>
+                    <input type="number" id="item-quantity" placeholder="itemQuantity" name="itemQuantity" step="any"
+                        min="0" required>
+                </div>
+
+                <div class="unitselection">
+                    <label for="iQUnit">Unit</label>
+                    <select name="unit1" id="iQUnit">
+                        <option value="" selected disabled>Select unit</option>
+                        <option value="mg">Milligram</option>
+                        <option value="g">Gram</option>
+                        <option value="kg">Kilogram</option>
+                        <option value="ml">Milliliter</option>
+                        <option value="liter">Liter</option>
+                        <option value="gal">Gallon</option>
+                        <option value="lbs">Pound</option>
+                        <option value="oz">Ounce</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="btns">
+                <input type="submit" value="Add" id="addItemButton">
+                <button type="button" id="cancel">close</button>
+            </div>
+
+        </div>
+
     </main>
 
     <script>
         let product_name;
+        // showProductsInCategory = document.getElementById('showProductsInCategory');
 
-        function productCategory(category, products) {
-            let overlay = document.getElementById('categoryProductOverlay');
-            let popup = document.getElementById('categoryProducts');
-            document.getElementById('cID').value = category.id;
+        // console.warn(showproductRecipebutton);
+        // showProductsInCategory.addEventListener('click', () => {
 
-            let selectedProducts = products.filter(product => product.category_id === category.id);
-            selectedProducts.sort((a, b) => {
-                if (a.productName < b.productName) return -1;
-                if (a.productName > b.productName) return 1;
-                if (a.productVariation < b.productVariation) return -1;
-                if (a.productVariation > b.productVariation) return 1;
-                return 0;
-            });
+        //     let overlay = document.getElementById('categoryProductOverlay');
+        //     let popup = document.getElementById('categoryProducts');
 
-            let tbody = document.getElementById('body');
-            tbody.innerHTML = '';
+        //     overlay.style.display = 'block';
+        //     popup.style.display = 'flex';
+        // });
 
-            selectedProducts.forEach(product => {
-                let newRow = document.createElement('tr');
+        // document.getElementById('cID').value = category.id;
 
-                let productCategoryCell = document.createElement('td');
-                productCategoryCell.textContent = category.categoryName;
-                newRow.appendChild(productCategoryCell);
+        // let selectedProducts = products.filter(product => product.category_id === category.id);
+        // selectedProducts.sort((a, b) => {
+        //     if (a.productName < b.productName) return -1;
+        //     if (a.productName > b.productName) return 1;
+        //     if (a.productVariation < b.productVariation) return -1;
+        //     if (a.productVariation > b.productVariation) return 1;
+        //     return 0;
+        // });
 
-                let productNameCell = document.createElement('td');
-                productNameCell.textContent = product.productName;
-                newRow.appendChild(productNameCell);
+        // let tbody = document.getElementById('body');
+        // tbody.innerHTML = '';
 
-                let variationCell = document.createElement('td');
-                variationCell.textContent = product.productVariation;
-                newRow.appendChild(variationCell);
+        // selectedProducts.forEach(product => {
+        //     let newRow = document.createElement('tr');
 
-                let actionCell = document.createElement('td');
+        //     let productCategoryCell = document.createElement('td');
+        //     productCategoryCell.textContent = category.categoryName;
+        //     newRow.appendChild(productCategoryCell);
 
-                let addRecipeLink = document.createElement('a');
-                addRecipeLink.setAttribute('href', '#');
-                addRecipeLink.setAttribute('onclick',
-                    `addRecipe('${product.productVariation}', '${product.productName}', '${product.id}')`);
-                let addRecipeIcon = document.createElement('i');
-                addRecipeIcon.setAttribute('class', 'bx bx-list-plus');
-                addRecipeLink.appendChild(addRecipeIcon);
-                actionCell.appendChild(addRecipeLink);
+        //     let productNameCell = document.createElement('td');
+        //     productNameCell.textContent = product.productName;
+        //     newRow.appendChild(productNameCell);
 
-                const categoryId = category.id;
-                const productId = product.id;
-                let route = `{{ route('viewProductRecipe', [':categoryId', ':productId']) }}`;
-                route = route.replace(':categoryId', categoryId).replace(':productId', productId);
+        //     let variationCell = document.createElement('td');
+        //     variationCell.textContent = product.productVariation;
+        //     newRow.appendChild(variationCell);
 
-                let showProductRecipe = document.createElement('a');
-                showProductRecipe.setAttribute('href', route);
-                let showIcon = document.createElement('i');
-                showIcon.setAttribute('class', 'bx bx-show');
-                showProductRecipe.appendChild(showIcon);
-                actionCell.appendChild(showProductRecipe);
+        //     let actionCell = document.createElement('td');
 
-                newRow.appendChild(actionCell);
+        //     let addRecipeLink = document.createElement('a');
+        //     addRecipeLink.setAttribute('href', '#');
+        //     addRecipeLink.setAttribute('onclick',
+        //         `addRecipe('${product.productVariation}', '${product.productName}', '${product.id}')`);
+        //     let addRecipeIcon = document.createElement('i');
+        //     addRecipeIcon.setAttribute('class', 'bx bx-list-plus');
+        //     addRecipeLink.appendChild(addRecipeIcon);
+        //     actionCell.appendChild(addRecipeLink);
 
-                tbody.appendChild(newRow);
-            });
+        //     const categoryId = category.id;
+        //     const productId = product.id;
+        //     let route = `{{ route('viewProductRecipe', [':categoryId', ':productId']) }}`;
+        //     route = route.replace(':categoryId', categoryId).replace(':productId', productId);
 
-            overlay.style.display = 'block';
-            popup.style.display = 'flex';
-        }
+        //     let showProductRecipe = document.createElement('a');
+        //     showProductRecipe.setAttribute('href', route);
+        //     let showIcon = document.createElement('i');
+        //     showIcon.setAttribute('class', 'bx bx-show');
+        //     showProductRecipe.appendChild(showIcon);
+        //     actionCell.appendChild(showProductRecipe);
+
+        //     newRow.appendChild(actionCell);
+
+        //     tbody.appendChild(newRow);
+        // });
 
         function closeProductCategory() {
             let overlay = document.getElementById('categoryProductOverlay');
@@ -230,14 +287,16 @@
             popup.style.display = 'none';
         }
 
-        function addRecipe(size, productName, id) {
+        function addRecipe(product) {
             let overlay = document.getElementById('recipeOverlay');
             let popup = document.getElementById('recipePopup');
             let pId = document.getElementById('pID');
+            let cID = document.getElementById('cID');
             let pname = document.getElementById('prod_name');
 
-            pname.textContent = size + " " + productName + " Recipe";
-            pId.value = id;
+            pname.textContent = product.productVariation + " " + product.productName + " Recipe";
+            pId.value = product.id;
+            cID.value = product.category_id;
 
             overlay.style.display = 'block';
             popup.style.display = 'flex';
@@ -258,50 +317,155 @@
 
         const recipeTextArea = document.getElementById('recipeTextArea');
 
-        function addItemToRecipe(itemName, quantity, id) {
+        // function addItemToRecipe(itemName, quantity, id) {
+        //     const recipeContainer = document.querySelector('#recipeContainer');
+        //     const newRecipeItem = document.createElement('p');
+        //     newRecipeItem.style.margin = '2px';
+        //     const itemText = `${quantity} ${itemName}`;
+        //     const saveItem = `${quantity}~${id}`;
+
+        //     newRecipeItem.textContent = itemText;
+
+        //     if (recipeTextArea.value === '') {
+        //         recipeTextArea.value = saveItem;
+        //     } else {
+        //         recipeTextArea.value += `, ${saveItem}`;
+        //     }
+
+        //     newRecipeItem.addEventListener('click', function() {
+        //         newRecipeItem.remove();
+        //         recipeTextArea.value = recipeTextArea.value.replace(`${saveItem}`, '');
+        //         console.log(recipeTextArea.value);
+        //     });
+
+        //     recipeContainer.appendChild(newRecipeItem);
+        // }
+
+        // function handleStockItemClick(stock) {
+        //     const quantity = prompt(`Enter quantity for ${stock.itemName}:`);
+        //     if (quantity !== null && quantity !== '') {
+        //         const formattedQuantity = formatQuantity(quantity);
+        //         if (isValidQuantity(formattedQuantity)) {
+        //             addItemToRecipe(stock.itemName, formattedQuantity, stock.id);
+        //         } else {
+        //             alert("Invalid quantity format. Please enter a valid quantity.");
+        //         }
+        //     }
+        // }
+
+        // function formatQuantity(quantity) {
+        //     return quantity.replace(/(\d)([a-zA-Z])/g, '$1 $2');
+        // }
+
+        // function isValidQuantity(quantity) {
+        //     const regex = /^\d+(\.\d+)?\s*(kg|g|mg|l|ml|gallon)$/i;
+        //     return regex.test(quantity);
+        // }
+
+        function addItemToRecipe(itemName, quantity, unit, id) {
             const recipeContainer = document.querySelector('#recipeContainer');
-            const newRecipeItem = document.createElement('p');
-            newRecipeItem.style.margin = '2px';
-            const itemText = `${quantity} ${itemName}`;
-            const saveItem = `${quantity}~${id}`;
+            const recipeTextArea = document.querySelector('#recipeTextArea'); // Assuming you have a textarea with this ID
+            const saveItem = `${quantity} ${unit}~${id}`;
 
-            newRecipeItem.textContent = itemText;
-
-            if (recipeTextArea.value === '') {
-                recipeTextArea.value = saveItem;
-            } else {
-                recipeTextArea.value += `, ${saveItem}`;
-            }
-
-            newRecipeItem.addEventListener('click', function() {
-                newRecipeItem.remove();
-                recipeTextArea.value = recipeTextArea.value.replace(`${saveItem}`, '');
-                console.log(recipeTextArea.value);
+            const existingItem = Array.from(recipeContainer.children).find(item => {
+                return item.dataset.id === String(id);
             });
 
-            recipeContainer.appendChild(newRecipeItem);
-        }
+            if (existingItem) {
+                const currentQuantity = parseInt(existingItem.dataset.quantity, 10);
+                const newQuantity = currentQuantity + parseInt(quantity, 10);
+                existingItem.textContent = `${newQuantity} ${unit} ${itemName}`;
+                existingItem.dataset.quantity = newQuantity;
+                const regex = new RegExp(`\\b${currentQuantity} ${unit}~${id}\\b`);
+                recipeTextArea.value = recipeTextArea.value.replace(regex, `${newQuantity} ${unit}~${id}`);
+            } else {
+                const newRecipediv = document.createElement('div');
+                newRecipediv.style.display = 'flex';
+                newRecipediv.style.alignItem = 'center';
 
-        function handleStockItemClick(stock) {
-            const quantity = prompt(`Enter quantity for ${stock.itemName}:`);
-            if (quantity !== null && quantity !== '') {
-                const formattedQuantity = formatQuantity(quantity);
-                if (isValidQuantity(formattedQuantity)) {
-                    addItemToRecipe(stock.itemName, formattedQuantity, stock.id);
+                const newRecipeItem = document.createElement('p');
+                newRecipeItem.style.margin = '2px';
+                newRecipeItem.style.width = '95%';
+                newRecipeItem.textContent = `${quantity} ${unit} ${itemName}`;
+                newRecipeItem.dataset.id = id;
+                newRecipeItem.dataset.quantity = quantity;
+
+
+                const recipeRemoveBtn = document.createElement('i');
+                recipeRemoveBtn.classList.add('bx', 'bx-x');
+                recipeRemoveBtn.style.fontSize = '1.2vw';
+
+
+                newRecipediv.appendChild(newRecipeItem);
+                newRecipediv.appendChild(recipeRemoveBtn);
+                recipeContainer.appendChild(newRecipediv);
+
+                recipeRemoveBtn.addEventListener('click', function() {
+                    newRecipeItem.remove();
+                    recipeRemoveBtn.remove();
+                    const regex = new RegExp(`\\b${quantity} ${unit}~${id}\\b`);
+                    recipeTextArea.value = recipeTextArea.value.replace(regex, '');
+                });
+
+                if (recipeTextArea.value === '') {
+                    recipeTextArea.value = saveItem;
                 } else {
-                    alert("Invalid quantity format. Please enter a valid quantity.");
+                    recipeTextArea.value += `, ${saveItem}`;
                 }
             }
         }
 
+        function handleStockItemClick(stock) {
+            const addProductRecipeOverlay = document.querySelector('#addProductRecipeOverlay');
+            const addProductRecipe = document.querySelector('#addProductRecipe');
+            const addItemButton = document.querySelector('#addItemButton');
+            const cancelButton = document.querySelector('#cancel');
+            const recipePopup = document.getElementById('recipePopup');
+            const categoryProducts = document.getElementById('categoryProducts');
+
+            addProductRecipeOverlay.style.display = 'block';
+            addProductRecipe.style.display = 'flex';
+            recipePopup.style.display = 'none'
+            categoryProducts.style.display = 'none'
+
+            addItemButton.onclick = function() {
+                const quantityInput = document.querySelector('#item-quantity');
+                const unitSelect = document.querySelector('#iQUnit');
+                const quantity = quantityInput.value;
+                const unit = unitSelect.value;
+
+                if (quantity && unit) {
+                    addItemToRecipe(stock.itemName, quantity, unit, stock.id);
+
+                    addProductRecipeOverlay.style.display = 'none';
+                    addProductRecipe.style.display = 'none';
+                    recipePopup.style.display = 'flex'
+                    categoryProducts.style.display = 'flex'
+
+                    quantityInput.value = '';
+                    unitSelect.value = '';
+                } else {
+                    alert("Please enter a valid quantity and select a unit.");
+                }
+            };
+
+            cancelButton.onclick = function() {
+                addProductRecipeOverlay.style.display = 'none';
+                addProductRecipe.style.display = 'none';
+                recipePopup.style.display = 'flex'
+                categoryProducts.style.display = 'flex'
+            };
+        }
+
         function formatQuantity(quantity) {
-            return quantity.replace(/(\d)([a-zA-Z])/g, '$1 $2');
+            return parseInt(quantity, 10); // Assuming the quantity is an integer
         }
 
         function isValidQuantity(quantity) {
-            const regex = /^\d+(\.\d+)?\s*(kg|g|mg|l|ml|gallon)$/i;
-            return regex.test(quantity);
+            return Number.isInteger(quantity) && quantity > 0;
         }
+
+
 
         const searchBar = document.getElementById('Search');
         const stockItems = document.querySelectorAll('.stockContainer p');
@@ -318,4 +482,3 @@
         });
     </script>
 @endsection
- 

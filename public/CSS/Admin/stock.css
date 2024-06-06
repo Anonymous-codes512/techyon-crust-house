@@ -226,8 +226,8 @@ table tbody tr td:last-child a:last-child:hover {
     background-color: #e2e2e2;
 }
 
-#unitsDiv input {
-    width: 80%;
+.unitdivs input {
+    width: 85%; 
     margin-right: 1vw;
 }
 
@@ -237,6 +237,11 @@ table tbody tr td:last-child a:last-child:hover {
     border-radius: 10px;
     padding: 0.71vw 0.5vw;
     background-color: #e2e2e2;
+}
+
+.unitdivs{
+    display: flex;
+    flex-direction: row;
 }
 
 .btns {

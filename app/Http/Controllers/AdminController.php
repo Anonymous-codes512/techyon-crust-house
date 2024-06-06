@@ -11,6 +11,7 @@ use App\Models\Product;
 use App\Models\Recipe;
 use App\Models\Stock;
 use App\Models\User;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
@@ -18,9 +19,14 @@ use Illuminate\Support\Facades\Log;
 
 class AdminController extends Controller
 {
-
     public function viewAdminDashboard()
     {
+        $admin_id = Session::get('user_id');
+
+        if (!$admin_id) {
+            return redirect()->route('viewLoginPage');
+        }
+
         $totalCategories = $this->totalCategories();
         $totalProducts = $this->totalProducts();
         $totalstocks = $this->totalstocks();
@@ -34,12 +40,19 @@ class AdminController extends Controller
             'totalProducts' => $totalProducts,
             'totalStocks' => $totalstocks,
             'branchRevenueArray' => $branchRevenueArray,
-            'totalRevenue' => $totalRevenue
+            'totalRevenue' => $totalRevenue,
+            'title' => 'dash'
         ]);
     }
 
     public function readNotification($id)
     {
+        $admin_id = Session::get('user_id');
+
+        if (!$admin_id) {
+            return redirect()->route('viewLoginPage');
+        }
+
         $notification = Notification::find($id);
         $notification->is_read = true;
         $notification->save();
@@ -48,6 +61,12 @@ class AdminController extends Controller
 
     public function deleteNotification($id)
     {
+        $admin_id = Session::get('user_id');
+
+        if (!$admin_id) {
+            return redirect()->route('viewLoginPage');
+        }
+
         $notification = Notification::find($id);
         $notification->delete();
         return Redirect()->route('viewStockPage');
@@ -55,6 +74,12 @@ class AdminController extends Controller
 
     public function redirectNotification($id)
     {
+        $admin_id = Session::get('user_id');
+
+        if (!$admin_id) {
+            return redirect()->route('viewLoginPage');
+        }
+
         $notification = Notification::find($id);
         $notification->is_read = true;
         $notification->save();
@@ -71,14 +96,24 @@ class AdminController extends Controller
 
     public function viewCategoryPage()
     {
-        // $categories = Category::paginate(2);
+        $admin_id = Session::get('user_id');
+
+        if (!$admin_id) {
+            return redirect()->route('viewLoginPage');
+        }
+
         $category = Category::all();
-        // session(['searchData' => $category]);
         return view('Admin.Category')->with(['categories' => $category]);
     }
 
     public function createCategory(Request $request)
     {
+        $admin_id = Session::get('user_id');
+
+        if (!$admin_id) {
+            return redirect()->route('viewLoginPage');
+        }
+
         $validatedData = $request->validate([
             'CategoryImage' => 'required|image|mimes:jpeg,png,jpg|',
             'categoryName' => 'required|string|max:255',
@@ -100,24 +135,30 @@ class AdminController extends Controller
 
     public function updateCategory(Request $request)
     {
+
+        $admin_id = Session::get('user_id');
+
+        if (!$admin_id) {
+            return redirect()->route('viewLoginPage');
+        }
+
         $validatedData = $request->validate([
-            'CategoryImage' => 'required|image|mimes:jpeg,png,jpg|max:2048',
             'categoryName' => 'required|string|max:255',
         ]);
         $category = Category::find($request->id);
-        $imageName = null;
 
         if ($request->hasFile('CategoryImage')) {
 
+            $imageName = null;
             $existingImagePath = public_path('Images/CategoryImages') . '/' . $category->categoryImage;
             File::delete($existingImagePath);
 
             $image = $request->file('CategoryImage');
             $imageName = time() . '.' . $image->getClientOriginalExtension();
             $image->move(public_path('Images/CategoryImages'), $imageName);
+            $category->categoryImage = $imageName;
         }
 
-        $category->categoryImage = $imageName;
         $category->categoryName = $validatedData['categoryName'];
         $category->save();
 
@@ -126,6 +167,11 @@ class AdminController extends Controller
 
     public function deleteCategory($id)
     {
+        $admin_id = Session::get('user_id');
+
+        if (!$admin_id) {
+            return redirect()->route('viewLoginPage');
+        }
 
         $category = Category::find($id);
         $category->delete();
@@ -144,18 +190,28 @@ class AdminController extends Controller
 
     public function viewProductPage()
     {
+        $admin_id = Session::get('user_id');
+
+        if (!$admin_id) {
+            return redirect()->route('viewLoginPage');
+        }
         $categories = Category::all();
         $products = Product::orderBy('category_name')->get();
         if ($categories->isEmpty()) {
             return view('Admin.Product');
         }
 
-        // session(['searchData' => $products]);
         return view('Admin.Product')->with(['categoryData' => $categories, 'productsData' => $products]);
     }
 
     public function createProduct(Request $request)
     {
+        $admin_id = Session::get('user_id');
+
+        if (!$admin_id) {
+            return redirect()->route('viewLoginPage');
+        }
+
         [$categoryId, $categoryName] = explode(',', $request->categoryId);
 
         $total_variations = intval($request->noOfVariations);
@@ -195,6 +251,12 @@ class AdminController extends Controller
 
     public function updateProduct(Request $request)
     {
+        $admin_id = Session::get('user_id');
+
+        if (!$admin_id) {
+            return redirect()->route('viewLoginPage');
+        }
+
         $product = Product::find($request->pId);
 
         if ($request->hasFile('productImage')) {
@@ -219,6 +281,12 @@ class AdminController extends Controller
 
     public function deleteProduct($id)
     {
+        $admin_id = Session::get('user_id');
+
+        if (!$admin_id) {
+            return redirect()->route('viewLoginPage');
+        }
+
         $product = Product::find($id);
         $product->delete();
         $imagePath = public_path('Images/ProductImages') . '/' . $product->productImage;
@@ -237,6 +305,12 @@ class AdminController extends Controller
 
     public function viewDealPage()
     {
+        $admin_id = Session::get('user_id');
+
+        if (!$admin_id) {
+            return redirect()->route('viewLoginPage');
+        }
+
         $handlers = Handler::with('deal')->get();
         $deals = $handlers->pluck('deal')->unique();
         $handlersAndProducts = Handler::join('products', 'handlers.product_id', '=', 'products.id')
@@ -247,12 +321,24 @@ class AdminController extends Controller
 
     public function viewDealProductsPage()
     {
+        $admin_id = Session::get('user_id');
+
+        if (!$admin_id) {
+            return redirect()->route('viewLoginPage');
+        }
+
         $products = Product::orderBy('category_id')->get();
         return view('Admin.DealProducts')->with(['Products' => $products]);
     }
 
     public function viewUpdateDealProductsPage($id)
     {
+        $admin_id = Session::get('user_id');
+
+        if (!$admin_id) {
+            return redirect()->route('viewLoginPage');
+        }
+
         $products = Product::orderBy('category_id')->get();
         $handler = Handler::find($id);
         return view('Admin.UpdateDealProduct')->with(['Products' => $products, 'dealId' => $id, 'dealproducts' => $handler]);
@@ -260,6 +346,12 @@ class AdminController extends Controller
 
     public function createDeal(Request $request)
     {
+        $admin_id = Session::get('user_id');
+
+        if (!$admin_id) {
+            return redirect()->route('viewLoginPage');
+        }
+
         $deal = new Deal();
 
         $imageName = null;
@@ -281,6 +373,12 @@ class AdminController extends Controller
 
     public function createDealProducts(Request $request)
     {
+        $admin_id = Session::get('user_id');
+
+        if (!$admin_id) {
+            return redirect()->route('viewLoginPage');
+        }
+
         $productDetails = [];
         $index = 0;
         while ($request->has("product_name_{$index}")) {
@@ -311,6 +409,12 @@ class AdminController extends Controller
 
     public function updateDeal(Request $request)
     {
+        $admin_id = Session::get('user_id');
+
+        if (!$admin_id) {
+            return redirect()->route('viewLoginPage');
+        }
+
         $deal = Deal::find($request->dId);
 
         if ($request->hasFile('dealImage')) {
@@ -336,6 +440,12 @@ class AdminController extends Controller
 
     public function addDealProduct(Request $request)
     {
+        $admin_id = Session::get('user_id');
+
+        if (!$admin_id) {
+            return redirect()->route('viewLoginPage');
+        }
+
         $productDetails = [];
         $index = 0;
 
@@ -377,6 +487,12 @@ class AdminController extends Controller
 
     public function deleteDeal($id)
     {
+        $admin_id = Session::get('user_id');
+
+        if (!$admin_id) {
+            return redirect()->route('viewLoginPage');
+        }
+     
         $deal = Deal::find($id);
         $deal->delete();
         $imagePath = public_path('Images/DealImages') . '/' . $deal->dealImage;
@@ -388,12 +504,20 @@ class AdminController extends Controller
 
     public function deleteDealProduct($id, $dId)
     {
+        $admin_id = Session::get('user_id');
+
+        if (!$admin_id) {
+            return redirect()->route('viewLoginPage');
+        }
+
         $handler = Handler::find($id);
+        $deals = Handler::with(['deal', 'product'])->get();
 
         if (!$handler) {
             return redirect()->route('viewDealPage')->with('error', 'Handler not found.');
         }
         $deal = $handler->deal;
+
 
         if (!$deal) {
             return redirect()->route('viewDealPage')->with('error', 'Deal not found.');
@@ -413,7 +537,9 @@ class AdminController extends Controller
         $deal->save();
         $handler->delete();
 
-        return redirect()->route('viewDealPage')->with('editAfterDelete', true);
+        return redirect()->route('viewDealPage')
+            ->with('deals', $deals)
+            ->with('deal', $deal);
     }
 
 
@@ -425,6 +551,12 @@ class AdminController extends Controller
 
     public function viewStockPage()
     {
+        $admin_id = Session::get('user_id');
+
+        if (!$admin_id) {
+            return redirect()->route('viewLoginPage');
+        }
+
         $conversionMap = [
             'g' => 1,           // grams
             'kg' => 1000,       // kilograms
@@ -472,6 +604,12 @@ class AdminController extends Controller
 
     public function createStock(Request $request)
     {
+        $admin_id = Session::get('user_id');
+
+        if (!$admin_id) {
+            return redirect()->route('viewLoginPage');
+        }
+
         $existingStock = Stock::where('itemName', $request->itemName)->first();
 
         if ($existingStock) {
@@ -503,7 +641,6 @@ class AdminController extends Controller
             $existingStock->save();
             return redirect()->route('viewStockPage');
         } else {
-            // Create new stock if it doesn't exist
             $newStock = new Stock();
             $newStock->itemName = $request->itemName;
             $newStock->itemQuantity = $request->stockQuantity . $request->unit1;
@@ -517,6 +654,11 @@ class AdminController extends Controller
 
     public function updateStock(Request $request)
     {
+        $admin_id = Session::get('user_id');
+
+        if (!$admin_id) {
+            return redirect()->route('viewLoginPage');
+        }
         $stockData = Stock::find($request->sId);
 
         $stockData->itemName = $request->itemName;
@@ -530,6 +672,12 @@ class AdminController extends Controller
 
     public function deleteStock($id)
     {
+        $admin_id = Session::get('user_id');
+
+        if (!$admin_id) {
+            return redirect()->route('viewLoginPage');
+        }
+
         $stockData = Stock::find($id);
         $stockData->delete();
 
@@ -544,43 +692,60 @@ class AdminController extends Controller
 
     public function viewRecipePage()
     {
-        $products = Product::with('category')->get();
-        $categories = $products->pluck('category')->unique();
+        $admin_id = Session::get('user_id');
+
+        if (!$admin_id) {
+            return redirect()->route('viewLoginPage');
+        }
+        $categories = Category::all();
         $stocks = Stock::all();
         session(['showproductRecipe' => false]);
-
-        return view('Admin.Recipe')->with(['products' => $products, 'categories' => $categories, 'stocks' => $stocks, 'recipes' => null]);
+        return view('Admin.Recipe')->with(['categoryProducts' => null, 'categories' => $categories, 'stocks' => $stocks, 'recipes' => null]);
     }
 
     public function createRecipe(Request $request)
     {
+        $admin_id = Session::get('user_id');
+
+        if (!$admin_id) {
+            return redirect()->route('viewLoginPage');
+        }
+
         $requestData = $request->all();
 
         $category_id = $requestData['cId'];
         $product_id = $requestData['pId'];
 
-        $recipeItems = explode(',', $requestData['recipeItems']);
-
+        $recipeItems = array_filter(explode(',', $requestData['recipeItems']), function ($item) {
+            return trim($item) !== '';
+        });
         foreach ($recipeItems as $item) {
-            $itemParts = explode('~', $item);
-            $quantity = $itemParts[0];
-            $stockId = $itemParts[1];
+            $itemParts = explode('~', trim($item));
+            if (count($itemParts) == 2) {
+                $quantity = trim($itemParts[0]);
+                $stockId = trim($itemParts[1]);
 
-            $newRecipe = new Recipe();
+                $newRecipe = new Recipe();
 
-            $newRecipe->category_id = $category_id;
-            $newRecipe->product_id = $product_id;
-            $newRecipe->stock_id = $stockId;
-            $newRecipe->quantity = $quantity;
+                $newRecipe->category_id = $category_id;
+                $newRecipe->product_id = $product_id;
+                $newRecipe->stock_id = $stockId;
+                $newRecipe->quantity = $quantity;
 
-            $newRecipe->save();
+                $newRecipe->save();
+            }
         }
-
         return redirect()->route('viewRecipePage');
     }
 
     public function viewProductRecipe($category_id, $product_id)
     {
+        $admin_id = Session::get('user_id');
+
+        if (!$admin_id) {
+            return redirect()->route('viewLoginPage');
+        }
+
         $recipes = Recipe::where('product_id', $product_id)->where('category_id', $category_id)->with('stock', 'product')->get();
 
         $products = Product::with('category')->get();
@@ -589,7 +754,7 @@ class AdminController extends Controller
         session(['showproductRecipe' => true]);
 
         return view('Admin.Recipe')->with([
-            'products' => $products,
+            'categoryProducts' => $products,
             'categories' => $categories,
             'stocks' => $stocks,
             'recipes' => $recipes
@@ -598,12 +763,31 @@ class AdminController extends Controller
 
     public function deleteStockFromRecipe($id, $cId, $pId)
     {
+        $admin_id = Session::get('user_id');
+
+        if (!$admin_id) {
+            return redirect()->route('viewLoginPage');
+        }
+
         $recipe = Recipe::find($id);
         if ($recipe) {
             $recipe->delete();
         }
 
         return redirect()->route('viewProductRecipe', ['category_id' => $cId, 'product_id' => $pId]);
+    }
+
+    public function showCategoryProducts($category_id)
+    {
+        $admin_id = Session::get('user_id');
+
+        if (!$admin_id) {
+            return redirect()->route('viewLoginPage');
+        }
+        $categories = Category::all();
+        $stocks = Stock::all();
+        $categoryProducts = Product::where('category_id', $category_id)->get();
+        return view('Admin.Recipe')->with(['categoryProducts' => $categoryProducts, 'categories' => $categories, 'stocks' => $stocks, 'recipes' => null]);
     }
 
     /*
@@ -614,17 +798,35 @@ class AdminController extends Controller
 
     public function viewOrdersPage()
     {
+        $admin_id = Session::get('user_id');
+
+        if (!$admin_id) {
+            return redirect()->route('viewLoginPage');
+        }
+
         return view('Admin.Order');
     }
 
     public function viewStaffPage()
     {
+        $admin_id = Session::get('user_id');
+
+        if (!$admin_id) {
+            return redirect()->route('viewLoginPage');
+        }
+
         $staff = User::whereIn('role', ['salesman', 'chef'])->get();
         return view('Admin.Staff')->with(['Staff' => $staff]);
     }
 
     public function updateStaff(Request $req)
     {
+        $admin_id = Session::get('user_id');
+
+        if (!$admin_id) {
+            return redirect()->route('viewLoginPage');
+        }
+
         dd($req->all());
         $validateData = $req->validate([
             'name' => 'required|string|max:255',
@@ -643,6 +845,12 @@ class AdminController extends Controller
     }
     public function deleteStaff($id)
     {
+        $admin_id = Session::get('user_id');
+
+        if (!$admin_id) {
+            return redirect()->route('viewLoginPage');
+        }
+        
         $staff = User::find($id);
         $staff->delete();
         return redirect()->route('viewStaffPage');

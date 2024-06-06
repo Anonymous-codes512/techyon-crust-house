@@ -69,43 +69,59 @@
             <hr>
 
             <div class="inputdivs">
-                <input type="text" id="itemName" name="itemName" placeholder="Item Name" required>
+                <label for="itemName">Product Name</label>
+                <input type="text" id="itemName" name="itemName" placeholder="Product Name" required>
             </div>
 
-            <div class="inputdivs" id="unitsDiv">
-                <input type="number" id="quantity" name="stockQuantity" min="0" placeholder="Stock Quantity"
-                    step="any" required>
-                <select name="unit1" id="stockunit">
-                    <option value="" selected disabled>Select unit</option>
-                    <option value="mg">Milligram</option>
-                    <option value="g">Gram</option>
-                    <option value="kg">Kilogram</option>
-                    <option value="ml">Milliliter</option>
-                    <option value="liter">liter</option>
-                    <option value="lbs">Pound</option>
-                    <option value="gal">Gallan</option>
-                    <option value="oz">Ounce</option>
-                </select>
 
+            <div class="inputdivs unitdivs" id="unitsDiv">
+                <div class="stockquantity">
+                    <label for="quantity">Stock Quantity</label>
+                    <input type="number" id="quantity" name="stockQuantity" min="0" placeholder="Stock Quantity"
+                        step="any" required>
+                </div>
+
+                <div class="unitselection">
+                    <label for="stockunit">Unit</label>
+                    <select name="unit1" id="stockunit">
+                        <option value="" selected disabled>Select unit</option>
+                        <option value="mg">Milligram</option>
+                        <option value="g">Gram</option>
+                        <option value="kg">Kilogram</option>
+                        <option value="ml">Milliliter</option>
+                        <option value="liter">liter</option>
+                        <option value="lbs">Pound</option>
+                        <option value="gal">Gallan</option>
+                        <option value="oz">Ounce</option>
+                    </select>
+                </div>
             </div>
 
-            <div class="inputdivs" id="unitsDiv">
-                <input type="number" id="minquantity" name="minStockQuantity" min="0"
+            <div class="inputdivs unitdivs" id="unitsDiv">
+                <div class="stockquantity">
+                    <label for="minquantity">Minimum Stock Quantity</label>
+                    <input type="number" id="minquantity" name="minStockQuantity" min="0"
                     placeholder="Minimum Stock Quantity " step="any" required>
-                <select name="unit2" id="minStockUnit">
-                    <option value="" selected disabled>Select unit</option>
-                    <option value="mg">Milligram</option>
-                    <option value="g">Gram</option>
-                    <option value="Kg">Kilogram</option>
-                    <option value="ml">Milliliter</option>
-                    <option value="liter">liter</option>
-                    <option value="lbs">Pound</option>
-                    <option value="gal">Gallan</option>
-                    <option value="oz">Ounce</option>
-                </select>
+                </div>
+
+                <div class="unitselection">
+                    <label for="minStockUnit">Unit</label>
+                    <select name="unit2" id="minStockUnit">
+                        <option value="" selected disabled>Select unit</option>
+                        <option value="mg">Milligram</option>
+                        <option value="g">Gram</option>
+                        <option value="kg">Kilogram</option>
+                        <option value="ml">Milliliter</option>
+                        <option value="liter">liter</option>
+                        <option value="lbs">Pound</option>
+                        <option value="gal">Gallan</option>
+                        <option value="oz">Ounce</option>
+                    </select>
+                </div>
             </div>
 
             <div class="inputdivs">
+                <label for="unitprice">Price per unit</label>
                 <input type="number" id="unitprice" name="unitPrice" placeholder="Unit Price" required>
             </div>
 
@@ -132,40 +148,56 @@
             <input type="hidden" id="sId" name="sId" required>
 
             <div class="inputdivs">
+                <label for="iName">Product Name</label>
                 <input type="text" id="iName" name="itemName" required>
             </div>
 
-            <div class="inputdivs" id="unitsDiv">
-                <input type="number" id="iQuantity" name="stockQuantity" step="any" min="0" required>
-                <select name="unit1" id="iQUnit">
-                    <option value="" selected disabled>Select unit</option>
-                    <option value="mg">Milligram</option>
-                    <option value="g">Gram</option>
-                    <option value="kg">Kilogram</option>
-                    <option value="ml">Milliliter</option>
-                    <option value="liter">Liter</option>
-                    <option value="gal">Gallon</option>
-                    <option value="lbs">Pound</option>
-                    <option value="oz">Ounce</option>
-                </select>
+            <div class="inputdivs unitdivs" id="unitsDiv">
+                <div class="stockquantity">
+                    <label for="iQuantity">Stock Quantity</label>
+                    <input type="number" id="iQuantity" name="stockQuantity" step="any" min="0" required>
+                </div>
+
+                <div class="unitselection">
+                    <label for="iQUnit">Unit</label>
+                    <select name="unit1" id="iQUnit">
+                        <option value="" selected disabled>Select unit</option>
+                        <option value="mg">Milligram</option>
+                        <option value="g">Gram</option>
+                        <option value="kg">Kilogram</option>
+                        <option value="ml">Milliliter</option>
+                        <option value="liter">Liter</option>
+                        <option value="gal">Gallon</option>
+                        <option value="lbs">Pound</option>
+                        <option value="oz">Ounce</option>
+                    </select>
+                </div>
             </div>
 
-            <div class="inputdivs" id="unitsDiv">
-                <input type="number" id="mQuantity" name="minStockQuantity" step="any" min="0" required>
-                <select name="unit2" id="mQUnit">
-                    <option value="" selected disabled>Select unit</option>
-                    <option value="mg">Milligram</option>
-                    <option value="g">Gram</option>
-                    <option value="kg">Kilogram</option>
-                    <option value="ml">Milliliter</option>
-                    <option value="liter">Liter</option>
-                    <option value="gal">Gallon</option>
-                    <option value="lbs">Pound</option>
-                    <option value="oz">Ounce</option>
-                </select>
+            <div class="inputdivs unitdivs" id="unitsDiv">
+                <div class="stockquantity">
+                    <label for="mQuantity">Minimum Stock Quantity</label>
+                    <input type="number" id="mQuantity" name="minStockQuantity" step="any" min="0" required>
+                </div>
+
+                <div class="unitselection">
+                    <label for="mQUnit">Unit</label>
+                    <select name="unit2" id="mQUnit">
+                        <option value="" selected disabled>Select unit</option>
+                        <option value="mg">Milligram</option>
+                        <option value="g">Gram</option>
+                        <option value="kg">Kilogram</option>
+                        <option value="ml">Milliliter</option>
+                        <option value="liter">Liter</option>
+                        <option value="gal">Gallon</option>
+                        <option value="lbs">Pound</option>
+                        <option value="oz">Ounce</option>
+                    </select>
+                </div>
             </div>
 
             <div class="inputdivs">
+                <label for="UPrice">Price per unit</label>
                 <input type="number" id="UPrice" name="unitPrice" required>
             </div>
 
