@@ -9,19 +9,15 @@ use App\Models\Handler;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
-use finfo;
 use Dompdf\Dompdf;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Session;
-use Illuminate\Support\Facades\View;
+use setasign\Fpdi\Fpdi;
 
 class SalesmanController extends Controller
 {
     public function viewSalesmanDashboard($id)
     {
-        $salesman_id = Session::get('user_id');
-
-        if (!$salesman_id) {
+        if (!session()->has('salesman')) {
             return redirect()->route('viewLoginPage');
         }
 
@@ -51,9 +47,7 @@ class SalesmanController extends Controller
 
     public function salesmanCategoryDashboard($categoryName, $id)
     {
-        $salesman_id = Session::get('user_id');
-
-        if (!$salesman_id) {
+        if (!session()->has('salesman')) {
             return redirect()->route('viewLoginPage');
         }
 
@@ -84,65 +78,186 @@ class SalesmanController extends Controller
         return $deals;
     }
 
-    public function placeOrder($salesman_id)
-    {
-        $salesman_id = Session::get('user_id');
+// public function placeOrder($salesman_id)
+    // {
+    //     if (!session()->has('salesman')) {
+    //         return redirect()->route('viewLoginPage');
+    //     }
 
-        if (!$salesman_id) {
-            return redirect()->route('viewLoginPage');
-        }
+    //     $newOrderNumber = 0;
 
-        $order = new Order();
-        $cartedProducts = Cart::where('salesman_id', $salesman_id)->get();
-        $totalBill = 0.0;
+    //     $lastOrder = Order::orderBy('id', 'desc')->first();
+    //     if ($lastOrder) {
+    //         $lastOrderNumber = intval(substr($lastOrder->order_number, 3));
+    //         $newOrderNumber = 'CH-' . sprintf('%03d', ($lastOrderNumber + 1));
+    //     } else {
+    //         $newOrderNumber = 'CH-100';
+    //     }
 
-        $order->total_bill = $totalBill;
-        $order->salesman_id = $salesman_id;
-        $order->save();
+    //     $order = new Order();
+    //     $cartedProducts = Cart::where('salesman_id', $salesman_id)->get();
+    //     $totalBill = 0.0;
 
-        foreach ($cartedProducts as $cartItem) {
-            preg_match('/\d+(\.\d+)?/', $cartItem->totalPrice, $matches);
-            $numericPart = $matches[0];
-            $totalProductPrice = floatval($numericPart);
-            $quantity = intval($cartItem->productQuantity);
-            $totalBill += $totalProductPrice;
+    //     $order->order_number = $newOrderNumber;
+    //     $order->total_bill = $totalBill;
+    //     $order->salesman_id = $salesman_id;
+    //     $order->save();
 
-            $orderItem = new OrderItem();
-            $orderItem->order_id = $order->id;
-            $orderItem->product_name = $cartItem->productName;
-            $orderItem->product_variation = $cartItem->productVariation;
-            $orderItem->addons = $cartItem->productAddon;
-            $orderItem->product_price = 'Rs. ' . ($totalProductPrice / $quantity);
-            $orderItem->product_quantity = $quantity;
-            $orderItem->total_price = $cartItem->totalPrice;
-            $orderItem->save();
-        }
+    //     foreach ($cartedProducts as $cartItem) {
+    //         preg_match('/\d+(\.\d+)?/', $cartItem->totalPrice, $matches);
+    //         $numericPart = $matches[0];
+    //         $totalProductPrice = floatval($numericPart);
+    //         $quantity = intval($cartItem->productQuantity);
+    //         $totalBill += $totalProductPrice;
 
-        foreach ($cartedProducts as $cartItem) {
-            $cartItem->delete();
-        }
+    //         $orderItem = new OrderItem();
+    //         $orderItem->order_id = $order->id;
+    //         $orderItem->order_number = $newOrderNumber;
+    //         $orderItem->product_name = $cartItem->productName;
+    //         $orderItem->product_variation = $cartItem->productVariation;
+    //         $orderItem->addons = $cartItem->productAddon;
+    //         $orderItem->product_price = 'Rs. ' . ($totalProductPrice / $quantity);
+    //         $orderItem->product_quantity = $quantity;
+    //         $orderItem->total_price = $cartItem->totalPrice;
+    //         $orderItem->save();
+    //     }
 
-        $order->total_bill = 'Rs. ' . $totalBill;
-        $order->save();
+    //     foreach ($cartedProducts as $cartItem) {
+    //         $cartItem->delete();
+    //     }
 
-        $products = OrderItem::where('order_id',  $order->id)->get();
-        $html = view('reciept', ['products' => $products, 'saleman' => $order->salesman->name])->render();
-        $dompdf = new Dompdf();
-        $dompdf->loadHtml($html);
-        $height = $dompdf->getCanvas()->get_height();
-        $dompdf->setPaper([0, 0, 300, $height], 'portrait');
-        $dompdf->render();
+    //     $order->total_bill = 'Rs. ' . $totalBill;
+    //     $order->save();
 
-        $dompdf->stream('crust house.pdf');
-        return redirect()->back();
+
+    //     $products = OrderItem::where('order_id', $order->id)->get();
+    //     $customerRecipt = view('reciept', ['products' => $products, 'saleman' => $order->salesman->name, 'ordernumber' => $order->order_number])->render();
+    //     $dompdf1 = new Dompdf();
+    //     $dompdf1->loadHtml($customerRecipt);
+    //     $height = $dompdf1->getCanvas()->get_height();
+    //     $dompdf1->setPaper([0, 0, 300, $height], 'portrait');
+    //     $dompdf1->render();
+
+    //     $dompdf1->stream($newOrderNumber . '.pdf');
+
+    //     $KitchenRecipt = view('KitchenRecipt', ['products' => $products, 'saleman' => $order->salesman->name, 'ordernumber' => $order->order_number])->render();
+    //     $dompdf2 = new Dompdf();
+    //     $dompdf2->loadHtml($KitchenRecipt);
+    //     $height = $dompdf2->getCanvas()->get_height();
+    //     $dompdf2->setPaper([0, 0, 300, $height], 'portrait');
+    //     $dompdf2->render();
+
+    //     $dompdf2->stream($newOrderNumber . '.pdf');
+
+    //     return redirect()->back();
+// }
+
+public function placeOrder($salesman_id)
+{
+    if (!session()->has('salesman')) {
+        return redirect()->route('viewLoginPage');
     }
+
+    $newOrderNumber = 0;
+
+    $lastOrder = Order::orderBy('id', 'desc')->first();
+    if ($lastOrder) {
+        $lastOrderNumber = intval(substr($lastOrder->order_number, 3));
+        $newOrderNumber = 'CH-' . sprintf('%03d', ($lastOrderNumber + 1));
+    } else {
+        $newOrderNumber = 'CH-100';
+    }
+
+    $order = new Order();
+    $cartedProducts = Cart::where('salesman_id', $salesman_id)->get();
+    $totalBill = 0.0;
+
+    $order->order_number = $newOrderNumber;
+    $order->total_bill = $totalBill;
+    $order->salesman_id = $salesman_id;
+    $order->save();
+
+    foreach ($cartedProducts as $cartItem) {
+        preg_match('/\d+(\.\d+)?/', $cartItem->totalPrice, $matches);
+        $numericPart = $matches[0];
+        $totalProductPrice = floatval($numericPart);
+        $quantity = intval($cartItem->productQuantity);
+        $totalBill += $totalProductPrice;
+
+        $orderItem = new OrderItem();
+        $orderItem->order_id = $order->id;
+        $orderItem->order_number = $newOrderNumber;
+        $orderItem->product_name = $cartItem->productName;
+        $orderItem->product_variation = $cartItem->productVariation;
+        $orderItem->addons = $cartItem->productAddon;
+        $orderItem->product_price = 'Rs. ' . ($totalProductPrice / $quantity);
+        $orderItem->product_quantity = $quantity;
+        $orderItem->total_price = $cartItem->totalPrice;
+        $orderItem->save();
+    }
+
+    foreach ($cartedProducts as $cartItem) {
+        $cartItem->delete();
+    }
+
+    $order->total_bill = 'Rs. ' . $totalBill;
+    $order->save();
+
+    $products = OrderItem::where('order_id', $order->id)->get();
+
+    $customerRecipt = view('reciept', ['products' => $products, 'saleman' => $order->salesman->name, 'ordernumber' => $order->order_number])->render();
+    $dompdf1 = new Dompdf();
+    $dompdf1->loadHtml($customerRecipt);
+    $dompdf1->setPaper([0, 0, 300, 675, 'portrait']);
+    $dompdf1->render();
+    $customerPdfContent = $dompdf1->output();
+
+    $KitchenRecipt = view('KitchenRecipt', ['products' => $products, 'saleman' => $order->salesman->name, 'ordernumber' => $order->order_number])->render();
+    $dompdf2 = new Dompdf();
+    $dompdf2->loadHtml($KitchenRecipt);
+    $dompdf2->setPaper([0, 0, 300, 675,'portrait']);
+    $dompdf2->render();
+    $kitchenPdfContent = $dompdf2->output();
+
+    $customerPdfPath = storage_path('app/public/') . $newOrderNumber . '_customer.pdf';
+    $kitchenPdfPath = storage_path('app/public/') . $newOrderNumber . '_kitchen.pdf';
+    file_put_contents($customerPdfPath, $customerPdfContent);
+    file_put_contents($kitchenPdfPath, $kitchenPdfContent);
+
+    $pdf = new Fpdi();
+    $pdf->AddPage('P', [105, 180]);
+    $pdf->setSourceFile($customerPdfPath);
+    $tplId = $pdf->importPage(1);
+    $pdf->useTemplate($tplId);
+
+    $pdf->AddPage('P', [105, 105]);
+    $pdf->setSourceFile($kitchenPdfPath);
+    $tplId = $pdf->importPage(1);
+    $pdf->useTemplate($tplId);
+
+    $combinedPdfPath = storage_path('app/public/') . $newOrderNumber . '_combined.pdf';
+    $pdf->Output($combinedPdfPath, 'F');
+
+    unlink($customerPdfPath);
+    unlink($kitchenPdfPath);
+
+    return response()->download($combinedPdfPath)->deleteFileAfterSend(true);
+}
+
+
+    // private function streamPdfContent($content)
+    // {
+    //     $tempFile = tempnam(sys_get_temp_dir(), 'pdf');
+    //     file_put_contents($tempFile, $content);
+    //     return $tempFile;
+    // }
+
+
 
 
     public function saveToCart(Request $request)
     {
-        $salesman_id = Session::get('user_id');
-
-        if (!$salesman_id) {
+        if (!session()->has('salesman')) {
             return redirect()->route('viewLoginPage');
         }
         $productOrder = new Cart();
@@ -171,9 +286,7 @@ class SalesmanController extends Controller
 
     public function clearCart($salesman_id)
     {
-        $salesman_id = Session::get('user_id');
-
-        if (!$salesman_id) {
+        if (!session()->has('salesman')) {
             return redirect()->route('viewLoginPage');
         }
 
@@ -187,9 +300,7 @@ class SalesmanController extends Controller
 
     public function removeOneProduct($id, $salesman_id)
     {
-        $salesman_id = Session::get('user_id');
-
-        if (!$salesman_id) {
+        if (!session()->has('salesman')) {
             return redirect()->route('viewLoginPage');
         }
 
@@ -202,12 +313,9 @@ class SalesmanController extends Controller
 
     public function increaseQuantity($id, $salesman_id)
     {
-        $salesman_id = Session::get('user_id');
-
-        if (!$salesman_id) {
+        if (!session()->has('salesman')) {
             return redirect()->route('viewLoginPage');
         }
-
         $cartedProduct = Cart::find($id);
         $productPrice = $cartedProduct->totalPrice;
 
@@ -225,12 +333,10 @@ class SalesmanController extends Controller
 
     public function decreaseQuantity($id, $salesman_id)
     {
-        $salesman_id = Session::get('user_id');
-
-        if (!$salesman_id) {
+        if (!session()->has('salesman')) {
             return redirect()->route('viewLoginPage');
         }
-        
+
         $cartedProduct = Cart::find($id);
         if ($cartedProduct->productQuantity > 1) {
             $productPrice = $cartedProduct->totalPrice;

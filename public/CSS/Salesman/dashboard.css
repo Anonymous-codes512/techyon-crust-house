@@ -65,7 +65,6 @@
 
 #products {
     display: flex;
-    justify-content: center;
     flex-direction: row;
     flex-wrap: wrap;
     padding: 0.21vw;

@@ -117,6 +117,9 @@ Route::get('/showCategoryProducts/{category_id}', [AdminController::class, 'show
 */
 
 Route::get('/viewOrdersPage', [AdminController::class,'viewOrdersPage'])->name('viewOrdersPage');
+Route::get('/viewOrderProducts/{order_id}', [AdminController::class,'viewOrderProducts'])->name('viewOrderProducts');
+Route::get('/printrecipt/{order_id}', [AdminController::class,'printRecipt'])->name('printrecipt');
+Route::get('/cancelorder/{order_id}', [AdminController::class,'cancelOrder'])->name('cancelorder');
 Route::get('/viewStaffPage', [AdminController::class,'viewStaffPage'])->name('viewStaffPage');
 Route::get('/updateStaff', [AdminController::class,'updateStaff'])->name('updateStaff');
 Route::get('/deleteStaff/{id}', [AdminController::class,'deleteStaff'])->name('deleteStaff');

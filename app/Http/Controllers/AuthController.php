@@ -50,13 +50,15 @@ class AuthController extends Controller
         $user = User::where('email', $request->email)->first();
 
         if ($user && Hash::check($request->password, $user->password)) {
-            session(['user_id' => $user->id]);
             session(['username' => $user->name]);
+
             if ($user->role === 'owner') {
                 return redirect()->route('dashboard');
             } else if ($user->role === 'admin') {
+                session()->put('admin', true);
                 return redirect()->route('admindashboard');
             } else if ($user->role === 'salesman') {
+                session()->put('salesman', true);
                 return redirect()->route('salesman_dashboard', ['id' => $user->id]);
             }
         } else {
@@ -66,7 +68,7 @@ class AuthController extends Controller
 
     public function logout()
     {
-        session()->forget(['user_id', 'username']);
+        session()->forget(['username', 'admin', 'salesman']);
         return redirect()->route('viewLoginPage');
     }
 }

@@ -243,7 +243,8 @@
         justify-content: space-between;
         margin: 10px;
     }
-	.border-black {
+
+    .border-black {
         border-top: 1px solid black;
         border-bottom: 1px solid black;
     }
@@ -255,6 +256,11 @@
 </style>
 
 <body>
+    @php
+        $subtotal = 0.0;
+        $ordernumber;
+    @endphp
+
     <div id="showScroll" class="container">
         <div class="receipt">
             <h1 class="logo">Crust House</h1>
@@ -263,34 +269,30 @@
                 <div class="address">
                     Crust House Bar-Code: 808 STORE: 332
                 </div>
-                <!-- <div class="details">
-                    <div class="detail">REG#03</div>
-                    <div class="detail">TRN#9754</div>
-                </div> -->
-                <div class="cashier">
-                    Helped by: {{ $saleman }}
+
+                <div class="details">
+                    <div style="display:inline; text-align:left;" class="cashier">Helped by:{{ $saleman }}</div>
+                    <div style="display:inline; text-align:right;" class="detail">Order # {{ $ordernumber }}</div>
                 </div>
+
                 <div style="border-bottom: 1px solid black;">
                     <div class="transactionDetails" style="font-weight: bold; border-bottom:1px solid black;">
                         <table>
-							<thead class="border-black">
-								<tr>
-									<th>No.</th>
-									<th>NAME</th>
-									<th>QTY</th>
-									<th>PRICE</th>
-								</tr>
-							</thead>
+                            <thead class="border-black">
+                                <tr>
+                                    <th>No.</th>
+                                    <th>NAME</th>
+                                    <th>QTY</th>
+                                    <th>PRICE</th>
+                                </tr>
+                            </thead>
                             <tbody>
-                                @php
-                                    $subtotal = 123;
-                                @endphp
-
                                 @foreach ($products as $i => $item)
                                     @php
                                         preg_match('/\d+(\.\d+)?/', $item->total_price, $matches);
                                         $numericPart = $matches[0];
                                         $subtotal += $numericPart;
+                                        $ordernumber = $item->order_number;
                                     @endphp
                                     <tr>
                                         <td>{{ $i + 1 }}</td>
@@ -303,29 +305,29 @@
                         </table>
                     </div>
 
-                    {{-- <div class="survey">
+                    <div class="survey">
                         <div class="surveyID">
-                            Recipt # {{  }}
+                            Recipt # {{ $ordernumber }}
                         </div>
-                        
-                    </div> --}}
-					<br>
-                    <div class="paymentDetails">
-						<div class="detail">SUBTOTAL: {{ $subtotal }}</div>
+
                     </div>
-					<br>
+                    <br>
                     <div class="paymentDetails">
-						<div class="detail">HI 4.0% TAX: 3.02</div>
+                        <div class="detail">SUBTOTAL: {{ $subtotal }}</div>
                     </div>
-					<br>
+                    <br>
+                    <div class="paymentDetails">
+                        <div class="detail">HI 4.0% TAX: 3.02</div>
+                    </div>
+                    <br>
                     <div class="paymentDetails bold">
-						<div class="detail">TOTAL: 78.64</div>
+                        <div class="detail">TOTAL: 78.64</div>
                     </div>
-					<br>
+                    <br>
                     <div class="paymentDetails">
-						<div class="detail">CASH: 85.00</div>
+                        <div class="detail">CASH: 85.00</div>
                     </div>
-					<br>
+                    <br>
                     <div class="paymentDetails">
                         <div class="detail">CHANGE: 6.36</div>
                     </div>
@@ -362,3 +364,90 @@
 </body>
 
 </html>
+
+
+
+
+
+{{-- 
+public function placeOrder($salesman_id)
+{
+    if (!session()->has('salesman')) {
+        return redirect()->route('viewLoginPage');
+    }
+
+    $newOrderNumber = 0;
+
+    $lastOrder = Order::orderBy('id', 'desc')->first();
+    if ($lastOrder) {
+        $lastOrderNumber = intval(substr($lastOrder->order_number, 3));
+        $newOrderNumber = 'CH-' . sprintf('%03d', ($lastOrderNumber + 1));
+    } else {
+        $newOrderNumber = 'CH-100';
+    }
+
+    $order = new Order();
+    $cartedProducts = Cart::where('salesman_id', $salesman_id)->get();
+    $totalBill = 0.0;
+
+    $order->order_number = $newOrderNumber;
+    $order->total_bill = $totalBill;
+    $order->salesman_id = $salesman_id;
+    $order->save();
+
+    foreach ($cartedProducts as $cartItem) {
+        preg_match('/\d+(\.\d+)?/', $cartItem->totalPrice, $matches);
+        $numericPart = $matches[0];
+        $totalProductPrice = floatval($numericPart);
+        $quantity = intval($cartItem->productQuantity);
+        $totalBill += $totalProductPrice;
+
+        $orderItem = new OrderItem();
+        $orderItem->order_id = $order->id;
+        $orderItem->order_number = $newOrderNumber;
+        $orderItem->product_name = $cartItem->productName;
+        $orderItem->product_variation = $cartItem->productVariation;
+        $orderItem->addons = $cartItem->productAddon;
+        $orderItem->product_price = 'Rs. ' . ($totalProductPrice / $quantity);
+        $orderItem->product_quantity = $quantity;
+        $orderItem->total_price = $cartItem->totalPrice;
+        $orderItem->save();
+    }
+
+    foreach ($cartedProducts as $cartItem) {
+        $cartItem->delete();
+    }
+
+    $order->total_bill = 'Rs. ' . $totalBill;
+    $order->save();
+
+    $this->createCustomerPDF( $order->id, $newOrderNumber);
+    $this->createKitchenPDF( $order->id, $newOrderNumber);
+
+    return redirect()->back();
+}
+public function createCustomerPDF($order_id, $orderNumber){
+    $products = OrderItem::where('order_id', $order_id)->get();
+    $order = Order::with('salesman')->where('id', $order_id)->first();
+    $customerRecipt = view('reciept', ['products' => $products, 'saleman' => $order->salesman->name, 'ordernumber' => $order->order_number])->render();
+    $dompdf1 = new Dompdf();
+    $dompdf1->loadHtml($customerRecipt);
+    $height = $dompdf1->getCanvas()->get_height();
+    $dompdf1->setPaper([0, 0, 300, $height], 'portrait');
+    $dompdf1->render();
+
+    $dompdf1->stream($orderNumber . '.pdf');
+}
+public function createKitchenPDF($order_id, $orderNumber){
+    $products = OrderItem::where('order_id', $order_id)->get();
+    $order = Order::with('salesman')->where('id', $order_id)->first();
+    $KitchenRecipt = view('KitchenRecipt', ['products' => $products, 'saleman' => $order->salesman->name, 'ordernumber' => $order->order_number])->render();
+    $dompdf2 = new Dompdf();
+    $dompdf2->loadHtml($KitchenRecipt);
+    $height = $dompdf2->getCanvas()->get_height();
+    $dompdf2->setPaper([0, 0, 300, $height], 'portrait');
+    $dompdf2->render();
+
+    $dompdf2->stream($orderNumber . '.pdf');
+
+} --}}

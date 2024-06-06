@@ -7,9 +7,12 @@ use App\Models\Category;
 use App\Models\Deal;
 use App\Models\Handler;
 use App\Models\Notification;
+use App\Models\Order;
+use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\Recipe;
 use App\Models\Stock;
+use Dompdf\Dompdf;
 use App\Models\User;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Http\Request;
@@ -21,9 +24,7 @@ class AdminController extends Controller
 {
     public function viewAdminDashboard()
     {
-        $admin_id = Session::get('user_id');
-
-        if (!$admin_id) {
+        if (!session()->has('admin')) {
             return redirect()->route('viewLoginPage');
         }
 
@@ -47,9 +48,7 @@ class AdminController extends Controller
 
     public function readNotification($id)
     {
-        $admin_id = Session::get('user_id');
-
-        if (!$admin_id) {
+        if (!session()->has('admin')) {
             return redirect()->route('viewLoginPage');
         }
 
@@ -61,9 +60,7 @@ class AdminController extends Controller
 
     public function deleteNotification($id)
     {
-        $admin_id = Session::get('user_id');
-
-        if (!$admin_id) {
+        if (!session()->has('admin')) {
             return redirect()->route('viewLoginPage');
         }
 
@@ -74,9 +71,7 @@ class AdminController extends Controller
 
     public function redirectNotification($id)
     {
-        $admin_id = Session::get('user_id');
-
-        if (!$admin_id) {
+        if (!session()->has('admin')) {
             return redirect()->route('viewLoginPage');
         }
 
@@ -96,9 +91,7 @@ class AdminController extends Controller
 
     public function viewCategoryPage()
     {
-        $admin_id = Session::get('user_id');
-
-        if (!$admin_id) {
+        if (!session()->has('admin')) {
             return redirect()->route('viewLoginPage');
         }
 
@@ -108,9 +101,7 @@ class AdminController extends Controller
 
     public function createCategory(Request $request)
     {
-        $admin_id = Session::get('user_id');
-
-        if (!$admin_id) {
+        if (!session()->has('admin')) {
             return redirect()->route('viewLoginPage');
         }
 
@@ -136,9 +127,7 @@ class AdminController extends Controller
     public function updateCategory(Request $request)
     {
 
-        $admin_id = Session::get('user_id');
-
-        if (!$admin_id) {
+        if (!session()->has('admin')) {
             return redirect()->route('viewLoginPage');
         }
 
@@ -167,9 +156,7 @@ class AdminController extends Controller
 
     public function deleteCategory($id)
     {
-        $admin_id = Session::get('user_id');
-
-        if (!$admin_id) {
+        if (!session()->has('admin')) {
             return redirect()->route('viewLoginPage');
         }
 
@@ -190,9 +177,7 @@ class AdminController extends Controller
 
     public function viewProductPage()
     {
-        $admin_id = Session::get('user_id');
-
-        if (!$admin_id) {
+        if (!session()->has('admin')) {
             return redirect()->route('viewLoginPage');
         }
         $categories = Category::all();
@@ -206,9 +191,7 @@ class AdminController extends Controller
 
     public function createProduct(Request $request)
     {
-        $admin_id = Session::get('user_id');
-
-        if (!$admin_id) {
+        if (!session()->has('admin')) {
             return redirect()->route('viewLoginPage');
         }
 
@@ -251,9 +234,7 @@ class AdminController extends Controller
 
     public function updateProduct(Request $request)
     {
-        $admin_id = Session::get('user_id');
-
-        if (!$admin_id) {
+        if (!session()->has('admin')) {
             return redirect()->route('viewLoginPage');
         }
 
@@ -281,9 +262,7 @@ class AdminController extends Controller
 
     public function deleteProduct($id)
     {
-        $admin_id = Session::get('user_id');
-
-        if (!$admin_id) {
+        if (!session()->has('admin')) {
             return redirect()->route('viewLoginPage');
         }
 
@@ -305,9 +284,7 @@ class AdminController extends Controller
 
     public function viewDealPage()
     {
-        $admin_id = Session::get('user_id');
-
-        if (!$admin_id) {
+        if (!session()->has('admin')) {
             return redirect()->route('viewLoginPage');
         }
 
@@ -321,9 +298,7 @@ class AdminController extends Controller
 
     public function viewDealProductsPage()
     {
-        $admin_id = Session::get('user_id');
-
-        if (!$admin_id) {
+        if (!session()->has('admin')) {
             return redirect()->route('viewLoginPage');
         }
 
@@ -333,9 +308,7 @@ class AdminController extends Controller
 
     public function viewUpdateDealProductsPage($id)
     {
-        $admin_id = Session::get('user_id');
-
-        if (!$admin_id) {
+        if (!session()->has('admin')) {
             return redirect()->route('viewLoginPage');
         }
 
@@ -346,9 +319,7 @@ class AdminController extends Controller
 
     public function createDeal(Request $request)
     {
-        $admin_id = Session::get('user_id');
-
-        if (!$admin_id) {
+        if (!session()->has('admin')) {
             return redirect()->route('viewLoginPage');
         }
 
@@ -373,9 +344,7 @@ class AdminController extends Controller
 
     public function createDealProducts(Request $request)
     {
-        $admin_id = Session::get('user_id');
-
-        if (!$admin_id) {
+        if (!session()->has('admin')) {
             return redirect()->route('viewLoginPage');
         }
 
@@ -409,9 +378,7 @@ class AdminController extends Controller
 
     public function updateDeal(Request $request)
     {
-        $admin_id = Session::get('user_id');
-
-        if (!$admin_id) {
+        if (!session()->has('admin')) {
             return redirect()->route('viewLoginPage');
         }
 
@@ -440,9 +407,7 @@ class AdminController extends Controller
 
     public function addDealProduct(Request $request)
     {
-        $admin_id = Session::get('user_id');
-
-        if (!$admin_id) {
+        if (!session()->has('admin')) {
             return redirect()->route('viewLoginPage');
         }
 
@@ -487,12 +452,10 @@ class AdminController extends Controller
 
     public function deleteDeal($id)
     {
-        $admin_id = Session::get('user_id');
-
-        if (!$admin_id) {
+        if (!session()->has('admin')) {
             return redirect()->route('viewLoginPage');
         }
-     
+
         $deal = Deal::find($id);
         $deal->delete();
         $imagePath = public_path('Images/DealImages') . '/' . $deal->dealImage;
@@ -504,9 +467,7 @@ class AdminController extends Controller
 
     public function deleteDealProduct($id, $dId)
     {
-        $admin_id = Session::get('user_id');
-
-        if (!$admin_id) {
+        if (!session()->has('admin')) {
             return redirect()->route('viewLoginPage');
         }
 
@@ -542,7 +503,6 @@ class AdminController extends Controller
             ->with('deal', $deal);
     }
 
-
     /*
     |---------------------------------------------------------------|
     |====================== Stock's Functions ======================|
@@ -551,9 +511,7 @@ class AdminController extends Controller
 
     public function viewStockPage()
     {
-        $admin_id = Session::get('user_id');
-
-        if (!$admin_id) {
+        if (!session()->has('admin')) {
             return redirect()->route('viewLoginPage');
         }
 
@@ -604,9 +562,7 @@ class AdminController extends Controller
 
     public function createStock(Request $request)
     {
-        $admin_id = Session::get('user_id');
-
-        if (!$admin_id) {
+        if (!session()->has('admin')) {
             return redirect()->route('viewLoginPage');
         }
 
@@ -654,9 +610,7 @@ class AdminController extends Controller
 
     public function updateStock(Request $request)
     {
-        $admin_id = Session::get('user_id');
-
-        if (!$admin_id) {
+        if (!session()->has('admin')) {
             return redirect()->route('viewLoginPage');
         }
         $stockData = Stock::find($request->sId);
@@ -672,9 +626,7 @@ class AdminController extends Controller
 
     public function deleteStock($id)
     {
-        $admin_id = Session::get('user_id');
-
-        if (!$admin_id) {
+        if (!session()->has('admin')) {
             return redirect()->route('viewLoginPage');
         }
 
@@ -692,9 +644,7 @@ class AdminController extends Controller
 
     public function viewRecipePage()
     {
-        $admin_id = Session::get('user_id');
-
-        if (!$admin_id) {
+        if (!session()->has('admin')) {
             return redirect()->route('viewLoginPage');
         }
         $categories = Category::all();
@@ -705,9 +655,7 @@ class AdminController extends Controller
 
     public function createRecipe(Request $request)
     {
-        $admin_id = Session::get('user_id');
-
-        if (!$admin_id) {
+        if (!session()->has('admin')) {
             return redirect()->route('viewLoginPage');
         }
 
@@ -740,9 +688,7 @@ class AdminController extends Controller
 
     public function viewProductRecipe($category_id, $product_id)
     {
-        $admin_id = Session::get('user_id');
-
-        if (!$admin_id) {
+        if (!session()->has('admin')) {
             return redirect()->route('viewLoginPage');
         }
 
@@ -763,9 +709,7 @@ class AdminController extends Controller
 
     public function deleteStockFromRecipe($id, $cId, $pId)
     {
-        $admin_id = Session::get('user_id');
-
-        if (!$admin_id) {
+        if (!session()->has('admin')) {
             return redirect()->route('viewLoginPage');
         }
 
@@ -779,9 +723,7 @@ class AdminController extends Controller
 
     public function showCategoryProducts($category_id)
     {
-        $admin_id = Session::get('user_id');
-
-        if (!$admin_id) {
+        if (!session()->has('admin')) {
             return redirect()->route('viewLoginPage');
         }
         $categories = Category::all();
@@ -798,20 +740,46 @@ class AdminController extends Controller
 
     public function viewOrdersPage()
     {
-        $admin_id = Session::get('user_id');
+        if (!session()->has('admin')) {
+            return redirect()->route('viewLoginPage');
+        }
+        $orders = Order::with('salesman')->get();
+        return view('Admin.Order')->with(['orders' => $orders, 'orderItems' => null]);
+    }
 
-        if (!$admin_id) {
+    public function viewOrderProducts($order_id)
+    {
+        if (!session()->has('admin')) {
             return redirect()->route('viewLoginPage');
         }
 
-        return view('Admin.Order');
+        $orders = Order::with('salesman')->get();
+        $orderItems = OrderItem::where('order_id', $order_id)->get();
+        return view('Admin.Order')->with(['orders' => $orders, 'orderItems' => $orderItems]);
+    }
+    
+    public function printRecipt($order_id){
+        $order = Order::with('salesman')->where('id', $order_id)->first();
+        $products = OrderItem::where('order_id', $order_id)->get();
+        $html = view('reciept', ['products' => $products, 'saleman' => $order->salesman->name, 'ordernumber'=> $order->order_number])->render();
+        $dompdf = new Dompdf();
+        $dompdf->loadHtml($html);
+        $height = $dompdf->getCanvas()->get_height();
+        $dompdf->setPaper([0, 0, 300, $height], 'portrait');
+        $dompdf->render();
+        $dompdf->stream($order->order_number.'.pdf');
+    }
+
+    public function cancelOrder($order_id){
+        $order = Order::with('salesman')->where('id', $order_id)->first();
+        $order->status = 3;
+        $order->save();
+        return redirect()->back();
     }
 
     public function viewStaffPage()
     {
-        $admin_id = Session::get('user_id');
-
-        if (!$admin_id) {
+        if (!session()->has('admin')) {
             return redirect()->route('viewLoginPage');
         }
 
@@ -821,9 +789,7 @@ class AdminController extends Controller
 
     public function updateStaff(Request $req)
     {
-        $admin_id = Session::get('user_id');
-
-        if (!$admin_id) {
+        if (!session()->has('admin')) {
             return redirect()->route('viewLoginPage');
         }
 
@@ -845,12 +811,10 @@ class AdminController extends Controller
     }
     public function deleteStaff($id)
     {
-        $admin_id = Session::get('user_id');
-
-        if (!$admin_id) {
+        if (!session()->has('admin')) {
             return redirect()->route('viewLoginPage');
         }
-        
+
         $staff = User::find($id);
         $staff->delete();
         return redirect()->route('viewStaffPage');

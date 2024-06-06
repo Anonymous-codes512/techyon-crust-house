@@ -79,26 +79,94 @@ table tbody tr td:last-child {
     text-align: center;
 }
 
-table tbody tr td a{
-    padding: 0.2vw 0.3vw;
-    font-size: 1.2vw;
+table tbody tr td a {
+    padding: 0.3vw 0.6vw;
+    font-size: 0.8vw;
     text-decoration: none;
     color: #fff;
-    border-radius: 5px;
-}
-
-table tbody tr td a:first-child {
-    background-color: #3fc28a;
-}
-
-table tbody tr td a:last-child {
+    border-radius: 10px;
     background-color: #f45b69;
 }
 
-table tbody tr td a:first-child:hover {
-    background-color: #2da571;
+table tbody tr td a:hover {
+    background-color: #f84857;
+}
+#orderItems {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    background-color: #ffffff;
+    position: absolute;
+    border-radius: 10px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
+    justify-content: space-around;
+    padding: 20px 30px;
 }
 
-table tbody tr td a:last-child:hover {
-    background-color: #f84857;
+#itemtable {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 0.5vw auto 2vw;
+    height: 50px; 
+    overflow-y: auto;
+}
+
+#itemtable thead tr {
+    border-bottom: 2px solid #000;
+}
+
+#itemtable thead tr th:last-child {
+    text-align: center;
+}
+
+#itemtable tbody tr {
+    border-bottom: 1px solid #898989;
+}
+
+#itemtable tbody tr td {
+    text-align: center;
+    border-radius: 6px;
+    padding: 0.5vw 0;
+    font-size: 1.3vw;
+}
+
+
+.btns {
+    display: flex;
+    justify-content: center;
+    width: 98%;
+    height: 18%;
+    margin: 0.31vw auto;
+}
+
+.btns button {
+    font-family: "Poppins", sans-serif;
+    font-size: 1.2vw;
+    padding: 0.5vw 2vw;
+    border-radius: 10px;
+    margin: 0.5vw;
+    border: none;
+    background-color: #e2e2e2;
+}
+
+#closebtn:hover {
+    background-color: #fff;
+}
+#printbtn {
+    background-color: #276e3d;
+    color: #d3d3d3;
+}
+#printbtn:hover {
+    background-color: #41bb41;
+}
+.table-row-data {
+    cursor: pointer;
+}
+
+.table-row-data:hover {
+    background-color: #fff;
 }
