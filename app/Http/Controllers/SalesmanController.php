@@ -78,7 +78,7 @@ class SalesmanController extends Controller
         return $deals;
     }
 
-// public function placeOrder($salesman_id)
+    // public function placeOrder($salesman_id)
     // {
     //     if (!session()->has('salesman')) {
     //         return redirect()->route('viewLoginPage');
@@ -150,110 +150,103 @@ class SalesmanController extends Controller
     //     $dompdf2->stream($newOrderNumber . '.pdf');
 
     //     return redirect()->back();
-// }
-
-public function placeOrder($salesman_id)
-{
-    if (!session()->has('salesman')) {
-        return redirect()->route('viewLoginPage');
-    }
-
-    $newOrderNumber = 0;
-
-    $lastOrder = Order::orderBy('id', 'desc')->first();
-    if ($lastOrder) {
-        $lastOrderNumber = intval(substr($lastOrder->order_number, 3));
-        $newOrderNumber = 'CH-' . sprintf('%03d', ($lastOrderNumber + 1));
-    } else {
-        $newOrderNumber = 'CH-100';
-    }
-
-    $order = new Order();
-    $cartedProducts = Cart::where('salesman_id', $salesman_id)->get();
-    $totalBill = 0.0;
-
-    $order->order_number = $newOrderNumber;
-    $order->total_bill = $totalBill;
-    $order->salesman_id = $salesman_id;
-    $order->save();
-
-    foreach ($cartedProducts as $cartItem) {
-        preg_match('/\d+(\.\d+)?/', $cartItem->totalPrice, $matches);
-        $numericPart = $matches[0];
-        $totalProductPrice = floatval($numericPart);
-        $quantity = intval($cartItem->productQuantity);
-        $totalBill += $totalProductPrice;
-
-        $orderItem = new OrderItem();
-        $orderItem->order_id = $order->id;
-        $orderItem->order_number = $newOrderNumber;
-        $orderItem->product_name = $cartItem->productName;
-        $orderItem->product_variation = $cartItem->productVariation;
-        $orderItem->addons = $cartItem->productAddon;
-        $orderItem->product_price = 'Rs. ' . ($totalProductPrice / $quantity);
-        $orderItem->product_quantity = $quantity;
-        $orderItem->total_price = $cartItem->totalPrice;
-        $orderItem->save();
-    }
-
-    foreach ($cartedProducts as $cartItem) {
-        $cartItem->delete();
-    }
-
-    $order->total_bill = 'Rs. ' . $totalBill;
-    $order->save();
-
-    $products = OrderItem::where('order_id', $order->id)->get();
-
-    $customerRecipt = view('reciept', ['products' => $products, 'saleman' => $order->salesman->name, 'ordernumber' => $order->order_number])->render();
-    $dompdf1 = new Dompdf();
-    $dompdf1->loadHtml($customerRecipt);
-    $dompdf1->setPaper([0, 0, 300, 675, 'portrait']);
-    $dompdf1->render();
-    $customerPdfContent = $dompdf1->output();
-
-    $KitchenRecipt = view('KitchenRecipt', ['products' => $products, 'saleman' => $order->salesman->name, 'ordernumber' => $order->order_number])->render();
-    $dompdf2 = new Dompdf();
-    $dompdf2->loadHtml($KitchenRecipt);
-    $dompdf2->setPaper([0, 0, 300, 675,'portrait']);
-    $dompdf2->render();
-    $kitchenPdfContent = $dompdf2->output();
-
-    $customerPdfPath = storage_path('app/public/') . $newOrderNumber . '_customer.pdf';
-    $kitchenPdfPath = storage_path('app/public/') . $newOrderNumber . '_kitchen.pdf';
-    file_put_contents($customerPdfPath, $customerPdfContent);
-    file_put_contents($kitchenPdfPath, $kitchenPdfContent);
-
-    $pdf = new Fpdi();
-    $pdf->AddPage('P', [105, 180]);
-    $pdf->setSourceFile($customerPdfPath);
-    $tplId = $pdf->importPage(1);
-    $pdf->useTemplate($tplId);
-
-    $pdf->AddPage('P', [105, 105]);
-    $pdf->setSourceFile($kitchenPdfPath);
-    $tplId = $pdf->importPage(1);
-    $pdf->useTemplate($tplId);
-
-    $combinedPdfPath = storage_path('app/public/') . $newOrderNumber . '_combined.pdf';
-    $pdf->Output($combinedPdfPath, 'F');
-
-    unlink($customerPdfPath);
-    unlink($kitchenPdfPath);
-
-    return response()->download($combinedPdfPath)->deleteFileAfterSend(true);
-}
-
-
-    // private function streamPdfContent($content)
-    // {
-    //     $tempFile = tempnam(sys_get_temp_dir(), 'pdf');
-    //     file_put_contents($tempFile, $content);
-    //     return $tempFile;
     // }
 
+    public function placeOrder($salesman_id, Request $request)
+    {
+        if (!session()->has('salesman')) {
+            return redirect()->route('viewLoginPage');
+        }
 
+        $newOrderNumber = 0;
 
+        $lastOrder = Order::orderBy('id', 'desc')->first();
+        if ($lastOrder) {
+            $lastOrderNumber = intval(substr($lastOrder->order_number, 3));
+            $newOrderNumber = 'CH-' . sprintf('%03d', ($lastOrderNumber + 1));
+        } else {
+            $newOrderNumber = 'CH-100';
+        }
+
+        $order = new Order();
+        $cartedProducts = Cart::where('salesman_id', $salesman_id)->get();
+        $totalBill = 0.0;
+
+        $order->order_number = $newOrderNumber;
+        $order->salesman_id = $salesman_id;
+        $order->total_bill = $totalBill;
+        $order->received_cash = $request->input('recievecash');
+        $order->return_change = $request->input('change');
+        $order->ordertype = $request->input('orderType');
+        $order->save();
+
+        foreach ($cartedProducts as $cartItem) {
+            preg_match('/\d+(\.\d+)?/', $cartItem->totalPrice, $matches);
+            $numericPart = $matches[0];
+            $totalProductPrice = floatval($numericPart);
+            $quantity = intval($cartItem->productQuantity);
+            $totalBill += $totalProductPrice;
+
+            $orderItem = new OrderItem();
+            $orderItem->order_id = $order->id;
+            $orderItem->order_number = $newOrderNumber;
+            $orderItem->product_name = $cartItem->productName;
+            $orderItem->product_variation = $cartItem->productVariation;
+            $orderItem->addons = $cartItem->productAddon;
+            $orderItem->product_price = 'Rs. ' . ($totalProductPrice / $quantity);
+            $orderItem->product_quantity = $quantity;
+            $orderItem->total_price = $cartItem->totalPrice;
+            $orderItem->save();
+        }
+
+        foreach ($cartedProducts as $cartItem) {
+            $cartItem->delete();
+        }
+
+        $order->total_bill = 'Rs. ' . $totalBill;
+        $order->save();
+
+        $orderData = Order::with('salesman')->find($order->id);
+        $products = OrderItem::where('order_id', $order->id)->get();
+
+        $customerRecipt = view('reciept', ['products' => $products, 'orderData'=>$orderData])->render();
+        $dompdf1 = new Dompdf();
+        $dompdf1->loadHtml($customerRecipt);
+        $dompdf1->setPaper([0, 0, 300, 675, 'portrait']);
+        $dompdf1->render();
+        $customerPdfContent = $dompdf1->output();
+
+        $KitchenRecipt = view('KitchenRecipt', ['products' => $products, 'orderData'=>$orderData])->render();
+        $dompdf2 = new Dompdf();
+        $dompdf2->loadHtml($KitchenRecipt);
+        $dompdf2->setPaper([0, 0, 300, 675, 'portrait']);
+        $dompdf2->render();
+        $kitchenPdfContent = $dompdf2->output();
+
+        $customerPdfPath = storage_path('app/public/') . $newOrderNumber . '_customer.pdf';
+        $kitchenPdfPath = storage_path('app/public/') . $newOrderNumber . '_kitchen.pdf';
+        file_put_contents($customerPdfPath, $customerPdfContent);
+        file_put_contents($kitchenPdfPath, $kitchenPdfContent);
+
+        $pdf = new Fpdi();
+        $pdf->AddPage('P', [105, 180]);
+        $pdf->setSourceFile($customerPdfPath);
+        $tplId = $pdf->importPage(1);
+        $pdf->useTemplate($tplId);
+
+        $pdf->AddPage('P', [105, 105]);
+        $pdf->setSourceFile($kitchenPdfPath);
+        $tplId = $pdf->importPage(1);
+        $pdf->useTemplate($tplId);
+
+        $combinedPdfPath = storage_path('app/public/') . $newOrderNumber . '_combined.pdf';
+        $pdf->Output($combinedPdfPath, 'F');
+
+        unlink($customerPdfPath);
+        unlink($kitchenPdfPath);
+
+        return response()->download($combinedPdfPath)->deleteFileAfterSend(true);
+    }
 
     public function saveToCart(Request $request)
     {

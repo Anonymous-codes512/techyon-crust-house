@@ -20,7 +20,6 @@
     margin: 0.41vw 0;
 }
 
-
 #category_bar {
     display: flex;
     flex-direction: row;
@@ -55,7 +54,7 @@
     margin-bottom: 1vw;
 }
 
-#deals_seperate_section_heading{
+#deals_seperate_section_heading {
     margin: 0;
     padding-left: 0.5vw;
     text-align: center;
@@ -88,7 +87,7 @@
 .imgbox img {
     border-radius: 06px;
     aspect-ratio: auto;
-    height: 70px;
+    height: 5vw;
 }
 
 .imgbox p {
@@ -118,8 +117,8 @@
 }
 
 #selectedProducts {
-    border: 1px solid black;
-    min-height: 75%;
+    border: 1px solid #999;
+    min-height: 60%;
     margin: 0 0.3vw;
     padding: 0.5vw;
     border-radius: 7px;
@@ -131,7 +130,7 @@
 
 #productdiv {
     margin-bottom: 5px;
-    border-bottom: 1px solid black;
+    border-bottom: 1px solid #999;
 }
 
 #productdiv p {
@@ -162,14 +161,31 @@
     color: #d40000;
 }
 
-#totalbill {
-    border: none;
-    margin: 0.3vw;
-    padding: 0.5vw;
-    background-color: #efefef;
-    border-radius: 07px;
+.payment-div {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    font-size: 0.81vw;
 }
 
+.paymentfields {
+    display: flex;
+    margin: 0.3vw;
+    width: 45%;
+    flex-direction: column;
+}
+
+.paymentfields input {
+    border: none;
+    border-radius: 10px;
+    padding: 0.5vw;
+    background-color: #e2e2e2;
+}
+
+.paymentfields input:focus {
+    outline: 0.01vw #999 solid;
+}
 #buttons {
     display: flex;
     justify-content: center;
@@ -212,18 +228,10 @@
 #buttons input[type="submit"]:hover {
     background-color: #d4a011;
 }
-#buttons #printRecipt {
-    background-color: #178939;
-    color: #fff;
-}
+
 #buttons #clearCart {
     background-color: #c40e0e;
     color: #fff;
-    width: 75%;
-}
-
-#buttons #printRecipt:hover {
-    background-color: #115325;
 }
 
 #buttons #clearCart:hover {

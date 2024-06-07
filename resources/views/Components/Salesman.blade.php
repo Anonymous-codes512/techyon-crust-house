@@ -40,9 +40,9 @@
                     <a href="{{ route('logout') }}"><i class='bx bx-log-out'></i></a>
                 </div>
 
-                <div class="theme">
+                {{-- <div class="theme">
                     <i class='bx bx-moon' id="theme" onclick="toggleTheme()"></i>
-                </div>
+                </div> --}}
             </div>
         </header>
 

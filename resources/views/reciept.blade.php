@@ -11,7 +11,8 @@
         margin: 0;
         box-sizing: border-box;
         font-family: "VT323", monospace;
-        color: #1f1f1f;
+        color: #111;
+        font-weight: bold;
     }
 
     .container {
@@ -128,6 +129,7 @@
     .survey .surveyID {
         font-size: 15px;
         margin-top: 10px;
+        font-weight: bold;
     }
 
     .paymentDetails {
@@ -244,9 +246,8 @@
         margin: 10px;
     }
 
-    .border-black {
-        border-top: 1px solid black;
-        border-bottom: 1px solid black;
+    table thead {
+        border-bottom: 2px solid black;
     }
 
     .couponContainer .couponBottom {
@@ -257,105 +258,119 @@
 
 <body>
     @php
+        date_default_timezone_set('Asia/Karachi');
+        $orderData = $orderData;
+        $date_time = $orderData->created_at;
+        $date = date('F d, Y', strtotime($date_time));
+        $time = date('g:i A', strtotime($date_time));
+
         $subtotal = 0.0;
-        $ordernumber;
     @endphp
 
     <div id="showScroll" class="container">
         <div class="receipt">
             <h1 class="logo">Crust House</h1>
+
             <div class="address">
                 Minar Road, Wah, Pk
-                <div class="address">
-                    Crust House Bar-Code: 808 STORE: 332
-                </div>
+            </div>
 
-                <div class="details">
-                    <div style="display:inline; text-align:left;" class="cashier">Helped by:{{ $saleman }}</div>
-                    <div style="display:inline; text-align:right;" class="detail">Order # {{ $ordernumber }}</div>
-                </div>
+            <div class="date-time">
+                <div class="detail">Date : {{ $date }}</div>
+                <div class="detail">Time : {{ $time }}</div>
+            </div>
 
-                <div style="border-bottom: 1px solid black;">
-                    <div class="transactionDetails" style="font-weight: bold; border-bottom:1px solid black;">
-                        <table>
-                            <thead class="border-black">
+            <br>
+            <div class="details">
+                <div class="detail">{{ $orderData->ordertype }}</div>
+            </div>
+            <br>
+            <div class="details">
+                <div class="detail cashier">Helped by:{{ $orderData->salesman->name }}</div>
+                <div class="detail ordernumber">Order # {{ $orderData->order_number }}</div>
+            </div>
+
+            <br>
+
+            <div style="border-bottom: 1px solid black;">
+                <div class="transactionDetails" style="font-weight: bold; border-bottom:1px solid black;">
+                    <table>
+                        <thead class="border-black">
+                            <tr>
+                                <th>No.</th>
+                                <th>NAME</th>
+                                <th> QTY</th>
+                                <th> PRICE</th>
+                            </tr>
+                        </thead>
+                        <br>
+                        <tbody>
+                            @foreach ($products as $i => $item)
+                                @php
+                                    preg_match('/\d+(\.\d+)?/', $item->total_price, $matches);
+                                    $numericPart = $matches[0];
+                                    $subtotal += $numericPart;
+
+                                @endphp
                                 <tr>
-                                    <th>No.</th>
-                                    <th>NAME</th>
-                                    <th>QTY</th>
-                                    <th>PRICE</th>
+                                    <td>{{ $i + 1 }}</td>
+                                    <td>{{ $item->product_name }}</td>
+                                    <td style="padding-left: 0.5vw;">{{ $item->product_quantity }}</td>
+                                    <td>{{ $item->total_price }}</td>
                                 </tr>
-                            </thead>
-                            <tbody>
-                                @foreach ($products as $i => $item)
-                                    @php
-                                        preg_match('/\d+(\.\d+)?/', $item->total_price, $matches);
-                                        $numericPart = $matches[0];
-                                        $subtotal += $numericPart;
-                                        $ordernumber = $item->order_number;
-                                    @endphp
-                                    <tr>
-                                        <td>{{ $i + 1 }}</td>
-                                        <td>{{ $item->product_name }}</td>
-                                        <td>{{ $item->product_quantity }}</td>
-                                        <td>{{ $item->total_price }}</td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="survey">
+                    <div class="surveyID">
+                        Recipt # {{ $orderData->order_number }}
                     </div>
 
-                    <div class="survey">
-                        <div class="surveyID">
-                            Recipt # {{ $ordernumber }}
-                        </div>
+                </div>
+                <br>
 
-                    </div>
-                    <br>
-                    <div class="paymentDetails">
-                        <div class="detail">SUBTOTAL: {{ $subtotal }}</div>
-                    </div>
-                    <br>
-                    <div class="paymentDetails">
-                        <div class="detail">HI 4.0% TAX: 3.02</div>
-                    </div>
-                    <br>
-                    <div class="paymentDetails bold">
-                        <div class="detail">TOTAL: 78.64</div>
-                    </div>
-                    <br>
-                    <div class="paymentDetails">
-                        <div class="detail">CASH: 85.00</div>
-                    </div>
-                    <br>
-                    <div class="paymentDetails">
-                        <div class="detail">CHANGE: 6.36</div>
-                    </div>
+                <div class="paymentDetails">
+                    <div class="detail">SUBTOTAL: {{ $subtotal }}</div>
+                </div>
+                {{-- <br> --}}
+                {{-- <div class="paymentDetails">
+                    <div class="detail">HI 4.0% TAX: 3.02</div>
+                </div> --}}
+                <br>
+                <div class="paymentDetails bold">
+                    <div class="detail">TOTAL: {{ $subtotal }}</div>
+                </div>
+                <br>
+                <div class="paymentDetails">
+                    <div class="detail">CASH: {{ $orderData->received_cash }}</div>
+                </div>
+                <br>
+                <div class="paymentDetails">
+                    <div class="detail">CHANGE: {{ $orderData->return_change }}</div>
+                </div>
 
-                    <div class="returnPolicy bold">
+                {{-- <div class="returnPolicy bold">
                         Returns with receipt, subject to CVS Return Policy, thru 08/30/2024
                         Refund amount is based on the price after all coupons and discounts.
+                    </div> --}}
+
+                <div class="feedback">
+                    <div class="break">
+                        *****************************
                     </div>
-                    <div class="returnPolicy">
-                        <div class="detail">MAY 31, 2024</div>
-                        <div class="detail">6:48 PM</div>
-                    </div>
-                    <div class="feedback">
-                        <div class="break">
-                            *****************************
-                        </div>
-                        <p class="center">
-                            We would love to hear your feedback on your recent experience with us. This survey will only
-                            take 1 minute to complete.
-                        </p>
-                        <h3 class="clickBait">Share Your Feedback</h3>
-                        <h4 class="web">www.Crusthouse.com</h4>
-                        <p class="center">
-                            Enjoy your Meal.!
-                        </p>
-                        <div class="break">
-                            *****************************
-                        </div>
+                    <p class="center">
+                        We would love to hear your feedback on your recent experience with us. This survey will only
+                        take 1 minute to complete.
+                    </p>
+                    <h3 class="clickBait">Share Your Feedback</h3>
+                    <h4 class="web">www.Crusthouse.com</h4>
+                    <p class="center">
+                        Enjoy your Meal.!
+                    </p>
+                    <div class="break">
+                        *****************************
                     </div>
                 </div>
             </div>

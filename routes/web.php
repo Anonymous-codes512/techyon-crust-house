@@ -124,6 +124,8 @@ Route::get('/viewStaffPage', [AdminController::class,'viewStaffPage'])->name('vi
 Route::get('/updateStaff', [AdminController::class,'updateStaff'])->name('updateStaff');
 Route::get('/deleteStaff/{id}', [AdminController::class,'deleteStaff'])->name('deleteStaff');
 
+Route::get('/download-pdf/{filename}', [SalesmanController::class, 'downloadPdf'])->name('downloadPdf');
+
 /*
 |---------------------------------------------------------------|
 |==================== Sales Man Routes =========================|
@@ -133,7 +135,7 @@ Route::get('/deleteStaff/{id}', [AdminController::class,'deleteStaff'])->name('d
 Route::get('salesman/dashboard/{id}', [SalesmanController::class,'viewSalesmanDashboard'])->name('salesman_dashboard');
 Route::get('salesman/dashboard/{categoryName}/{id}', [SalesmanController::class,'salesmanCategoryDashboard'])->name('salesman_dash');
 Route::get('salesman/deals/', [SalesmanController::class,'deals'])->name('deals');
-Route::get('salesman/placeOrder/{salesman_id}', [SalesmanController::class,'placeOrder'])->name('placeOrder');
+Route::post('salesman/placeOrder/{salesman_id}', [SalesmanController::class,'placeOrder'])->name('placeOrder');
 Route::post('salesman/saveToCart', [SalesmanController::class,'saveToCart'])->name('saveToCart');
 Route::get('salesman/clearCart/{salesman_id}', [SalesmanController::class,'clearCart'])->name('clearCart');
 Route::get('salesman/removeOneProduct/{id}/{salesman_id}', [SalesmanController::class,'removeOneProduct'])->name('removeOneProduct');

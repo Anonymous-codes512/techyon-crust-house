@@ -54,9 +54,9 @@
 
             </div>
 
-            <div class="fgtpswd">
+            {{-- <div class="fgtpswd">
                 <a href="{{ route('viewLoginPage') }}">Already have an account</a>
-            </div>
+            </div> --}}
 
             <div class="btn">
                 <input type="submit" value="Register">

@@ -34,10 +34,10 @@
                 @enderror
             </div>
         
-            <div class="fgtpswd">
+            {{-- <div class="fgtpswd">
                 <a href="">I forgot my Password</a>
                 <a href="{{ route('viewRegisterPage') }}">Don't have an account</a>
-            </div>
+            </div> --}}
             
             <div class="btn">
                 <input type="submit" value="Login">

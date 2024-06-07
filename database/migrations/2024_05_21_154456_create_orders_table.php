@@ -16,8 +16,11 @@ return new class extends Migration
             $table->string('order_number')->unique();
             $table->unsignedBigInteger('salesman_id');
             $table->foreign('salesman_id')->references('id')->on('users')->onDelete('cascade');
-            $table->integer('status')->default('2');
             $table->string('total_bill');
+            $table->decimal('received_cash', 8, 2);
+            $table->decimal('return_change', 8, 2);
+            $table->string('ordertype')->after('return_change')->nullable();
+            $table->integer('status')->default('2');
             $table->timestamps();
         });        
     }

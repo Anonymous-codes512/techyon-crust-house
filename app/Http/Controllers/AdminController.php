@@ -761,7 +761,7 @@ class AdminController extends Controller
     public function printRecipt($order_id){
         $order = Order::with('salesman')->where('id', $order_id)->first();
         $products = OrderItem::where('order_id', $order_id)->get();
-        $html = view('reciept', ['products' => $products, 'saleman' => $order->salesman->name, 'ordernumber'=> $order->order_number])->render();
+        $html = view('reciept', ['products' => $products, 'orderData'=>$order])->render();
         $dompdf = new Dompdf();
         $dompdf->loadHtml($html);
         $height = $dompdf->getCanvas()->get_height();

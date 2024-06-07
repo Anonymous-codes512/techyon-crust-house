@@ -80,7 +80,7 @@
                                     <img src="{{ asset('Images/DealImages/' . $deal->deal->dealImage) }}" alt="Product">
                                     <p class="product_name">{{ $deal->deal->dealTitle }}</p>
                                 </div>
-                           @endif
+                            @endif
                         @endforeach
                     @else
                         <p class="product_name">No Deal Found</p>
@@ -135,13 +135,50 @@
                     @endforeach
                 </div>
 
-                <input type="text" name="totalbill" id="totalbill" value="Total bill : Rs {{ $totalbill }}" readonly>
-                <div id="buttons">
-                    <a href="{{ route('placeOrder', $id) }}"><input type="button" id="proceed" value="Proceed"></a>
-                    <button type="button" id="printRecipt" onclick="printReceipt()">Print Receipt</button>
-                    <button onclick="window.location='{{ route('clearCart', $id) }}'" type="button" id="clearCart">Clear
-                        Cart</button>
-                </div>
+                <form action="{{ route('placeOrder', $id) }}" method="post" enctype="multipart/form-data">
+                    @csrf
+                    <div class="payment-div">
+                        <div class="paymentfields">
+                            <label for="totalbill">Total Bill</label>
+                            <input type="text" name="totalbill" id="totalbill" value="Rs {{ $totalbill }}" readonly>
+                        </div>
+
+                        <div class="paymentfields">
+                            <label for="recievecash">Recieve Bill</label>
+                            <input type="number" name="recievecash" id="recievecash" placeholder="Recieved"
+                                oninput="calculateChange()" required>
+                        </div>
+
+                        <div class="paymentfields">
+                            <label for="change">Change</label>
+                            <input type="number" name="change" id="change" placeholder="Change" readonly>
+                        </div>
+
+                        <div class="paymentfields">
+                            <div>
+                                <label for="dinein">Order type</label>
+                            </div>
+                            <div
+                                style=" display:flex; flex-direction:row; background-color:#e2e2e2;border-radius: 10px; padding:0.5vw 2px;">
+                                <div>
+                                    <label for="dinein">Dine-In</label>
+                                    <input type="radio" name="orderType" id="dinein" value="dine-in" checked>
+                                </div>
+                                <div>
+                                    <label for="takeaway">Takeaway</label>
+                                    <input type="radio" name="orderType" id="takeaway" value="takeaway">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="buttons">
+                        <input type="submit" id="proceed" value="Proceed">
+                        <button onclick="window.location='{{ route('clearCart', $id) }}'" type="button"
+                            id="clearCart">Clear
+                            Cart</button>
+                    </div>
+                </form>
             </div>
         </div>
 
@@ -180,6 +217,27 @@
                 <input id="addbtn" type="submit" value="Add">
             </div>
         </form>
+        <script>
+            function calculateChange() {
+                let totalBillStr = document.getElementById('totalbill').value;
+                let totalBill = parseFloat(totalBillStr.replace('Rs', '').trim());
+                let receivedBill = parseFloat(document.getElementById('recievecash').value);
+
+                if (isNaN(totalBill) || isNaN(receivedBill)) {
+                    return;
+                }
+
+                let change = receivedBill - totalBill;
+
+                if (change < 0) {
+                    document.getElementById('proceed').disabled = true;
+                } else {
+                    document.getElementById('proceed').disabled = false;
+                }
+
+                document.getElementById('change').value = change.toFixed(2);
+            }
+        </script>
 
     </main>
 @endsection

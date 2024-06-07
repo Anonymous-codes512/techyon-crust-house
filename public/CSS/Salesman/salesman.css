@@ -10,6 +10,11 @@ body {
     font-family: "Poppins", sans-serif;
 }
 
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
 .container {
     display: flex;
     flex-direction: column;
