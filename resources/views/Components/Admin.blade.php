@@ -120,8 +120,14 @@
                 <div class="profilepanel">
                     <div class="profile">
                         <div class="profilepic">
-                            <img src="{{ asset('Images/Rectangle 3463281.png') }}" alt="Profile Picture">
+                            @if (session('profile_pic'))
+                                <img src="{{ asset('Images/UsersImages/' . session('profile_pic')) }}"
+                                    alt="Profile Picture">
+                            @else
+                                <img src="{{ asset('Images/Rectangle 3463281.png') }}" alt="Profile Picture">
+                            @endif
                         </div>
+
 
                         @if (session('username'))
                             <p class="profilename">{{ session('username') }}</p>
@@ -172,9 +178,6 @@
                         <i class='bx bx-log-out-circle' title="logout"></i>
                     </a>
 
-                    <div class="theme">
-                        <i class='bx bx-moon' id="theme" title="theme change" onclick="toggleTheme()"></i>
-                    </div>
                 </div>
             </header>
 

@@ -17,6 +17,7 @@
         <table id="EmpTable">
             <thead>
                 <tr>
+                    <th>Profile Picture</th>
                     <th>Member Name</th>
                     <th>Email Address</th>
                     <th>Role</th>
@@ -25,15 +26,18 @@
             </thead>
             <tbody>
                 @foreach ($Staff as $staff)
-                    <tr>
-                        <td>{{ $staff->name }}</td>
-                        <td>{{ $staff->email }}</td>
-                        <td>{{ $staff->role }}</td>
-                        <td>
-                            <a onclick="editStaff({{ json_encode($staff) }})"><i class='bx bxs-edit-alt'></i></a>
-                            <a href="{{ route('deleteStaff', $staff->id) }}"><i class='bx bxs-trash-alt'></i></a>
-                        </td>
-                    </tr>
+                    @if ($staff->role !== 'admin')
+                        <tr>
+                            <td><img src={{ asset('Images/UsersImages/' . $staff->profile_picture) }} alt="Image"></td>
+                            <td>{{ $staff->name }}</td>
+                            <td>{{ $staff->email }}</td>
+                            <td>{{ $staff->role }}</td>
+                            <td>
+                                <a onclick="editStaff({{ json_encode($staff) }})"><i class='bx bxs-edit-alt'></i></a>
+                                <a href="{{ route('deleteStaff', $staff->id) }}"><i class='bx bxs-trash-alt'></i></a>
+                            </td>
+                        </tr>
+                    @endif
                 @endforeach
             </tbody>
         </table>
@@ -43,6 +47,14 @@
             enctype="multipart/form-data">
             @csrf
             <h3>Add New Staff Member</h3>
+
+            <div class="inputdivs">
+                <label for="upload-file" class="choose-file-btn">
+                    <span>Choose File</span>
+                    <input type="file" id="upload-file" name="profile_picture" accept=".jpg,.jpeg,.png" required>
+                    <p id="filename"></p>
+                </label>
+            </div>
 
             <div class="inputdivs">
                 <label for="name">Enter Name</label>
@@ -60,6 +72,17 @@
             @error('email')
                 <div class="error-message">{{ $message }}</div>
             @enderror
+
+            <div class="inputdivs">
+                <label for="branch">Select Branch</label>
+                <select name="branch" id="branch">
+                    <option value="none" selected disabled>Select Branch</option>
+                    @foreach ($branches as $branch)
+                        <option value="{{ $branch->id }}">{{ $branch->branchName }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
 
             <div class="inputdivs">
                 <label for="role">Select Status</label>
@@ -100,11 +123,20 @@
 
 
         <div id="editOverlay"></div>
-        <form class="editstaff" id="editStaff" action="{{ route('updateStaff') }}" method="POST" enctype="multipart/form-data">
+        <form class="editstaff" id="editStaff" action="{{ route('updateStaff') }}" method="POST"
+            enctype="multipart/form-data">
             @csrf
 
             <h3>Edit Staff Member</h3>
             <input type="hidden" id="staffId" name="staffId">
+
+            <div class="inputdivs">
+                <label for="upload-update-file" class="choose-file-btn">
+                    <span>Choose File</span>
+                    <input type="file" id="upload-update-file" name="updated_profile_picture" accept=".jpg,.jpeg,.png">
+                    <p id="namefile"></p>
+                </label>
+            </div>
 
             <div class="inputdivs">
                 <label for="editname">Member Name</label>
@@ -120,6 +152,17 @@
             @enderror
 
             <div class="inputdivs">
+                <label for="editbranch">Select Branch</label>
+                <select name="branch" id="editbranch">
+                    <option value="none" selected disabled>Select Branch</option>
+                    @foreach ($branches as $branch)
+                        <option value="{{ $branch->id }}">{{ $branch->branchName }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div class="inputdivs">
                 <label for="editrole">Member Role</label>
                 <select name="role" id="editrole">
                     <option value="" selected disabled>Select the Role</option>
@@ -131,7 +174,7 @@
             <div class="inputdivs">
                 <label for="password">Password</label>
                 <div class="passwordfield">
-                    <input type="password" id="editpassword" name="password" required>
+                    <input type="password" id="editpassword" name="password">
                     <i class='bx bxs-lock-alt' onclick="showAndHideEditPswd()"></i>
                 </div>
             </div>
@@ -139,7 +182,7 @@
             <div class="inputdivs">
                 <label for="cnfrmPswd">Confirm Password</label>
                 <div class="passwordfield">
-                    <input type="password" id="editcnfrmPswd" name="password_confirmation" required>
+                    <input type="password" id="editcnfrmPswd" name="password_confirmation">
                     <i class='bx bxs-lock-alt' onclick="showAndHideEditCnfrmPswd()"></i>
                 </div>
             </div>
@@ -165,7 +208,6 @@
         }
 
         function editStaff(staff) {
-
             let overlay = document.getElementById('editOverlay');
             let popup = document.getElementById('editStaff');
 
@@ -173,12 +215,22 @@
             document.getElementById('editname').value = staff.name;
             document.getElementById('editemail').value = staff.email;
 
+            let branchDropdown = document.getElementById('editbranch');
+            for (let option of branchDropdown.options) {
+                if (option.value === staff.branch_id) {
+                    option.selected = true;
+                    break; 
+                }
+            }
+
             let roleDropdown = document.getElementById('editrole');
             for (let option of roleDropdown.options) {
                 if (option.value === staff.role) {
                     option.selected = true;
+                    break; 
                 }
             }
+
             overlay.style.display = 'block';
             popup.style.display = 'flex';
         }
@@ -225,7 +277,7 @@
                 cnfrmPswd.type = 'password';
             }
         }
-        
+
         function showAndHideCnfrmPswd() {
             let cnfrmPswd = document.getElementById('cnfrmPswd');
             if (cnfrmPswd.type === 'password') {
@@ -234,5 +286,19 @@
                 cnfrmPswd.type = 'password';
             }
         }
+
+        const uploadUpdatedFile = document.getElementById('upload-update-file');
+        const filenamSpan = document.getElementById('namefile');
+        uploadUpdatedFile.addEventListener('change', function(e) {
+            const fileNam = this.value.split('\\').pop();
+            filenamSpan.textContent = fileNam ? fileNam : 'No file chosen';
+        });
+
+        const uploadFile = document.getElementById('upload-file');
+        const filenameSpan = document.getElementById('filename');
+        uploadFile.addEventListener('change', function(e) {
+            const fileName = this.value.split('\\').pop();
+            filenameSpan.textContent = fileName ? fileName : 'No file chosen';
+        });
     </script>
 @endsection

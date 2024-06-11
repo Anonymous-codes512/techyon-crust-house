@@ -16,7 +16,6 @@
             $id = $id;
             $cartProducts = $cartProducts;
             $totalbill = 0;
-            // dd($Deals);
         @endphp
 
         <div id="productsSide">
@@ -142,7 +141,7 @@
                             <label for="totalbill">Total Bill</label>
                             <input type="text" name="totalbill" id="totalbill" value="Rs {{ $totalbill }}" readonly>
                         </div>
-
+ 
                         <div class="paymentfields">
                             <label for="recievecash">Recieve Bill</label>
                             <input type="number" name="recievecash" id="recievecash" placeholder="Recieved"

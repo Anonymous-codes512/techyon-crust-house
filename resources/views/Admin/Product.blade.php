@@ -118,17 +118,6 @@
             <h3>Edit Product</h3>
             <hr>
 
-            <div class="inputdivs">
-                <label for="editcategory">Select Category</label>
-                <select name="editcategoryId" id="editcategory">
-                    <option value="none" selected disabled>Select Product Category</option>
-                    @foreach ($categoryData as $category)
-                        <option value="{{ $category->id }},{{ $category->categoryName }}">{{ $category->categoryName }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
-
             <input type="hidden" id="pId" name="pId">
 
             <div class="inputdivs">

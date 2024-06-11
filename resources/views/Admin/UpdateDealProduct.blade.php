@@ -11,11 +11,17 @@
         @php
             $dealId = $dealId;
             $dealProducts = $dealproducts;
+            $dealProductsIds = [];
+            foreach ($dealProducts->handlers as $product) {
+                $dealProductsIds[] = $product->product_id;
+            }
         @endphp
-
         <section class="products">
             @foreach ($Products as $product)
-                <div class="imgbox" onclick="toggleProductSelection(this)">
+                @php
+                    $isSelected = in_array($product->id, $dealProductsIds);
+                @endphp
+                 <div class="imgbox {{ $isSelected ? 'selected' : '' }}" onclick="toggleProductSelection(this)">
                     <img src="{{ asset('Images/ProductImages/' . $product->productImage) }}" alt="Product">
                     <p class="category_name">{{ $product->category_name }}</p>
                     <p class="product_id">{{ $product->id }}</p>

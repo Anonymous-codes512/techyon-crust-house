@@ -100,9 +100,25 @@
     flex-direction: column;
     justify-content: flex-start;
     width: 30vw;
-    height: 18vw;
+    height: 20vw;
 }
-
+.inputdivs{
+    display: flex;
+    justify-content: space-between;
+    width: 90%;
+}
+.stockquantity{
+    display: flex;
+    width: 45%;
+} 
+.unitselection{
+    display: flex;
+    width: 45%;
+}
+.recipeContainer {
+    max-height: 200px; 
+    overflow-y: auto;
+}
 #addProductRecipe h3 {
     margin: 0;
     padding: 1vw 2vw;
@@ -132,6 +148,12 @@
     padding: 0.71vw 0.5vw;
     background-color: #e2e2e2;
 }
+
+.remove-item:hover {
+    background-color:#F45B69;
+    color: #fff;
+}
+
 
 .btns {
     display: flex;

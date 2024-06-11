@@ -38,21 +38,11 @@
             <span class="error-message">{{ $message }}</span>
         @enderror
     
-        <input type="number" name="streatnumber" id="streatnumber" placeholder="Streat Number" required>
-        @error('streatnumber')
+        <input type="text" name="address" id="address" placeholder="Address" required>
+        @error('address')
             <span class="error-message">{{ $message }}</span>
         @enderror
     
-        <input type="number" name="numberofitems" id="numberofitems" placeholder="Number of Items" required>
-        @error('numberofitems')
-            <span class="error-message">{{ $message }}</span>
-        @enderror
-    
-        <input type="number" name="numberofstaff" id="numberofstaff" placeholder="Number of Staff" required>
-        @error('numberofstaff')
-            <span class="error-message">{{ $message }}</span>
-        @enderror
-        
         <div class="options">
             <div class="opt"><p class="opt-txt"> You want Rider </p><label class="switch"> <input type="checkbox" name="riderOption"><span class="slider round"></span></label></div>
             <div class="opt"><p class="opt-txt"> You want Online Delivery </p> <label class="switch"> <input type="checkbox" name="onlineDeliveryOption"><span class="slider round"></span></label></div>

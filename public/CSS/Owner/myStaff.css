@@ -14,29 +14,54 @@ main {
     height: 100%;
     background: rgba(0, 0, 0, 0.5);
     display: none;
-    z-index: 999; 
+    z-index: 999;
 }
-.newrider {
+.addNewUser {
     display: none;
     flex-direction: column;
-    background-color: #ffffff; 
+    background-color: #ffffff;
     position: absolute;
     border-radius: 10px;
     width: 30vw;
-    height: 32vw;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     z-index: 1000;
 }
 
-.newrider h3{
+.addNewUser h3 {
     margin: 0;
     padding: 1vw 2vw;
     font-family: "Poppins", sans-serif;
-    
 }
-.inputdivs{
+
+.choose-file-btn {
+    display: flex;
+    background-color: #e2e2e2;
+    color: #333;
+    text-align: center;
+    border-radius: 10px;
+}
+
+.choose-file-btn input[type="file"] {
+    display: none;
+}
+
+.choose-file-btn span {
+    padding: 0.5vw;
+    border: 1px solid #bbbbbb;
+    background-color: #bbbbbb;
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+    cursor: pointer;
+}
+
+.choose-file-btn p {
+    margin: 0;
+    padding: 0.5vw;
+}
+
+.inputdivs {
     margin: 0.4vw auto;
     width: 85%;
     display: flex;
@@ -45,21 +70,54 @@ main {
     font-size: 1vw;
 }
 
-.inputdivs input, .inputdivs select{
+.inputdivs input,
+.inputdivs select {
     border: none;
-    border-radius: 6px; 
+    border-radius: 6px;
     padding: 0.5vw 0.2vw;
     background-color: #e2e2e2;
+    font-size: 1vw;
+}
+.inputdivs label {
+    font-size: 1vw;
+}
+.passwordfield {
+    display: flex;
+    width: 100%;
+    font-family: "Poppins", sans-serif;
+    border: 1px solid #8d8d8d;
+    border-radius: 5px;
 }
 
-.btns{
+.passwordfield input {
+    border: none;
+    padding: 0.5vw 0.2vw;
+    border-radius: 6px;
+    width: 90%;
+}
+
+.passwordfield i {
+    border-left: 1px solid #8d8d8d;
+    padding: 5px 10px;
+    background-color: #cdcdcd;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
+.error-message {
+    color: #f45b69;
+    font-size: 0.7rem;
+    margin: 0px 20px;
+}
+
+.btns {
     display: flex;
     justify-content: space-around;
     margin: 01vw auto;
     width: 85%;
 }
 
-.btns button , .btns input{
+.btns button,
+.btns input {
     display: flex;
     font-family: "Poppins", sans-serif;
     font-size: 1.2vw;
@@ -68,20 +126,20 @@ main {
     border: none;
 }
 
-#cancel{
+#cancel {
     background-color: #e2e2e2;
 }
 
-.btns input{
+.btns input {
     background-color: #ffbb00;
     color: #fff;
 }
 
-#cancel:hover{
+#cancel:hover {
     background-color: #d3d3d3;
 }
 
-.btns input:hover{
+.btns input:hover {
     background-color: #d4a011;
     color: #fff;
 }
@@ -180,36 +238,37 @@ table tbody tr td:nth-child(5) {
 
 /* Online Ordres */
 
-.processbtns{
+.processbtns {
     display: flex;
     width: 80%;
     margin: 0.1vw auto;
 }
 
-.inactivebtn, .activebtn{
+.inactivebtn,
+.activebtn {
     border: none;
     margin-right: 0.5vw;
     padding: 0.5vw 1vw;
     border-radius: 7px;
     font-family: "Poppins", sans-serif;
 }
- 
-.inactivebtn{
+
+.inactivebtn {
     background-color: #f2f2f2;
 }
-.activebtn{
+.activebtn {
     background-color: #ffbb00;
     color: #fff;
 }
 
-.activebtn:hover{
-    background-color:#a97e05 ;
+.activebtn:hover {
+    background-color: #a97e05;
 }
-.inactivebtn:hover{
+.inactivebtn:hover {
     background-color: #d3d3d3;
 }
 
-.order-status{
+.order-status {
     border: 1px solid #000;
 }
 
@@ -232,7 +291,7 @@ table tbody tr td:nth-child(5) {
 }
 
 @media (max-width: 850px) and (min-width: 600px) {
-    table{
+    table {
         width: 95%;
     }
     table tbody tr,
@@ -248,23 +307,22 @@ table tbody tr td:nth-child(5) {
     }
 }
 @media (max-width: 600px) {
-
-    .rgtpnl{
+    .rgtpnl {
         height: auto;
     }
-    
+
     .path {
         font-size: 1vh;
     }
 
-    table{
+    table {
         width: 95%;
     }
     table tbody tr td:last-child {
         display: flex;
         flex-direction: column;
     }
-    .status{
+    .status {
         background-color: transparent !important;
     }
     table tbody tr,

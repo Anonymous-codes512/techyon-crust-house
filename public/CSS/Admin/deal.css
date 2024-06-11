@@ -374,7 +374,7 @@ table tbody tr td:last-child a:last-child:hover {
 .imgbox img {
     border-radius: 06px;
     width: 100%;
-    height: 150px;
+    height: 15vw;
 }
 
 .imgbox p {

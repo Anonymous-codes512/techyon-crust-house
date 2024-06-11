@@ -29,6 +29,7 @@ main {
 .newCategory button {
     background-color: #ffbb00;
     border: none;
+    margin-right: 1vw;
     padding: 0.81vw 1.2vw;
     color: #fff;
     font-size: 1rem;

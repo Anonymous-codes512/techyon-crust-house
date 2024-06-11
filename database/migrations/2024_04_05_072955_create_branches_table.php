@@ -16,9 +16,7 @@ return new class extends Migration
             $table->string('branchLocation');
             $table->string('branchName');
             $table->string('branchCode')->unique();
-            $table->integer('branchStreatNumber');
-            $table->integer('numberOfItems');
-            $table->integer('numberOfStaff');
+            $table->string('address');
             $table->boolean('riderOption')->nullable();
             $table->boolean('onlineDeliveryOption')->nullable();
             $table->boolean('DiningTableOption')->nullable();

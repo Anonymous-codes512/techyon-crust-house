@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Branch;
 use App\Models\BranchRevenue;
 use App\Models\Category;
 use App\Models\Deal;
@@ -12,6 +13,7 @@ use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\Recipe;
 use App\Models\Stock;
+use App\Models\StockHistory;
 use Dompdf\Dompdf;
 use App\Models\User;
 use Illuminate\Support\Facades\Session;
@@ -19,6 +21,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class AdminController extends Controller
 {
@@ -306,15 +309,16 @@ class AdminController extends Controller
         return view('Admin.DealProducts')->with(['Products' => $products]);
     }
 
-    public function viewUpdateDealProductsPage($id)
+    public function viewUpdateDealProductsPage($deal_id)
     {
         if (!session()->has('admin')) {
             return redirect()->route('viewLoginPage');
         }
 
         $products = Product::orderBy('category_id')->get();
-        $handler = Handler::find($id);
-        return view('Admin.UpdateDealProduct')->with(['Products' => $products, 'dealId' => $id, 'dealproducts' => $handler]);
+        $handler = Deal::with('handlers')->find($deal_id);
+        // dd($products, $handler);
+        return view('Admin.UpdateDealProduct')->with(['Products' => $products, 'dealId' => $deal_id, 'dealproducts' => $handler]);
     }
 
     public function createDeal(Request $request)
@@ -566,6 +570,14 @@ class AdminController extends Controller
             return redirect()->route('viewLoginPage');
         }
 
+        $stock_history = new StockHistory();
+
+        $stock_history->itemName = $request->itemName;
+        $stock_history->itemQuantity = number_format($request->stockQuantity, 2) . $request->unit1;
+        $stock_history->mimimumItemQuantity = number_format($request->minStockQuantity, 2) . $request->unit2;
+        $stock_history->unitPrice = number_format($request->unitPrice, 2) . ' Pkr';
+        $stock_history->save();
+
         $existingStock = Stock::where('itemName', $request->itemName)->first();
 
         if ($existingStock) {
@@ -590,18 +602,19 @@ class AdminController extends Controller
 
             $updatedQuantity = $totalQuantityInBaseUnit / $conversionMap[$unit];
 
-            $existingStock->itemQuantity = $updatedQuantity . $unit;
-            $existingStock->mimimumItemQuantity = $request->minStockQuantity . $request->unit2;
-            $existingStock->unitPrice = $request->unitPrice . ' Pkr';
+            $existingStock->itemQuantity = number_format($updatedQuantity, 2) . $unit;
+            $existingStock->mimimumItemQuantity = number_format($request->minStockQuantity, 2) . $request->unit2;
+            $existingStock->unitPrice = number_format($request->unitPrice, 2) . ' Pkr';
 
             $existingStock->save();
             return redirect()->route('viewStockPage');
         } else {
             $newStock = new Stock();
             $newStock->itemName = $request->itemName;
-            $newStock->itemQuantity = $request->stockQuantity . $request->unit1;
-            $newStock->mimimumItemQuantity = $request->minStockQuantity . $request->unit2;
-            $newStock->unitPrice = $request->unitPrice . ' Pkr';
+
+            $newStock->itemQuantity = number_format($request->stockQuantity, 2) . $request->unit1;
+            $newStock->mimimumItemQuantity = number_format($request->minStockQuantity, 2) . $request->unit2;
+            $newStock->unitPrice = number_format($request->unitPrice, 2) . ' Pkr';
 
             $newStock->save();
             return redirect()->route('viewStockPage');
@@ -636,6 +649,12 @@ class AdminController extends Controller
         return redirect()->route('viewStockPage');
     }
 
+    public function stockHistory()
+    {
+        $stock_history = StockHistory::all();
+        return view('Admin.StockHistory')->with(['stockHistory' => $stock_history]);
+    }
+
     /*
         |---------------------------------------------------------------|
         |======================= Recipe Functions ======================|
@@ -668,6 +687,7 @@ class AdminController extends Controller
             return trim($item) !== '';
         });
         foreach ($recipeItems as $item) {
+
             $itemParts = explode('~', trim($item));
             if (count($itemParts) == 2) {
                 $quantity = trim($itemParts[0]);
@@ -679,7 +699,6 @@ class AdminController extends Controller
                 $newRecipe->product_id = $product_id;
                 $newRecipe->stock_id = $stockId;
                 $newRecipe->quantity = $quantity;
-
                 $newRecipe->save();
             }
         }
@@ -757,23 +776,28 @@ class AdminController extends Controller
         $orderItems = OrderItem::where('order_id', $order_id)->get();
         return view('Admin.Order')->with(['orders' => $orders, 'orderItems' => $orderItems]);
     }
-    
-    public function printRecipt($order_id){
+
+    public function printRecipt($order_id)
+    {
         $order = Order::with('salesman')->where('id', $order_id)->first();
         $products = OrderItem::where('order_id', $order_id)->get();
-        $html = view('reciept', ['products' => $products, 'orderData'=>$order])->render();
+        $html = view('reciept', ['products' => $products, 'orderData' => $order])->render();
         $dompdf = new Dompdf();
         $dompdf->loadHtml($html);
         $height = $dompdf->getCanvas()->get_height();
         $dompdf->setPaper([0, 0, 300, $height], 'portrait');
         $dompdf->render();
-        $dompdf->stream($order->order_number.'.pdf');
+        $dompdf->stream($order->order_number . '.pdf');
     }
 
-    public function cancelOrder($order_id){
+    public function cancelOrder($order_id)
+    {
         $order = Order::with('salesman')->where('id', $order_id)->first();
         $order->status = 3;
         $order->save();
+
+        $this->deductStock($order_id);
+
         return redirect()->back();
     }
 
@@ -782,9 +806,11 @@ class AdminController extends Controller
         if (!session()->has('admin')) {
             return redirect()->route('viewLoginPage');
         }
-
-        $staff = User::whereIn('role', ['salesman', 'chef'])->get();
-        return view('Admin.Staff')->with(['Staff' => $staff]);
+        $branches = Branch::all();
+        $staff = User::with('branch')
+            ->whereIn('role', ['salesman', 'chef', 'admin'])
+            ->get();
+        return view('Admin.Staff')->with(['Staff' => $staff, 'branches'=>$branches]);
     }
 
     public function updateStaff(Request $req)
@@ -793,18 +819,34 @@ class AdminController extends Controller
             return redirect()->route('viewLoginPage');
         }
 
-        dd($req->all());
         $validateData = $req->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'string|min:8|confirmed',
+            'email' => 'required|string|email|max:255|unique:users,email,' . $req->input('staffId'),
+            'password' => 'nullable|string|min:8|confirmed',
+            'updated_profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif', // Check for image file
         ]);
 
-        $auth = new User();
-        $auth->name = $req->name;
-        $auth->email = $req->email;
-        $auth->role = $req->role;
-        $auth->password = Hash::make($req->password);
+        $auth = User::find($req->input('staffId'));
+        if ($req->hasFile('updated_profile_picture')) {
+            $imageName = null;
+            $existingImagePath = public_path('Images/UsersImages') . '/' . $auth->profile_picture;
+            File::delete($existingImagePath);
+
+            $image = $req->file('updated_profile_picture');
+            $imageName = time() . '.' . $image->getClientOriginalExtension();
+            $image->move(public_path('Images/UsersImages'), $imageName);
+            $auth->profile_picture = $imageName;
+        }
+
+        $auth->name = $req->input('name');
+        $auth->email = $req->input('email');
+        $auth->role = $req->input('role');
+        $auth->branch_id = $req->input('branch');
+
+        if ($req->filled('password')) {
+            $auth->password = Hash::make($req->input('password'));
+        }
+
         $auth->save();
 
         return redirect()->route('viewStaffPage');
@@ -818,6 +860,91 @@ class AdminController extends Controller
         $staff = User::find($id);
         $staff->delete();
         return redirect()->route('viewStaffPage');
+    }
+
+    public function deductStock($order_id)
+    {
+        $order = Order::with('items')->find($order_id);
+        $productQuantities = [];
+
+        foreach ($order->items as $item) {
+            if (!isset($productQuantities[$item->product_id])) {
+                $productQuantities[$item->product_id] = 0;
+            }
+            $productQuantities[$item->product_id] += $item->product_quantity;
+        }
+
+        foreach ($productQuantities as $product_id => $totalQuantity) {
+            $product = Product::find($product_id);
+            $recipes = Recipe::where('product_id', $product->id)->get();
+
+            foreach ($recipes as $recipeItem) {
+                $quantityToDeduct = floatval($recipeItem->quantity);
+                $stockItem = Stock::find($recipeItem->stock_id);
+
+                if ($stockItem) {
+                    $currentQuantityInBaseUnit = $this->convertToBaseUnit($stockItem->itemQuantity);
+                    $deductedQuantityInBaseUnit = $quantityToDeduct * $totalQuantity;
+                    $newQuantityInBaseUnit = $currentQuantityInBaseUnit + $deductedQuantityInBaseUnit;
+                    $newQuantity = $this->convertFromBaseUnit($newQuantityInBaseUnit, $stockItem->itemQuantity);
+
+                    echo "Current Quantity in Base Unit: " . $currentQuantityInBaseUnit . '<br>';
+                    echo "Deducted Quantity in Base Unit: " . $deductedQuantityInBaseUnit . '<br>';
+                    echo "New Quantity in Base Unit: " . $newQuantityInBaseUnit . '<br>';
+                    echo "New Quantity: " . $newQuantity . '<br><br>';
+
+                    $stockItem->itemQuantity = $newQuantity;
+                    $stockItem->save();
+                }
+            }
+        }
+    }
+
+    private function convertToBaseUnit($quantity)
+    {
+        // Assuming quantity is in the format "10 kg", "5 liter", etc.
+        preg_match('/(\d+(\.\d+)?)\s*(\w+)/', $quantity, $matches);
+        $quantityValue = floatval($matches[1]);
+        $unit = strtolower($matches[3]);
+
+        switch ($unit) {
+            case 'g':
+            case 'ml':
+                return $quantityValue;
+            case 'kg':
+                return $quantityValue * 1000;
+            case 'liter':
+                return $quantityValue * 1000;
+            case 'lbs':
+                return $quantityValue * 453.592; // 1 lb = 453.592 g
+            case 'oz':
+                return $quantityValue * 28.3495; // 1 oz = 28.3495 g
+            default:
+                return $quantityValue;
+        }
+    }
+
+    private function convertFromBaseUnit($quantity, $originalUnit)
+    {
+        preg_match('/(\d+(\.\d+)?)\s*(\w+)/', $originalUnit, $matches);
+        $unit = strtolower($matches[3]);
+
+        switch ($unit) {
+            case 'kg':
+                return ($quantity / 1000) . ' kg';
+            case 'g':
+                return $quantity . ' g';
+            case 'liter':
+                return ($quantity / 1000) . ' liter';
+            case 'ml':
+                return $quantity . ' ml';
+            case 'lbs':
+                return ($quantity / 453.592) . ' lbs';
+            case 'oz':
+                return ($quantity / 28.3495) . ' oz';
+            default:
+                return $quantity . ' ' . $unit;
+        }
     }
 
     /*

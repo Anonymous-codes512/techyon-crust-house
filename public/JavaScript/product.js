@@ -24,14 +24,6 @@ function editProduct(product) {
     document.getElementById('editProductVariation').value = product.productVariation;
     document.getElementById('editVariationPrice').value = product.productPrice;
 
-    const categorySelect = document.getElementById('editcategory');
-    const categoryValue = `${product.category_id},${product.category_name}`;
-    for (let option of categorySelect.options) {
-        if (option.value === categoryValue) {
-            option.selected = true;
-            break;
-        }
-    }
 
     overlay.style.display = 'block';
     popup.style.display = 'flex';

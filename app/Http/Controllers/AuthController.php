@@ -18,20 +18,54 @@ class AuthController extends Controller
         return view('Auth.Registration');
     }
 
+    // public function register(Request $req)
+    // {
+    //     $validateData = $req->validate([
+    //         'name' => 'required|string|max:255',
+    //         'email' => 'required|string|email|max:255|unique:users',
+    //         'password' => 'required|string|min:8|confirmed',
+    //     ]);
+
+    //     $auth = new User();
+    //     $auth->name = $req->name;
+    //     $auth->email = $req->email;
+    //     $auth->role = $req->role;
+    //     $auth->password = Hash::make($req->password);
+    //     $auth->save();
+
+    //     if ($req->has('role')) {
+    //         return redirect()->route('viewStaffPage');
+    //     } else {
+    //         return redirect()->route('viewLoginPage');
+    //     }
+    // }
+
     public function register(Request $req)
     {
         $validateData = $req->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
+            'profile_picture' => 'image|mimes:jpeg,png,jpg,gif',
         ]);
 
-        $auth = new User();
-        $auth->name = $req->name;
-        $auth->email = $req->email;
-        $auth->role = $req->role;
-        $auth->password = Hash::make($req->password);
-        $auth->save();
+        $user = new User();
+        if ($req->hasFile('profile_picture')) {
+            $image = $req->file('profile_picture');
+            $imageName = time() . '.' . $image->getClientOriginalExtension();
+            $image->move(public_path('Images/UsersImages'), $imageName);
+            $user->profile_picture = $imageName;
+        } else {
+            $imageName = null;
+            $user->profile_picture = $imageName;
+        }
+
+        $user->name = $req->name;
+        $user->email = $req->email;
+        $user->role = $req->role;
+        $user->branch_id = $req->branch;
+        $user->password = Hash::make($req->password);
+        $user->save();
 
         if ($req->has('role')) {
             return redirect()->route('viewStaffPage');
@@ -39,6 +73,7 @@ class AuthController extends Controller
             return redirect()->route('viewLoginPage');
         }
     }
+
 
     public function login(Request $request)
     {
@@ -50,7 +85,7 @@ class AuthController extends Controller
         $user = User::where('email', $request->email)->first();
 
         if ($user && Hash::check($request->password, $user->password)) {
-            session(['username' => $user->name]);
+            session(['username' => $user->name, 'profile_pic' => $user->profile_picture]);
 
             if ($user->role === 'owner') {
                 return redirect()->route('dashboard');

@@ -11,6 +11,7 @@
 
         <div class="newCategory">
             <button onclick="addStock()">Add New Stock</button>
+            <button onclick="window.location='{{ route('viewstockhistory') }}'">Stock History</button>
         </div>
 
         @php

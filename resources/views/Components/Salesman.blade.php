@@ -27,15 +27,23 @@
             <div class="profilepanel">
                 <div class="profile">
                     <div class="profilepic">
-                        <img src="{{ asset('Images/Rectangle 3463281.png') }}" alt="Profile Picture">
+                        @if (session('profile_pic'))
+                            <img src="{{ asset('Images/UsersImages/' . session('profile_pic')) }}"
+                                alt="Profile Picture">
+                        @else
+                            <img src="{{ asset('Images/Rectangle 3463281.png') }}" alt="Profile Picture">
+                        @endif
                     </div>
-                    <p class="profilename">{{ session('username') }}</p>
+
+                    @if (session('username'))
+                        <p class="profilename">{{ session('username') }}</p>
+                    @endif
                 </div>
 
                 <div class="notification">
                     <i class='bx bx-bell'></i>
                 </div>
-                
+
                 <div class="logout">
                     <a href="{{ route('logout') }}"><i class='bx bx-log-out'></i></a>
                 </div>
@@ -56,4 +64,3 @@
 </body>
 
 </html>
- 

@@ -26,14 +26,11 @@ class OwnerController extends Controller
 
     public function newBranch(Request $req)
     {
-        
         $validatedData = $req->validate([
             'branchArea' => 'required|string|max:255',
             'branchname' => 'required|string|max:255',
             'branchcode' => 'required|string|max:50|unique:branches',
-            'streatnumber' => 'required|string|max:255',
-            'numberofitems' => 'required|integer',
-            'numberofstaff' => 'required|integer',
+            'address' => 'required|string|max:255'
         ]);
         
         $riderOption = $req->has('riderOption') ? true : false;
@@ -44,9 +41,42 @@ class OwnerController extends Controller
         $newBranch->branchLocation = $validatedData['branchArea'];
         $newBranch->branchName = $validatedData['branchname'];
         $newBranch->branchCode = $validatedData['branchcode'];
-        $newBranch->branchStreatNumber = $validatedData['streatnumber'];
-        $newBranch->numberOfItems = $validatedData['numberofitems'];
-        $newBranch->numberOfStaff = $validatedData['numberofstaff'];
+        $newBranch->address = $validatedData['address'];
+    
+        $newBranch->riderOption = $riderOption;
+        $newBranch->onlineDeliveryOption = $onlineDeliveryOption;
+        $newBranch->diningTableOption = $diningTableOption;
+
+        $newBranch->save();
+
+        return redirect()->route('dashboard');
+    }
+
+    public function viewAddStaff(){
+        $branches = Branch::all();
+        return view('Owner.MyStaff')->with(['branches'=>$branches]); 
+    }
+
+    public function newuser(Request $req)
+    {
+        dd($req->all());
+        $validatedData = $req->validate([
+            'branchArea' => 'required|string|max:255',
+            'branchname' => 'required|string|max:255',
+            'branchcode' => 'required|string|max:50|unique:branches',
+            'address' => 'required|string|max:255'
+        ]);
+        
+        $riderOption = $req->has('riderOption') ? true : false;
+        $onlineDeliveryOption = $req->has('onlineDeliveryOption') ? true : false;
+        $diningTableOption = $req->has('diningTableOption') ? true : false;
+        
+        $newBranch = new Branch();
+        $newBranch->branchLocation = $validatedData['branchArea'];
+        $newBranch->branchName = $validatedData['branchname'];
+        $newBranch->branchCode = $validatedData['branchcode'];
+        $newBranch->address = $validatedData['address'];
+    
         $newBranch->riderOption = $riderOption;
         $newBranch->onlineDeliveryOption = $onlineDeliveryOption;
         $newBranch->diningTableOption = $diningTableOption;

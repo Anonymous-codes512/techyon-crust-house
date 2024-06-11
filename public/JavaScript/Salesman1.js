@@ -250,7 +250,7 @@ function handlePizzaCategory(product, allProducts, productVariationDropdown, dri
             addOnsArray.push(`${element.productVariation} (Rs. ${element.productPrice})`);
         }
         if (element.productName.toLowerCase() === product.productName.toLowerCase()) {
-            productVariations.push(`${element.productVariation} (Rs. ${element.productPrice})`);
+            productVariations.push(`${element.id}-${element.productVariation} (Rs. ${element.productPrice})`);
         }
     });
 
@@ -262,7 +262,9 @@ function handleDrinksCategory(product, allProducts, productVariationDropdown, dr
     let productVariations = [];
     let uniqueDrinkFlavours = new Set();
 
-    document.getElementById('addOnsLabel').style.display = 'block';
+    document.getElementById('addOnsLabel').style.display = 'none';
+    document.getElementById("addons").style.display = 'none';
+    document.getElementById("drinkFlavourLabel").style.display = 'none';
     document.getElementById("prodVariationLabel").style.display = 'block';
 
     allProducts.forEach(element => {
@@ -270,12 +272,12 @@ function handleDrinksCategory(product, allProducts, productVariationDropdown, dr
             uniqueDrinkFlavours.add(element.productName);
         }
         if (element.productName.toLowerCase() === product.productName.toLowerCase()) {
-            productVariations.push(`${element.productVariation} (Rs. ${element.productPrice})`);
+            productVariations.push(`${element.id}-${element.productVariation} (Rs. ${element.productPrice})`);
         }
     });
 
     let drinkFlavour = Array.from(uniqueDrinkFlavours);
-    addOnsDropdown(drinkFlavour, drinkFlavourDropdown, 'Drink Flavour');
+    // addOnsDropdown(drinkFlavour, drinkFlavourDropdown, 'Drink Flavour');
     addOptionsToDropdown(productVariations, productVariationDropdown);
 
     drinkFlavourDropdown.addEventListener('change', () => {
@@ -295,9 +297,10 @@ function handleDrinksCategory(product, allProducts, productVariationDropdown, dr
 function handleOtherCategories(product, allProducts, productVariationDropdown, drinkFlavourDropdown) {
     let productVariations = [];
     document.getElementById('addons').style.display = 'none';
+    document.getElementById("drinkFlavourLabel").style.display = 'none';
     allProducts.forEach(element => {
         if (element.productName.toLowerCase() === product.productName.toLowerCase()) {
-            productVariations.push(`${element.productVariation} (Rs. ${element.productPrice})`);
+            productVariations.push(`${element.id}-${element.productVariation} (Rs. ${element.productPrice})`);
         }
     });
 
@@ -305,10 +308,15 @@ function handleOtherCategories(product, allProducts, productVariationDropdown, d
 }
 
 function addOptionsToDropdown(optionsArray, dropdown) {
+    console.log(optionsArray);
+    console.log(dropdown);
     dropdown.innerHTML = "";
     let label = document.getElementById("prodVariationLabel");
     label.textContent = "Select Variation";
+    let productId = document.getElementById('product_id');
+    let parts, variation, product_names;
 
+    let prodName = document.getElementById('prodName');
     let defaultOption = document.createElement("option");
     defaultOption.text = 'Default';
     defaultOption.value = optionsArray[0];
@@ -316,14 +324,23 @@ function addOptionsToDropdown(optionsArray, dropdown) {
 
     for (let i = 0; i < optionsArray.length; i++) {
         let option = document.createElement("option");
-        option.text = optionsArray[i];
-        option.value = optionsArray[i];
+        parts = optionsArray[i].split("-");
+        variation = parts[1].split(" ");
+        option.text = parts[1];
+        option.value = parts.join('-');
         dropdown.add(option);
     }
 
     dropdown.addEventListener('change', () => {
         document.getElementById('prodQuantity').value = '1';
         let selectedOption = dropdown.options[dropdown.selectedIndex];
+        let selectedOptionParts = selectedOption.value.split('-');
+        let selectedvariation = selectedOptionParts[1].split(' ')[0];
+        let product_names_array = prodName.value.split(' ');
+        product_names_array[0] = product_names_array[0].replace(product_names_array[0].split(' ')[0], selectedvariation);
+        product_names = product_names_array.join(' ');
+        prodName.value = product_names;
+        productId.value = selectedOptionParts[0];
 
         let totalPriceElement = document.getElementById('totalprice');
         let match = selectedOption.value.match(/Rs\. (\d+)/);

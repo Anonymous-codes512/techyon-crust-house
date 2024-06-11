@@ -42,8 +42,8 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($categoryProducts as $product)   
-                            <tr>
+                            @foreach ($categoryProducts as $product)
+                                <tr>
                                     <td>{{ $product->category_name }}</td>
                                     <td>{{ $product->productName }}</td>
                                     <td>{{ $product->productVariation }}</td>
@@ -51,7 +51,7 @@
                                         <a href="#"><i onclick="addRecipe({{ json_encode($product) }})"
                                                 class="bx bx-list-plus"></i></a>
 
-                                        <a href="{{ route('viewProductRecipe', [$product->category_id , $product->id]) }}"><i
+                                        <a href="{{ route('viewProductRecipe', [$product->category_id, $product->id]) }}"><i
                                                 onclick="showProductRecipe()" class="bx bx-show"></i></a>
                                     </td>
                                 </tr>
@@ -60,7 +60,8 @@
                     </table>
                 </div>
                 <div class="btns">
-                    <a href="{{route('viewRecipePage') }}"><button type="button" onclick="closeProductCategory()">Close</button></a>
+                    <a href="{{ route('viewRecipePage') }}"><button type="button"
+                            onclick="closeProductCategory()">Close</button></a>
                     <button id="showproductRecipebutton" onclick="showProductRecipe()"style="display: none;"
                         type="button"></button>
                 </div>
@@ -159,6 +160,19 @@
         <div id="addProductRecipe">
             <h3>Add Recipe to Product</h3>
             <hr>
+
+            <div class="inputdivs inputProductName" style="display: flex; margin:5px;">
+                <div class="stockquantity">
+                    <label for="item-name">Item Name</label>
+                    <input type="text" id="item-name" placeholder="item Name" name="item-name" readonly required>
+                </div>
+
+                <div class="stockquantity">
+                    <label for="item-stock-quantity">Item Stock Quantity</label>
+                    <input type="text" id="item-stock-quantity" placeholder="123kg.." name="item-stock-quantity" readonly
+                        required>
+                </div>
+            </div>
 
             <div class="inputdivs inputProductName" style="display: flex; margin:5px;">
                 <div class="stockquantity">
@@ -364,53 +378,161 @@
 
         function addItemToRecipe(itemName, quantity, unit, id) {
             const recipeContainer = document.querySelector('#recipeContainer');
-            const recipeTextArea = document.querySelector('#recipeTextArea'); // Assuming you have a textarea with this ID
-            const saveItem = `${quantity} ${unit}~${id}`;
+            const recipeTextArea = document.querySelector('#recipeTextArea');
 
-            const existingItem = Array.from(recipeContainer.children).find(item => {
+            function convertWeightToGrams(quantity, unit) {
+                switch (unit) {
+                    case 'kg':
+                        return quantity * 1000;
+                    case 'g':
+                        return quantity;
+                    case 'mg':
+                        return quantity / 1000;
+                    case 'lbs':
+                        return quantity * 453.592;
+                    case 'oz':
+                        return quantity * 28.3495;
+                    default:
+                        return 0;
+                }
+            }
+
+            function convertVolumeToMilliliters(quantity, unit) {
+                switch (unit) {
+                    case 'liter':
+                        return quantity * 1000;
+                    case 'ml':
+                        return quantity;
+                    case 'gal':
+                        return quantity * 3785.41;
+                    default:
+                        return 0;
+                }
+            }
+
+            function convertFromGrams(grams) {
+                if (grams >= 1000) {
+                    return {
+                        quantity: grams / 1000,
+                        unit: 'kg'
+                    };
+                } else if (grams >= 453.592) {
+                    return {
+                        quantity: grams / 453.592,
+                        unit: 'lbs'
+                    };
+                } else if (grams >= 28.3495) {
+                    return {
+                        quantity: grams / 28.3495,
+                        unit: 'oz'
+                    };
+                } else if (grams >= 1) {
+                    return {
+                        quantity: grams,
+                        unit: 'g'
+                    };
+                } else {
+                    return {
+                        quantity: grams * 1000,
+                        unit: 'mg'
+                    };
+                }
+            }
+
+            function convertFromMilliliters(milliliters) {
+                if (milliliters >= 1000) {
+                    return {
+                        quantity: milliliters / 1000,
+                        unit: 'liter'
+                    };
+                } else if (milliliters >= 3785.41) {
+                    return {
+                        quantity: milliliters / 3785.41,
+                        unit: 'gal'
+                    };
+                } else {
+                    return {
+                        quantity: milliliters,
+                        unit: 'ml'
+                    };
+                }
+            }
+
+            const isWeightUnit = ['kg', 'g', 'mg', 'lbs', 'oz'].includes(unit);
+            const isVolumeUnit = ['liter', 'ml', 'gal'].includes(unit);
+
+            let quantityInBaseUnit;
+            if (isWeightUnit) {
+                quantityInBaseUnit = convertWeightToGrams(parseFloat(quantity), unit);
+            } else if (isVolumeUnit) {
+                quantityInBaseUnit = convertVolumeToMilliliters(parseFloat(quantity), unit);
+            } else {
+                alert("Unsupported unit.");
+                return;
+            }
+
+            const existingItem = Array.from(recipeContainer.querySelectorAll('.recipe-item')).find(item => {
                 return item.dataset.id === String(id);
             });
 
             if (existingItem) {
-                const currentQuantity = parseInt(existingItem.dataset.quantity, 10);
-                const newQuantity = currentQuantity + parseInt(quantity, 10);
-                existingItem.textContent = `${newQuantity} ${unit} ${itemName}`;
-                existingItem.dataset.quantity = newQuantity;
-                const regex = new RegExp(`\\b${currentQuantity} ${unit}~${id}\\b`);
-                recipeTextArea.value = recipeTextArea.value.replace(regex, `${newQuantity} ${unit}~${id}`);
+                const currentQuantityInBaseUnit = parseFloat(existingItem.dataset.quantityBaseUnit);
+                const newQuantityInBaseUnit = currentQuantityInBaseUnit + quantityInBaseUnit;
+                let convertedQuantity;
+
+                if (isWeightUnit) {
+                    convertedQuantity = convertFromGrams(newQuantityInBaseUnit);
+                } else if (isVolumeUnit) {
+                    convertedQuantity = convertFromMilliliters(newQuantityInBaseUnit);
+                }
+
+                existingItem.textContent = `${convertedQuantity.quantity.toFixed(2)} ${convertedQuantity.unit} ${itemName}`;
+                existingItem.dataset.quantityBaseUnit = newQuantityInBaseUnit;
+                existingItem.dataset.quantity = convertedQuantity.quantity.toFixed(2);
+                existingItem.dataset.unit = convertedQuantity.unit;
+
+                const regex = new RegExp(`\\b${currentQuantityInBaseUnit}\\s+${existingItem.dataset.unit}~${id}\\b`);
+                recipeTextArea.value = recipeTextArea.value.replace(regex,
+                    `${newQuantityInBaseUnit} ${existingItem.dataset.unit === 'g' ? 'g' : 'ml'}~${id}`);
             } else {
                 const newRecipediv = document.createElement('div');
                 newRecipediv.style.display = 'flex';
-                newRecipediv.style.alignItem = 'center';
+                newRecipediv.style.alignItems = 'center';
 
                 const newRecipeItem = document.createElement('p');
+                newRecipeItem.classList.add('recipe-item');
                 newRecipeItem.style.margin = '2px';
                 newRecipeItem.style.width = '95%';
                 newRecipeItem.textContent = `${quantity} ${unit} ${itemName}`;
                 newRecipeItem.dataset.id = id;
+                newRecipeItem.dataset.quantityBaseUnit = quantityInBaseUnit;
                 newRecipeItem.dataset.quantity = quantity;
-
+                newRecipeItem.dataset.unit = unit;
 
                 const recipeRemoveBtn = document.createElement('i');
-                recipeRemoveBtn.classList.add('bx', 'bx-x');
+                recipeRemoveBtn.classList.add('bx', 'bx-x', 'remove-item');
                 recipeRemoveBtn.style.fontSize = '1.2vw';
-
+                recipeRemoveBtn.style.borderRadius = '50%';
+                recipeRemoveBtn.style.marginRight = '5px'
 
                 newRecipediv.appendChild(newRecipeItem);
                 newRecipediv.appendChild(recipeRemoveBtn);
                 recipeContainer.appendChild(newRecipediv);
 
                 recipeRemoveBtn.addEventListener('click', function() {
-                    newRecipeItem.remove();
-                    recipeRemoveBtn.remove();
-                    const regex = new RegExp(`\\b${quantity} ${unit}~${id}\\b`);
+                    newRecipediv.remove();
+                    const regex = new RegExp(
+                        `\\b${quantityInBaseUnit}\\s+${unit === 'g' || unit === 'kg' || unit === 'mg' || unit === 'lbs' || unit === 'oz' ? 'g' : 'ml'}~${id}\\b`
+                    );
                     recipeTextArea.value = recipeTextArea.value.replace(regex, '');
                 });
 
                 if (recipeTextArea.value === '') {
-                    recipeTextArea.value = saveItem;
+                    recipeTextArea.value =
+                        `${quantityInBaseUnit} ${unit === 'g' || unit === 'kg' || unit === 'mg' || unit === 'lbs' || unit === 'oz' ? 'g' : 'ml'}~${id}`;
                 } else {
-                    recipeTextArea.value += `, ${saveItem}`;
+                    recipeTextArea.value +=
+                        `, ${quantityInBaseUnit} ${unit === 'g' || unit === 'kg' || unit === 'mg' || unit === 'lbs' || unit === 'oz' ? 'g' : 'ml'}~${id}`;
                 }
             }
         }
@@ -421,51 +543,66 @@
             const addItemButton = document.querySelector('#addItemButton');
             const cancelButton = document.querySelector('#cancel');
             const recipePopup = document.getElementById('recipePopup');
+            let itemName = document.getElementById('item-name');
+            let itemStockQuantity = document.getElementById('item-stock-quantity');
             const categoryProducts = document.getElementById('categoryProducts');
 
             addProductRecipeOverlay.style.display = 'block';
             addProductRecipe.style.display = 'flex';
-            recipePopup.style.display = 'none'
-            categoryProducts.style.display = 'none'
+
+            itemName.value = stock.itemName;
+            itemStockQuantity.value = stock.itemQuantity;
+
+            recipePopup.style.display = 'none';
+            categoryProducts.style.display = 'none';
 
             addItemButton.onclick = function() {
-                const quantityInput = document.querySelector('#item-quantity');
-                const unitSelect = document.querySelector('#iQUnit');
-                const quantity = quantityInput.value;
-                const unit = unitSelect.value;
+    const quantityInput = document.getElementById('item-quantity');
+    const unitSelect = document.querySelector('#iQUnit');
+    const quantity = quantityInput.value;
+    const unit = unitSelect.value;
 
-                if (quantity && unit) {
-                    addItemToRecipe(stock.itemName, quantity, unit, stock.id);
+    const enteredQuantity = parseFloat(quantity);
+    const stockQuantity = parseFloat(itemStockQuantity.value);
 
-                    addProductRecipeOverlay.style.display = 'none';
-                    addProductRecipe.style.display = 'none';
-                    recipePopup.style.display = 'flex'
-                    categoryProducts.style.display = 'flex'
+    if (enteredQuantity > 0 && enteredQuantity <= stockQuantity) {
+        // Quantity is valid, proceed with adding the item
+        if (quantity && unit) {
+            addItemToRecipe(stock.itemName, quantity, unit, stock.id);
 
-                    quantityInput.value = '';
-                    unitSelect.value = '';
-                } else {
-                    alert("Please enter a valid quantity and select a unit.");
-                }
-            };
+            addProductRecipeOverlay.style.display = 'none';
+            addProductRecipe.style.display = 'none';
+            recipePopup.style.display = 'flex';
+            categoryProducts.style.display = 'flex';
 
-            cancelButton.onclick = function() {
-                addProductRecipeOverlay.style.display = 'none';
-                addProductRecipe.style.display = 'none';
-                recipePopup.style.display = 'flex'
-                categoryProducts.style.display = 'flex'
-            };
+            quantityInput.value = '';
+            unitSelect.value = '';
+        } else {
+            alert("Please enter a valid quantity and select a unit.");
+        }
+    } else {
+        // Quantity is not valid, show an alert
+        alert('Quantity must be greater than 0 and less than or equal to the stock quantity.');
+    }
+
+    // Attach the click event handler to cancelButton
+    cancelButton.onclick = function() {
+        addProductRecipeOverlay.style.display = 'none';
+        addProductRecipe.style.display = 'none';
+        recipePopup.style.display = 'flex';
+        categoryProducts.style.display = 'flex';
+    };
+}
+
         }
 
-        function formatQuantity(quantity) {
-            return parseInt(quantity, 10); // Assuming the quantity is an integer
-        }
+        // function formatQuantity(quantity) {
+        //     return parseInt(quantity, 10); // Assuming the quantity is an integer
+        // }
 
-        function isValidQuantity(quantity) {
-            return Number.isInteger(quantity) && quantity > 0;
-        }
-
-
+        // function isValidQuantity(quantity) {
+        //     return Number.isInteger(quantity) && quantity > 0;
+        // }
 
         const searchBar = document.getElementById('Search');
         const stockItems = document.querySelectorAll('.stockContainer p');

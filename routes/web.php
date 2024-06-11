@@ -27,16 +27,16 @@ Route::get('/logout',[AuthController::class, 'logout'])->name('logout');
 
 Route::get('/dashboard', [OwnerController::class, 'viewOwnerDashboard'])->name('dashboard');
 Route::get('/addnewbranch', [OwnerController ::class, 'addNewBranchIndex'])->name('addNewBranch');
-Route::post('/storeNewBranchData',[OwnerController::class,'newBranch'])->name('storeNewBranchData');
+Route::post('/storeNewBranchData',[OwnerController::class,'newBranch'])->name('storeNewBranchData'); 
+// Route::post('/addNewUser',[OwnerController::class,'newUser'])->name('addNewUser'); 
 Route::get('/branchesDashboard', [OwnerController::class, 'viewBranchesDashboard'])->name('branchesDashboard');
+Route::get('/mystaff', [OwnerController::class, 'viewAddStaff'])->name('staff');
 
 Route::get('/addnewbranch1', function() { return view('Owner.AddNewBranch1'); });
 Route::get('/addnewbranch2', function(){ return view('Owner.AddNewBranch2'); });
 Route::get('/addnewbranch3', function(){ return view('Owner.AddNewBranch3'); });
-Route::get('/mystaff', function(){ return view('Owner.MyStaff'); })->name('staff');
 Route::get('/onlineorders', function(){ return view('Owner.OnlineOrder'); })->name('onlineorders');
 Route::get('/diningtable', function(){ return view('Owner.DiningTable'); })->name('diningtable');
-
 
 /*
 |---------------------------------------------------------------|
@@ -97,6 +97,7 @@ Route::get('/viewStockPage', [AdminController::class,'viewStockPage'])->name('vi
 Route::post('/createStock', [AdminController::class,'createStock'])->name('createStock');
 Route::post('/updateStock',[AdminController::class,'updateStock'])->name('updateStock');
 Route::get('/deleteStock/{id}',[AdminController::class,'deleteStock'])->name('deleteStock');
+Route::get('/viewstockhistory',[AdminController::class,'stockHistory'])->name('viewstockhistory');
 
 /*
 |---------------------------------------------------------------|
@@ -121,7 +122,7 @@ Route::get('/viewOrderProducts/{order_id}', [AdminController::class,'viewOrderPr
 Route::get('/printrecipt/{order_id}', [AdminController::class,'printRecipt'])->name('printrecipt');
 Route::get('/cancelorder/{order_id}', [AdminController::class,'cancelOrder'])->name('cancelorder');
 Route::get('/viewStaffPage', [AdminController::class,'viewStaffPage'])->name('viewStaffPage');
-Route::get('/updateStaff', [AdminController::class,'updateStaff'])->name('updateStaff');
+Route::post('/updateStaff', [AdminController::class,'updateStaff'])->name('updateStaff');
 Route::get('/deleteStaff/{id}', [AdminController::class,'deleteStaff'])->name('deleteStaff');
 
 Route::get('/download-pdf/{filename}', [SalesmanController::class, 'downloadPdf'])->name('downloadPdf');

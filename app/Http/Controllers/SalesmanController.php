@@ -9,6 +9,8 @@ use App\Models\Handler;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
+use App\Models\Recipe;
+use App\Models\Stock;
 use Dompdf\Dompdf;
 use Illuminate\Http\Request;
 use setasign\Fpdi\Fpdi;
@@ -190,12 +192,14 @@ class SalesmanController extends Controller
             $orderItem = new OrderItem();
             $orderItem->order_id = $order->id;
             $orderItem->order_number = $newOrderNumber;
+            $orderItem->product_id = $cartItem->product_id;
             $orderItem->product_name = $cartItem->productName;
             $orderItem->product_variation = $cartItem->productVariation;
             $orderItem->addons = $cartItem->productAddon;
             $orderItem->product_price = 'Rs. ' . ($totalProductPrice / $quantity);
             $orderItem->product_quantity = $quantity;
             $orderItem->total_price = $cartItem->totalPrice;
+            // dd($cartedProducts);
             $orderItem->save();
         }
 
@@ -206,17 +210,20 @@ class SalesmanController extends Controller
         $order->total_bill = 'Rs. ' . $totalBill;
         $order->save();
 
-        $orderData = Order::with('salesman')->find($order->id);
+        $this->deductStock($order->id);
+
+        $orderData = Order::with(['salesman.branch'])->find($order->id);
+
         $products = OrderItem::where('order_id', $order->id)->get();
 
-        $customerRecipt = view('reciept', ['products' => $products, 'orderData'=>$orderData])->render();
+        $customerRecipt = view('reciept', ['products' => $products, 'orderData' => $orderData])->render();
         $dompdf1 = new Dompdf();
         $dompdf1->loadHtml($customerRecipt);
         $dompdf1->setPaper([0, 0, 300, 675, 'portrait']);
         $dompdf1->render();
         $customerPdfContent = $dompdf1->output();
 
-        $KitchenRecipt = view('KitchenRecipt', ['products' => $products, 'orderData'=>$orderData])->render();
+        $KitchenRecipt = view('KitchenRecipt', ['products' => $products, 'orderData' => $orderData])->render();
         $dompdf2 = new Dompdf();
         $dompdf2->loadHtml($KitchenRecipt);
         $dompdf2->setPaper([0, 0, 300, 675, 'portrait']);
@@ -260,12 +267,15 @@ class SalesmanController extends Controller
         $addon = explode(' (Rs. ', rtrim($request->input('addOn'), ')'));
         $variations = explode(' (Rs. ', rtrim($request->input('prodVariation'), ')'));
 
+        
         $productOrder->salesman_id = $salesman_id;
+        $productOrder->product_id = $request->input('product_id');
         $productOrder->productName = $request->input('productname');
         $productOrder->productPrice = $request->input('productprice');
         $productOrder->productAddon = $addon[0] ?? null;
         $productOrder->addonPrice = isset($addon[1]) ? 'Rs. ' . $addon[1] : null;
-        $productOrder->productVariation = $variations[0] ?? null;
+        $parts = explode('-', $variations[0]);
+        $productOrder->productVariation = $parts[1] ?? null;
         $productOrder->variationPrice = isset($variations[1]) ? 'Rs. ' . $variations[1] : null;
         $productOrder->drinkFlavour = $drinkFlavour[0] ?? null;
         $productOrder->drinkFlavourPrice = isset($drinkFlavour[1]) ? 'Rs. ' . $drinkFlavour[1] : null;
@@ -275,6 +285,91 @@ class SalesmanController extends Controller
         $productOrder->save();
 
         return redirect()->route('salesman_dashboard', ['id' => $salesman_id]);
+    }
+
+    public function deductStock($order_id)
+    {
+        $order = Order::with('items')->find($order_id);
+        $productQuantities = [];
+
+        foreach ($order->items as $item) {
+            if (!isset($productQuantities[$item->product_id])) {
+                $productQuantities[$item->product_id] = 0;
+            }
+            $productQuantities[$item->product_id] += $item->product_quantity;
+        }
+
+        foreach ($productQuantities as $product_id => $totalQuantity) {
+            $product = Product::find($product_id);
+            $recipes = Recipe::where('product_id', $product->id)->get();
+
+            foreach ($recipes as $recipeItem) {
+                $quantityToDeduct = floatval($recipeItem->quantity);
+                $stockItem = Stock::find($recipeItem->stock_id);
+
+                if ($stockItem) {
+                    $currentQuantityInBaseUnit = $this->convertToBaseUnit($stockItem->itemQuantity);
+                    $deductedQuantityInBaseUnit = $quantityToDeduct * $totalQuantity;
+                    $newQuantityInBaseUnit = $currentQuantityInBaseUnit - $deductedQuantityInBaseUnit;
+                    $newQuantity = $this->convertFromBaseUnit($newQuantityInBaseUnit, $stockItem->itemQuantity);
+
+                    echo "Current Quantity in Base Unit: " . $currentQuantityInBaseUnit . '<br>';
+                    echo "Deducted Quantity in Base Unit: " . $deductedQuantityInBaseUnit . '<br>';
+                    echo "New Quantity in Base Unit: " . $newQuantityInBaseUnit . '<br>';
+                    echo "New Quantity: " . $newQuantity . '<br><br>';
+
+                    $stockItem->itemQuantity = $newQuantity;
+                    $stockItem->save();
+                }
+            }
+        }
+    }
+
+    private function convertToBaseUnit($quantity)
+    {
+        // Assuming quantity is in the format "10 kg", "5 liter", etc.
+        preg_match('/(\d+(\.\d+)?)\s*(\w+)/', $quantity, $matches);
+        $quantityValue = floatval($matches[1]);
+        $unit = strtolower($matches[3]);
+
+        switch ($unit) {
+            case 'g':
+            case 'ml':
+                return $quantityValue;
+            case 'kg':
+                return $quantityValue * 1000;
+            case 'liter':
+                return $quantityValue * 1000;
+            case 'lbs':
+                return $quantityValue * 453.592; // 1 lb = 453.592 g
+            case 'oz':
+                return $quantityValue * 28.3495; // 1 oz = 28.3495 g
+            default:
+                return $quantityValue;
+        }
+    }
+
+    private function convertFromBaseUnit($quantity, $originalUnit)
+    {
+        preg_match('/(\d+(\.\d+)?)\s*(\w+)/', $originalUnit, $matches);
+        $unit = strtolower($matches[3]);
+
+        switch ($unit) {
+            case 'kg':
+                return ($quantity / 1000) . ' kg';
+            case 'g':
+                return $quantity . ' g';
+            case 'liter':
+                return ($quantity / 1000) . ' liter';
+            case 'ml':
+                return $quantity . ' ml';
+            case 'lbs':
+                return ($quantity / 453.592) . ' lbs';
+            case 'oz':
+                return ($quantity / 28.3495) . ' oz';
+            default:
+                return $quantity . ' ' . $unit;
+        }
     }
 
     public function clearCart($salesman_id)

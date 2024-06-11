@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('total_bill');
             $table->decimal('received_cash', 8, 2);
             $table->decimal('return_change', 8, 2);
-            $table->string('ordertype')->after('return_change')->nullable();
+            $table->string('ordertype')->nullable();
             $table->integer('status')->default('2');
             $table->timestamps();
         });        

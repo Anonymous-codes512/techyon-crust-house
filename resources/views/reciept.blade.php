@@ -272,7 +272,7 @@
             <h1 class="logo">Crust House</h1>
 
             <div class="address">
-                Minar Road, Wah, Pk
+                Address : {{ $orderData->salesman->branch->address }}
             </div>
 
             <div class="date-time">
