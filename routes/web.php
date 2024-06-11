@@ -31,6 +31,8 @@ Route::post('/storeNewBranchData',[OwnerController::class,'newBranch'])->name('s
 // Route::post('/addNewUser',[OwnerController::class,'newUser'])->name('addNewUser'); 
 Route::get('/branchesDashboard', [OwnerController::class, 'viewBranchesDashboard'])->name('branchesDashboard');
 Route::get('/mystaff', [OwnerController::class, 'viewAddStaff'])->name('staff');
+Route::post('/updateStaffData', [OwnerController::class,'updateStaffData'])->name('updateStaffData');
+Route::get('/deleteStaffData/{id}', [OwnerController::class,'deleteStaffData'])->name('deleteStaffData');
 
 Route::get('/addnewbranch1', function() { return view('Owner.AddNewBranch1'); });
 Route::get('/addnewbranch2', function(){ return view('Owner.AddNewBranch2'); });

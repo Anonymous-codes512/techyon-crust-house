@@ -229,7 +229,7 @@ table tbody tr td a:last-child:hover {
     font-size: 1.2vw;
     padding: 0.5vw 2vw;
     border-radius: 10px;
-    border: none;
+    border: none; 
 }
 
 #cancel{

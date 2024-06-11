@@ -851,6 +851,7 @@ class AdminController extends Controller
 
         return redirect()->route('viewStaffPage');
     }
+    
     public function deleteStaff($id)
     {
         if (!session()->has('admin')) {

@@ -2,11 +2,12 @@
 
 main {
     justify-content: start;
-    height: 100%;
+    /* height: 100%; */
+    font-size: 1.2vw;
     position: relative;
 }
 
-#overlay {
+#overlay, #editOverlay {
     position: fixed;
     top: 0;
     left: 0;
@@ -16,7 +17,7 @@ main {
     display: none;
     z-index: 999;
 }
-.addNewUser {
+.addNewUser, .editstaff {
     display: none;
     flex-direction: column;
     background-color: #ffffff;
@@ -29,7 +30,7 @@ main {
     z-index: 1000;
 }
 
-.addNewUser h3 {
+.addNewUser h3, .editstaff h3{
     margin: 0;
     padding: 1vw 2vw;
     font-family: "Poppins", sans-serif;
@@ -182,58 +183,72 @@ main {
 }
 
 table {
-    width: 80% !important;
-    margin: 1vw auto;
-    margin-top: 0;
-    padding: 1vw;
-    background-color: #ffffff;
-    font-family: "Poppins", sans-serif;
-    font-size: 0.75rem;
-    border-radius: 10px;
-}
-#EmpTable_filter,
-#EmpTable_paginate,
-.dataTables_length,
-.dataTables_info {
-    width: 78%;
-    padding: 0.2vw 0.61vw;
-    margin: 0.2vw auto;
-    font-family: "Poppins", sans-serif;
-    font-size: 0.75rem;
-}
-#EmpTable_filter label input {
-    margin: 0 1vw;
-}
-
-#EmpTable_paginate {
-    display: flex;
-    justify-content: flex-end;
-    padding: 0;
-    margin-bottom: 1vw;
-}
-#EmpTable_paginate a,
-#EmpTable_paginate span {
-    margin: 0 0.51vw;
-}
-
-.dataTables_length label select {
-    margin: 0.5vw;
+    border-collapse: collapse;
+    width: 95%;
+    margin: 0.5vw auto 2vw;
 }
 
 table thead tr {
-    font-size: 0.85vw;
-    color: #454545;
+    border-bottom: 2px solid #000;
 }
 
-table thead tr td:nth-child(5),
-table thead tr td:last-child,
+table thead tr th {
+    width: 150px;
+    text-align: left;
+}
+
+table thead tr th:last-child {
+    text-align: center;
+}
+
+table tbody tr {
+    border-bottom: 1px solid #898989;
+}
+
+table tbody tr td {
+    text-align: left;
+    border-radius: 6px;
+    padding: 0.5vw 0;
+    width: 150px;
+}
+
 table tbody tr td:last-child {
     text-align: center;
 }
 
-table tbody tr td:nth-child(5) {
-    text-align: center;
-    border-radius: 10px;
+table tbody tr td a{
+    padding: 0.2vw 0.3vw;
+    font-size: 1.2vw;
+    text-decoration: none;
+    color: #fff;
+    border-radius: 5px;
+}
+
+table tbody tr td:first-child {
+    text-align: left;
+}
+
+table tbody tr td:first-child img {
+    width: 100px;
+    /* height: 70px; */
+    padding: 5px;
+    border-radius: 15px;
+}
+
+table tbody tr td a:first-child {
+    background-color: #3fc28a;
+}
+
+table tbody tr td a:last-child {
+    background-color: #f45b69;
+}
+
+table tbody tr td a:first-child:hover {
+    background-color: #2da571;
+}
+
+table tbody tr td a:last-child:hover {
+    background-color: #f84857;
 }
 
 /* Online Ordres */
