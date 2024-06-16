@@ -26,10 +26,14 @@ Route::get('/logout',[AuthController::class, 'logout'])->name('logout');
 */
 
 Route::get('/dashboard', [OwnerController::class, 'viewOwnerDashboard'])->name('dashboard');
+// Route::post('/addNewUser',[OwnerController::class,'newUser'])->name('addNewUser'); 
+
 Route::get('/addnewbranch', [OwnerController ::class, 'addNewBranchIndex'])->name('addNewBranch');
 Route::post('/storeNewBranchData',[OwnerController::class,'newBranch'])->name('storeNewBranchData'); 
-// Route::post('/addNewUser',[OwnerController::class,'newUser'])->name('addNewUser'); 
-Route::get('/branchesDashboard', [OwnerController::class, 'viewBranchesDashboard'])->name('branchesDashboard');
+Route::get('/branches', [OwnerController::class, 'viewBranches'])->name('branches');
+Route::post('/updateBranches', [OwnerController::class, 'updateBranches'])->name('updateBranches');
+Route::get('/deleteBranch/{branch_id}', [OwnerController::class, 'deleteBranch'])->name('deleteBranch');
+
 Route::get('/mystaff', [OwnerController::class, 'viewAddStaff'])->name('staff');
 Route::post('/updateStaffData', [OwnerController::class,'updateStaffData'])->name('updateStaffData');
 Route::get('/deleteStaffData/{id}', [OwnerController::class,'deleteStaffData'])->name('deleteStaffData');
@@ -109,6 +113,7 @@ Route::get('/viewstockhistory',[AdminController::class,'stockHistory'])->name('v
 
 Route::get('/viewRecipePage', [AdminController::class,'viewRecipePage'])->name('viewRecipePage');
 Route::post('/createRecipe', [AdminController::class,'createRecipe'])->name('createRecipe');
+Route::post('/editProductRecipe', [AdminController::class,'editProductRecipe'])->name('editProductRecipe');
 Route::get('/viewProductRecipe/{category_id}/{product_id}', [AdminController::class,'viewProductRecipe'])->name('viewProductRecipe');
 Route::get('/deleteStockFromRecipe/{id}/{cid}/{pId}', [AdminController::class, 'deleteStockFromRecipe'])->name('deleteStockFromRecipe');
 Route::get('/showCategoryProducts/{category_id}', [AdminController::class, 'showCategoryProducts'])->name('showCategoryProducts');

@@ -4,8 +4,6 @@
     <main id="dashboard">
         <div class="title">
             <h3>Dashboard</h3>
-            <button id="addBranch"><a href="{{ route('addNewBranch') }}" style="text-decoration: none; color:#ffff;">Add New
-                    Branch</a></button>
         </div>
 
         <div class="stat">
@@ -50,7 +48,7 @@
                 </div>
                 <div class="disc">
                     <p>Total Staff</p>
-                    <h3>120</h3>
+                    <h3>1200</h3>
                 </div>
             </div>
         </div>
@@ -133,4 +131,6 @@
                 style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
         </div>
     </main>
+
+    
 @endsection

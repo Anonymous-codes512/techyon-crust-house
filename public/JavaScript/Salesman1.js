@@ -34,6 +34,7 @@ function showAddToCart(product, deals, allProducts) {
         }
     } else {
         if (prodName) prodName.value = product.deal.dealTitle;
+        if (productId) productId.value = product.deal_id;
         if (price) price.value = `Rs. ${product.deal.dealDiscountedPrice}`;
         if (totalPrice) totalPrice.value = `Rs. ${product.deal.dealDiscountedPrice}`;
         if (drinkFlavour) drinkFlavour.style.display = 'block';
@@ -51,9 +52,9 @@ function showAddToCart(product, deals, allProducts) {
 */
 
 function updateDealsDropdown(deal, deals, allProducts) {
-    const pizzaFlavourDropdown = document.getElementById("addons");
-    const addOnsDropdown = document.getElementById("drinkFlavour");
-    const drinkFlavourDropdown = document.getElementById("prodVariation");
+    const pizzaFlavourDropdown = document.getElementById("prodVariation");
+    const addOnsDropdown = document.getElementById("addons");
+    const drinkFlavourDropdown = document.getElementById("drinkFlavour");
 
     clearDropdown(pizzaFlavourDropdown);
     clearDropdown(drinkFlavourDropdown);
@@ -130,7 +131,7 @@ function clearDropdown(dropdown) {
 function PizzaFlavourDropdown(optionsArray, dropdown, name) {
     if (!dropdown) return;
     dropdown.innerHTML = "";
-    const label = document.getElementById("addOnsLabel");
+    const label = document.getElementById("prodVariationLabel");
     if (label) label.textContent = "Select Pizza Flavour";
 
     let defaultOption = document.createElement("option");
@@ -148,7 +149,7 @@ function PizzaFlavourDropdown(optionsArray, dropdown, name) {
 
 function DrinkFlavourDropdown(optionsArray, dropdown, name) {
     if (!dropdown) return;
-    const label = document.getElementById("prodVariationLabel");
+    const label = document.getElementById("drinkFlavourLabel");
 
     if (dropdown) dropdown.style.display = 'block';
     if (label) label.style.display = 'block';
@@ -178,7 +179,7 @@ function DrinkFlavourDropdown(optionsArray, dropdown, name) {
 function addOnsDealDropdown(optionsArray, dropdown) {
     if (!dropdown) return;
     dropdown.innerHTML = "";
-    const label = document.getElementById("drinkFlavourLabel");
+    const label = document.getElementById("addOnsLabel");
     if (label) label.textContent = "Select Extra Topping";
 
     let defaultOption = document.createElement("option");
@@ -580,7 +581,7 @@ function decrease() {
     let currentValue = parseInt(quantityInput.value);
 
     if (currentValue <= 1) {
-        alert('Minimum quantity should be 1.');
+        // alert('Minimum quantity should be 1.');
     } else {
         currentValue = currentValue - 1;
         quantityInput.value = currentValue;

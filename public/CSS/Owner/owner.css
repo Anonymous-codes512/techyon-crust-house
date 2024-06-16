@@ -218,6 +218,18 @@ main {
     line-height: 2;
 }
 
+.alert-danger{
+    color:#F45B69;
+    font-size: 0.7rem;
+    margin:0px 20px;
+}
+
+.alert-success{
+    color:#40c788;
+    font-size: 0.7rem;
+    margin:0px 20px;
+}
+
 #addBranch {
     border: none;
     margin: 0 1rem;
@@ -342,24 +354,6 @@ canvas {
     height: 100%;
 }
 
-.options {
-    display: flex;
-    flex-direction: column;
-    height: 20%;
-    justify-content: center;
-    align-items: start;
-    padding: 0 1rem;
-    margin: 0 1rem;
-}
-.opt {
-    display: flex;
-    flex-direction: row;
-    margin: 0.5vw 0;
-}
-
-.opt-txt {
-    margin: 0;
-}
 
 @media (max-width: 1050px) and (min-width: 600px) {
     .profilename {

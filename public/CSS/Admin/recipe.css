@@ -62,11 +62,12 @@
     height: 25%;
     border-radius: 0 0 10px 10px;
 }
- 
+
 #recipeOverlay,
 #categoryProductOverlay,
 #productRecipeOverlay,
-#addProductRecipeOverlay {
+#addProductRecipeOverlay,
+#editProductRecipeOverlay {
     position: fixed;
     top: 0;
     left: 0;
@@ -80,7 +81,8 @@
 #recipePopup,
 #categoryProducts,
 #productRecipe,
-#addProductRecipe {
+#addProductRecipe,
+#editProductRecipe {
     display: none;
     flex-direction: row;
     justify-content: center;
@@ -96,35 +98,47 @@
     z-index: 1000;
     justify-content: space-around;
 }
-#addProductRecipe {
+
+#addProductRecipe,
+#editProductRecipe {
     flex-direction: column;
     justify-content: flex-start;
-    width: 30vw;
-    height: 20vw;
+    width: 35vw;
+    height: 22vw;
 }
-.inputdivs{
+
+#editProductRecipe {
+    width: 45vw;
+    height: 18vw;
+}
+.inputdivs {
     display: flex;
-    justify-content: space-between;
+    justify-content: space-around;
     width: 90%;
 }
-.stockquantity{
+
+.stockquantity {
     display: flex;
-    width: 45%;
-} 
-.unitselection{
-    display: flex;
-    width: 45%;
+    width: 30%;
 }
+
+.unitselection {
+    display: flex;
+    width: 30%;
+}
+
 .recipeContainer {
-    max-height: 200px; 
+    max-height: 200px;
     overflow-y: auto;
 }
-#addProductRecipe h3 {
+#addProductRecipe h3,
+#editProductRecipe h3 {
     margin: 0;
     padding: 1vw 2vw;
     font-family: "Poppins", sans-serif;
 }
-#addProductRecipe hr {
+#addProductRecipe hr,
+#editProductRecipe hr {
     border: 1px solid #9b9b9b;
     width: 98%;
     margin: 0 auto 1vw;
@@ -150,10 +164,14 @@
 }
 
 .remove-item:hover {
-    background-color:#F45B69;
+    background-color: #f45b69;
     color: #fff;
 }
 
+.edit-item:hover {
+    background-color: #2ea666;
+    color: #fff;
+}
 
 .btns {
     display: flex;

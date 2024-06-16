@@ -40,9 +40,9 @@
                     @endif
                 </div>
 
-                <div class="notification">
+                {{-- <div class="notification">
                     <i class='bx bx-bell'></i>
-                </div>
+                </div> --}}
 
                 <div class="logout">
                     <a href="{{ route('logout') }}"><i class='bx bx-log-out'></i></a>

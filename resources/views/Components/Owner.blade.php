@@ -30,7 +30,7 @@
                     </div>
                     <div class="menuItems" id="menu2">
                         <i class='bx bx-package'></i>
-                        <a href="{{ route('branchesDashboard') }}" style="text-decoration: none;">
+                        <a href="{{ route('branches') }}" style="text-decoration: none;">
                             <p class="link"> My Branch</p>
                         </a>
                     </div>

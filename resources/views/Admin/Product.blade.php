@@ -55,12 +55,12 @@
             |================ Add new Product Overlay ======================|
             |---------------------------------------------------------------|
         --}}
-
+ 
         <div id="overlay"></div>
         <form class="newproduct" id="newProduct" action="{{ route('createProduct') }}" method="POST"
             enctype="multipart/form-data">
             @csrf
-            <h3>Add New Product</h3>
+            <h3>Add New Product</h3> 
             <hr>
 
             <div class="inputdivs">

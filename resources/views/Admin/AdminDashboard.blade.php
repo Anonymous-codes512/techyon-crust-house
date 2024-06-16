@@ -16,7 +16,7 @@
         </div>
 
         <div class="cards">
-            <a href="" class="category" id="category">
+            <a class="category" id="category">
                 <div class="icon">
                     <i class='bx bxs-category-alt'></i>
                 </div>
@@ -30,7 +30,7 @@
                 </div>
             </a>
 
-            <a href="" class="products" id="products">
+            <a class="products" id="products">
                 <div class="icon">
                     <i class='bx bx-package'></i>
                 </div>
@@ -44,7 +44,7 @@
                 </div>
             </a>
 
-            <a href="" class="stock" id="stock">
+            <a class="stock" id="stock">
                 <div class="icon">
                     <i class='bx bxs-store'></i>
                 </div>
@@ -58,7 +58,7 @@
                 </div>
             </a>
 
-            <a href="" class="branchRevenue" id="branchRevenue">
+            <a class="branchRevenue" id="branchRevenue">
                 <div class="icon">
                     <i class='bx bx-dollar-circle'></i>
                 </div>

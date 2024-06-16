@@ -30,17 +30,21 @@
             </thead>
             <tbody>
                 @foreach ($Staff as $staffdata)
-                    <tr>
-                        <td><img src={{ asset('Images/UsersImages/' . $staffdata->profile_picture) }} alt="Image"></td>
-                        <td>{{ $staffdata->name }}</td>
-                        <td>{{ $staffdata->email }}</td>
-                        <td>{{ $staffdata->role }}</td>
-                        <td>{{ $staffdata->branch_id }}</td>
-                        <td>
-                            <a onclick="editStaff({{ json_encode($staffdata) }})"><i class='bx bxs-edit-alt'></i></a>
-                            <a href="{{ route('deleteStaffData', $staffdata->id) }}"><i class='bx bxs-trash-alt'></i></a>
-                        </td>
-                    </tr>
+                    @if (strtolower($staffdata->role) !== 'owner')
+                        <tr>
+                            <td><img src={{ asset('Images/UsersImages/' . $staffdata->profile_picture) }} alt="Image">
+                            </td>
+                            <td>{{ $staffdata->name }}</td>
+                            <td>{{ $staffdata->email }}</td>
+                            <td>{{ $staffdata->role }}</td>
+                            <td>{{ $staffdata->branch_id }}</td>
+                            <td>
+                                <a onclick="editStaff({{ json_encode($staffdata) }})"><i class='bx bxs-edit-alt'></i></a>
+                                <a href="{{ route('deleteStaffData', $staffdata->id) }}"><i
+                                        class='bx bxs-trash-alt'></i></a>
+                            </td>
+                        </tr>
+                    @endif
                 @endforeach
             </tbody>
         </table>
@@ -50,7 +54,7 @@
             |================== Add new Staff Overlay ======================|
             |---------------------------------------------------------------|
         --}}
-        
+
         <div id="overlay"></div>
         <form action="{{ route('storeRegistrationData') }}" class="addNewUser" id="addNewUser" method="post"
             enctype="multipart/form-data">

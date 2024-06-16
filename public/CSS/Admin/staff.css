@@ -145,7 +145,6 @@ table tbody tr td a:last-child:hover {
     
 }
 
-
 .choose-file-btn {
     display: flex;
     background-color: #e2e2e2;
@@ -214,6 +213,18 @@ table tbody tr td a:last-child:hover {
     color:#F45B69;
     font-size: 0.7rem;
     margin:0px 20px;
+}
+.error {
+    display: flex;
+    color: #F45B69;
+    margin: auto;
+    width: 85%;
+}
+.success {
+    display: flex;
+    color: #179f58;
+    margin: auto;
+    width: 85%;
 }
 
 .btns{

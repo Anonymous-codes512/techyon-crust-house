@@ -10,8 +10,9 @@
         </div>
 
         @php
-            // $products = $products;
+            $recipes = $recipes;
             $categories = $categories;
+            $products = $categoryProducts;
         @endphp
 
         <div class="productCategory">
@@ -27,6 +28,15 @@
                 </div>
             @endforeach
         </div>
+
+        {{-- @if (session('editproductrecipie'))
+            <script>
+                alert('123')
+                document.addEventListener('DOMContentLoaded', function() {
+                    document.getElementById('add_recipe').click();
+                });
+            </script>
+        @endif --}}
 
         @if ($categoryProducts != null)
             <div id="categoryProductOverlay" style="display: block;"></div>
@@ -48,7 +58,8 @@
                                     <td>{{ $product->productName }}</td>
                                     <td>{{ $product->productVariation }}</td>
                                     <td>
-                                        <a href="#"><i onclick="addRecipe({{ json_encode($product) }})"
+                                        <a id="add_recipe" href="#"><i
+                                                onclick="addRecipe({{ json_encode($product) }}, {{ json_encode($recipes) }})"
                                                 class="bx bx-list-plus"></i></a>
 
                                         <a href="{{ route('viewProductRecipe', [$product->category_id, $product->id]) }}"><i
@@ -193,89 +204,102 @@
                         <option value="gal">Gallon</option>
                         <option value="lbs">Pound</option>
                         <option value="oz">Ounce</option>
+                        <option value="dozan">Dozan</option>
+                        <option value="piece">Piece</option>
                     </select>
                 </div>
             </div>
 
             <div class="btns">
                 <input type="submit" value="Add" id="addItemButton">
-                <button type="button" id="cancel">close</button>
+                <button type="button" id="cancel" onclick="closeHandleStockItemClick()">close</button>
             </div>
 
         </div>
+
+        <div id="editProductRecipeOverlay"></div>
+        <form id="editProductRecipe" action="{{ route('editProductRecipe') }}" method="POST"
+            enctype="multipart/form-data" onsubmit="handleFormSubmit(event)">
+
+            @csrf
+            <h3>Edit Recipe</h3>
+            <hr>
+            <input type="hidden" id="recipeid" name="recipeId">
+            <div class="inputdivs inputProductName" style="display: flex; margin:5px;">
+                <div class="stockquantity">
+                    <label for="item-name">Item Name</label>
+                    <input type="text" id="edit-item-name" placeholder="item Name" name="item-name" readonly
+                        required>
+                </div>
+
+                <div class="stockquantity">
+                    <label for="item-stock-quantity">Item Stock Quantity</label>
+                    <input type="text" id="edit-item-stock-quantity" placeholder="123kg.." name="item-stock-quantity"
+                        required>
+                </div>
+
+                <div class="unitselection">
+                    <label for="iQUnit">Unit</label>
+                    <select name="unit1" id="editQUnit">
+                        <option value="" selected disabled>Select unit</option>
+                        <option value="mg">Milligram</option>
+                        <option value="g">Gram</option>
+                        <option value="kg">Kilogram</option>
+                        <option value="ml">Milliliter</option>
+                        <option value="liter">Liter</option>
+                        <option value="gal">Gallon</option>
+                        <option value="lbs">Pound</option>
+                        <option value="oz">Ounce</option>
+                        <option value="dozan">Dozan</option>
+                        <option value="piece">Piece</option>
+                    </select>
+                </div>
+            </div>
+
+            <script>
+                function hideFormPopup() {
+                    document.getElementById('editProductRecipeOverlay').style.display = 'none';
+                    document.getElementById('editProductRecipe').style.display = 'none';
+                }
+
+                function handleFormSubmit(event) {
+                    event.preventDefault();
+                    const formData = new FormData(event.target);
+                    fetch(event.target.action, {
+                            method: 'POST',
+                            body: formData
+                        })
+                        .then(response => response.text())
+                        .then(text => {
+                            try {
+                                const data = JSON.parse(text);
+                                console.log('Form submitted successfully:', data);
+                                hideFormPopup();
+                                const product = {
+                                    /* your product data */ };
+                                const recipes = {
+                                    /* your recipes data */ };
+                                addRecipe(product, recipes);
+                            } catch (error) {
+                                console.error('Form submission error:', text);
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Form submission error:', error);
+                        });
+                }
+            </script>
+
+            <div class="btns">
+                <input type="submit" value="Update">
+                <button type="button" id="cancel" onclick="closeEditProductRecipe()">close</button>
+            </div>
+        </form>
 
     </main>
 
     <script>
         let product_name;
-        // showProductsInCategory = document.getElementById('showProductsInCategory');
-
-        // console.warn(showproductRecipebutton);
-        // showProductsInCategory.addEventListener('click', () => {
-
-        //     let overlay = document.getElementById('categoryProductOverlay');
-        //     let popup = document.getElementById('categoryProducts');
-
-        //     overlay.style.display = 'block';
-        //     popup.style.display = 'flex';
-        // });
-
-        // document.getElementById('cID').value = category.id;
-
-        // let selectedProducts = products.filter(product => product.category_id === category.id);
-        // selectedProducts.sort((a, b) => {
-        //     if (a.productName < b.productName) return -1;
-        //     if (a.productName > b.productName) return 1;
-        //     if (a.productVariation < b.productVariation) return -1;
-        //     if (a.productVariation > b.productVariation) return 1;
-        //     return 0;
-        // });
-
-        // let tbody = document.getElementById('body');
-        // tbody.innerHTML = '';
-
-        // selectedProducts.forEach(product => {
-        //     let newRow = document.createElement('tr');
-
-        //     let productCategoryCell = document.createElement('td');
-        //     productCategoryCell.textContent = category.categoryName;
-        //     newRow.appendChild(productCategoryCell);
-
-        //     let productNameCell = document.createElement('td');
-        //     productNameCell.textContent = product.productName;
-        //     newRow.appendChild(productNameCell);
-
-        //     let variationCell = document.createElement('td');
-        //     variationCell.textContent = product.productVariation;
-        //     newRow.appendChild(variationCell);
-
-        //     let actionCell = document.createElement('td');
-
-        //     let addRecipeLink = document.createElement('a');
-        //     addRecipeLink.setAttribute('href', '#');
-        //     addRecipeLink.setAttribute('onclick',
-        //         `addRecipe('${product.productVariation}', '${product.productName}', '${product.id}')`);
-        //     let addRecipeIcon = document.createElement('i');
-        //     addRecipeIcon.setAttribute('class', 'bx bx-list-plus');
-        //     addRecipeLink.appendChild(addRecipeIcon);
-        //     actionCell.appendChild(addRecipeLink);
-
-        //     const categoryId = category.id;
-        //     const productId = product.id;
-        //     let route = `{{ route('viewProductRecipe', [':categoryId', ':productId']) }}`;
-        //     route = route.replace(':categoryId', categoryId).replace(':productId', productId);
-
-        //     let showProductRecipe = document.createElement('a');
-        //     showProductRecipe.setAttribute('href', route);
-        //     let showIcon = document.createElement('i');
-        //     showIcon.setAttribute('class', 'bx bx-show');
-        //     showProductRecipe.appendChild(showIcon);
-        //     actionCell.appendChild(showProductRecipe);
-
-        //     newRow.appendChild(actionCell);
-
-        //     tbody.appendChild(newRow);
-        // });
 
         function closeProductCategory() {
             let overlay = document.getElementById('categoryProductOverlay');
@@ -301,12 +325,30 @@
             popup.style.display = 'none';
         }
 
-        function addRecipe(product) {
+        // function addRecipe(product, recipes) {
+        //     console.log(product)
+        //     console.log(recipes)
+        //     let overlay = document.getElementById('recipeOverlay');
+        //     let popup = document.getElementById('recipePopup');
+        //     let pId = document.getElementById('pID');
+        //     let cID = document.getElementById('cID');
+        //     let pname = document.getElementById('prod_name');
+
+        //     pname.textContent = product.productVariation + " " + product.productName + " Recipe";
+        //     pId.value = product.id;
+        //     cID.value = product.category_id;
+
+        //     overlay.style.display = 'block';
+        //     popup.style.display = 'flex';
+        // }
+
+        function addRecipe(product, recipes) {
             let overlay = document.getElementById('recipeOverlay');
             let popup = document.getElementById('recipePopup');
             let pId = document.getElementById('pID');
             let cID = document.getElementById('cID');
             let pname = document.getElementById('prod_name');
+            let recipeTextArea = document.getElementById('recipeTextArea');
 
             pname.textContent = product.productVariation + " " + product.productName + " Recipe";
             pId.value = product.id;
@@ -314,6 +356,93 @@
 
             overlay.style.display = 'block';
             popup.style.display = 'flex';
+
+            recipes.forEach(recipe => {
+                if (product.id === recipe.product_id) {
+                    const match = recipe.quantity.match(/^([\d.]+)\s*(.*)$/);
+
+                    const quantity = match[1];
+                    const Unit = match[2];
+                    const itemName = recipe.stock.itemName;
+                    const id = recipe.stock_id;
+
+                    const Recipediv = document.createElement('div');
+                    Recipediv.style.display = 'flex';
+                    Recipediv.style.alignItems = 'center';
+
+                    const existingRecipeItem = document.createElement('p');
+                    existingRecipeItem.classList.add('recipe-item');
+                    existingRecipeItem.style.margin = '2px';
+                    existingRecipeItem.style.width = '95%';
+                    existingRecipeItem.textContent = `${recipe.quantity} ${itemName}`;
+                    existingRecipeItem.dataset.id = id;
+                    existingRecipeItem.dataset.quantity = quantity;
+
+                    const recipeEditBtn = document.createElement('i');
+                    recipeEditBtn.classList.add('bx', 'bx-edit-alt', 'edit-item');
+                    recipeEditBtn.style.fontSize = '1vw';
+                    recipeEditBtn.style.padding = '5px';
+                    recipeEditBtn.style.borderRadius = '50%';
+                    recipeEditBtn.style.marginRight = '5px'
+
+                    const recipeRemoveBtn = document.createElement('i');
+                    recipeRemoveBtn.classList.add('bx', 'bx-x', 'remove-item');
+                    recipeRemoveBtn.style.fontSize = '1.2vw';
+                    recipeRemoveBtn.style.borderRadius = '50%';
+                    recipeRemoveBtn.style.marginRight = '5px';
+
+                    Recipediv.appendChild(existingRecipeItem);
+                    Recipediv.appendChild(recipeEditBtn);
+                    Recipediv.appendChild(recipeRemoveBtn);
+                    recipeContainer.appendChild(Recipediv);
+
+                    recipeEditBtn.addEventListener('click', function() {
+                        updateproductRecipe(itemName, quantity, Unit, recipe.id);
+                    });
+
+                    recipeRemoveBtn.addEventListener('click', function() {
+                        newRecipediv.remove();
+                        const itemToRemove = `${quantity} ${Unit}~${id}, `;
+                        recipeTextArea.value = recipeTextArea.value.replace(itemToRemove, '');
+                    });
+                    if (recipeTextArea.value === '') {
+                        recipeTextArea.value = `${quantity} ${Unit}~${id}`;
+                    } else {
+                        recipeTextArea.value += `, ${quantity} ${Unit}~${id}`;
+                    }
+                }
+            });
+        }
+
+        function updateproductRecipe(itemName, quantity, Unit, id) {
+            let overlay = document.getElementById('editProductRecipeOverlay');
+            let popup = document.getElementById('editProductRecipe');
+
+            const recipePopup = document.getElementById('recipePopup');
+            const categoryProducts = document.getElementById('categoryProducts');
+
+            document.getElementById('edit-item-name').value = itemName;
+            document.getElementById('edit-item-stock-quantity').value = quantity;
+            document.getElementById('editQUnit').value = Unit;
+            document.getElementById('recipeid').value = id;
+
+            recipePopup.style.display = 'none';
+            categoryProducts.style.display = 'none';
+
+            overlay.style.display = 'block';
+            popup.style.display = 'flex';
+        }
+
+        function closeEditProductRecipe() {
+            let overlay = document.getElementById('editProductRecipeOverlay');
+            let popup = document.getElementById('editProductRecipe');
+            const recipePopup = document.getElementById('recipePopup');
+            const categoryProducts = document.getElementById('categoryProducts');
+
+            recipePopup.style.display = 'flex';
+            categoryProducts.style.display = 'flex';
+            overlay.style.display = 'none';
+            popup.style.display = 'none';
         }
 
         function closeRecipe() {
@@ -331,50 +460,7 @@
 
         const recipeTextArea = document.getElementById('recipeTextArea');
 
-        // function addItemToRecipe(itemName, quantity, id) {
-        //     const recipeContainer = document.querySelector('#recipeContainer');
-        //     const newRecipeItem = document.createElement('p');
-        //     newRecipeItem.style.margin = '2px';
-        //     const itemText = `${quantity} ${itemName}`;
-        //     const saveItem = `${quantity}~${id}`;
 
-        //     newRecipeItem.textContent = itemText;
-
-        //     if (recipeTextArea.value === '') {
-        //         recipeTextArea.value = saveItem;
-        //     } else {
-        //         recipeTextArea.value += `, ${saveItem}`;
-        //     }
-
-        //     newRecipeItem.addEventListener('click', function() {
-        //         newRecipeItem.remove();
-        //         recipeTextArea.value = recipeTextArea.value.replace(`${saveItem}`, '');
-        //         console.log(recipeTextArea.value);
-        //     });
-
-        //     recipeContainer.appendChild(newRecipeItem);
-        // }
-
-        // function handleStockItemClick(stock) {
-        //     const quantity = prompt(`Enter quantity for ${stock.itemName}:`);
-        //     if (quantity !== null && quantity !== '') {
-        //         const formattedQuantity = formatQuantity(quantity);
-        //         if (isValidQuantity(formattedQuantity)) {
-        //             addItemToRecipe(stock.itemName, formattedQuantity, stock.id);
-        //         } else {
-        //             alert("Invalid quantity format. Please enter a valid quantity.");
-        //         }
-        //     }
-        // }
-
-        // function formatQuantity(quantity) {
-        //     return quantity.replace(/(\d)([a-zA-Z])/g, '$1 $2');
-        // }
-
-        // function isValidQuantity(quantity) {
-        //     const regex = /^\d+(\.\d+)?\s*(kg|g|mg|l|ml|gallon)$/i;
-        //     return regex.test(quantity);
-        // }
 
         function addItemToRecipe(itemName, quantity, unit, id) {
             const recipeContainer = document.querySelector('#recipeContainer');
@@ -458,7 +544,7 @@
                 }
             }
 
-            const isWeightUnit = ['kg', 'g', 'mg', 'lbs', 'oz'].includes(unit);
+            const isWeightUnit = ['kg', 'g', 'mg', 'lbs', 'oz', 'piece', 'dozan'].includes(unit);
             const isVolumeUnit = ['liter', 'ml', 'gal'].includes(unit);
 
             let quantityInBaseUnit;
@@ -502,12 +588,18 @@
                 const newRecipeItem = document.createElement('p');
                 newRecipeItem.classList.add('recipe-item');
                 newRecipeItem.style.margin = '2px';
-                newRecipeItem.style.width = '95%';
+                newRecipeItem.style.width = '90%';
                 newRecipeItem.textContent = `${quantity} ${unit} ${itemName}`;
                 newRecipeItem.dataset.id = id;
                 newRecipeItem.dataset.quantityBaseUnit = quantityInBaseUnit;
                 newRecipeItem.dataset.quantity = quantity;
                 newRecipeItem.dataset.unit = unit;
+
+                const recipeEditBtn = document.createElement('i');
+                recipeEditBtn.classList.add('bx', 'bx-edit-alt', 'edit-item');
+                recipeEditBtn.style.fontSize = '1.2vw';
+                recipeEditBtn.style.borderRadius = '50%';
+                recipeEditBtn.style.marginRight = '5px'
 
                 const recipeRemoveBtn = document.createElement('i');
                 recipeRemoveBtn.classList.add('bx', 'bx-x', 'remove-item');
@@ -516,6 +608,7 @@
                 recipeRemoveBtn.style.marginRight = '5px'
 
                 newRecipediv.appendChild(newRecipeItem);
+                newRecipediv.appendChild(recipeEditBtn);
                 newRecipediv.appendChild(recipeRemoveBtn);
                 recipeContainer.appendChild(newRecipediv);
 
@@ -535,6 +628,19 @@
                         `, ${quantityInBaseUnit} ${unit === 'g' || unit === 'kg' || unit === 'mg' || unit === 'lbs' || unit === 'oz' ? 'g' : 'ml'}~${id}`;
                 }
             }
+            console.log(recipeTextArea.value);
+        }
+
+        function closeHandleStockItemClick() {
+            const addProductRecipeOverlay = document.querySelector('#addProductRecipeOverlay');
+            const addProductRecipe = document.querySelector('#addProductRecipe');
+            const recipePopup = document.getElementById('recipePopup');
+            const categoryProducts = document.getElementById('categoryProducts');
+
+            addProductRecipeOverlay.style.display = 'none';
+            addProductRecipe.style.display = 'none';
+            recipePopup.style.display = 'flex';
+            categoryProducts.style.display = 'flex';
         }
 
         function handleStockItemClick(stock) {
@@ -542,67 +648,162 @@
             const addProductRecipe = document.querySelector('#addProductRecipe');
             const addItemButton = document.querySelector('#addItemButton');
             const cancelButton = document.querySelector('#cancel');
-            const recipePopup = document.getElementById('recipePopup');
             let itemName = document.getElementById('item-name');
             let itemStockQuantity = document.getElementById('item-stock-quantity');
+            const recipePopup = document.getElementById('recipePopup');
             const categoryProducts = document.getElementById('categoryProducts');
 
             addProductRecipeOverlay.style.display = 'block';
             addProductRecipe.style.display = 'flex';
 
             itemName.value = stock.itemName;
-            itemStockQuantity.value = stock.itemQuantity;
+            itemStockQuantity.value = stock.itemQuantity; // Assuming stock has itemQuantity with unit
 
             recipePopup.style.display = 'none';
             categoryProducts.style.display = 'none';
 
             addItemButton.onclick = function() {
-    const quantityInput = document.getElementById('item-quantity');
-    const unitSelect = document.querySelector('#iQUnit');
-    const quantity = quantityInput.value;
-    const unit = unitSelect.value;
+                const quantityInput = document.getElementById('item-quantity');
+                const unitSelect = document.querySelector('#iQUnit');
+                const enteredQuantity = parseFloat(quantityInput.value);
+                const enteredUnit = unitSelect.value;
 
-    const enteredQuantity = parseFloat(quantity);
-    const stockQuantity = parseFloat(itemStockQuantity.value);
+                const [stockQuantity, stockUnit] = parseQuantityAndUnit(stock.itemQuantity);
+                const convertedQuantity = convertToStockUnit(enteredQuantity, enteredUnit, stockUnit);
 
-    if (enteredQuantity > 0 && enteredQuantity <= stockQuantity) {
-        // Quantity is valid, proceed with adding the item
-        if (quantity && unit) {
-            addItemToRecipe(stock.itemName, quantity, unit, stock.id);
+                if (convertedQuantity > 0 && convertedQuantity <= stockQuantity) {
+                    if (enteredQuantity && enteredUnit) {
+                        addItemToRecipe(stock.itemName, enteredQuantity, enteredUnit, stock.id);
 
-            addProductRecipeOverlay.style.display = 'none';
-            addProductRecipe.style.display = 'none';
-            recipePopup.style.display = 'flex';
-            categoryProducts.style.display = 'flex';
+                        addProductRecipeOverlay.style.display = 'none';
+                        addProductRecipe.style.display = 'none';
+                        recipePopup.style.display = 'flex';
+                        categoryProducts.style.display = 'flex';
 
-            quantityInput.value = '';
-            unitSelect.value = '';
-        } else {
-            alert("Please enter a valid quantity and select a unit.");
-        }
-    } else {
-        // Quantity is not valid, show an alert
-        alert('Quantity must be greater than 0 and less than or equal to the stock quantity.');
-    }
+                        quantityInput.value = '';
+                        unitSelect.value = '';
+                    } else {
+                        alert("Please enter a valid quantity and select a unit.");
+                    }
+                } else {
+                    alert('Quantity must be greater than 0 and less than or equal to the stock quantity.');
+                }
+            }
 
-    // Attach the click event handler to cancelButton
-    cancelButton.onclick = function() {
-        addProductRecipeOverlay.style.display = 'none';
-        addProductRecipe.style.display = 'none';
-        recipePopup.style.display = 'flex';
-        categoryProducts.style.display = 'flex';
-    };
-}
-
+            cancelButton.onclick = function() {
+                addProductRecipeOverlay.style.display = 'none';
+                addProductRecipe.style.display = 'none';
+                recipePopup.style.display = 'flex';
+                categoryProducts.style.display = 'flex';
+            };
         }
 
-        // function formatQuantity(quantity) {
-        //     return parseInt(quantity, 10); // Assuming the quantity is an integer
-        // }
+        function parseQuantityAndUnit(quantityWithUnit) {
+            const regex = /^([0-9.]+)\s*([a-zA-Z]+)$/;
+            const match = quantityWithUnit.match(regex);
 
-        // function isValidQuantity(quantity) {
-        //     return Number.isInteger(quantity) && quantity > 0;
-        // }
+            if (match) {
+                const quantity = parseFloat(match[1]);
+                const unit = match[2];
+                return [quantity, unit];
+            } else {
+                throw new Error('Invalid quantity and unit format');
+            }
+        }
+
+        function convertToStockUnit(quantity, fromUnit, toUnit) {
+            const conversionRates = {
+                'mg': {
+                    'mg': 1,
+                    'g': 0.001,
+                    'kg': 0.000001,
+                    'ml': 0.001,
+                    'liter': 0.000001,
+                    'gal': 0.000000264172,
+                    'lbs': 0.00000220462,
+                    'oz': 0.000035274
+                },
+                'g': {
+                    'mg': 1000,
+                    'g': 1,
+                    'kg': 0.001,
+                    'ml': 1,
+                    'liter': 0.001,
+                    'gal': 0.000264172,
+                    'lbs': 0.00220462,
+                    'oz': 0.035274
+                },
+                'kg': {
+                    'mg': 1000000,
+                    'g': 1000,
+                    'kg': 1,
+                    'ml': 1000,
+                    'liter': 1,
+                    'gal': 0.264172,
+                    'lbs': 2.20462,
+                    'oz': 35.274
+                },
+                'ml': {
+                    'mg': 1,
+                    'g': 0.001,
+                    'kg': 0.000001,
+                    'ml': 1,
+                    'liter': 0.001,
+                    'gal': 0.000264172,
+                    'lbs': 0.00220462,
+                    'oz': 0.035274
+                },
+                'liter': {
+                    'mg': 1000000,
+                    'g': 1000,
+                    'kg': 1,
+                    'ml': 1000,
+                    'liter': 1,
+                    'gal': 0.264172,
+                    'lbs': 2.20462,
+                    'oz': 35.274
+                },
+                'gal': {
+                    'mg': 3785411.78,
+                    'g': 3785.41,
+                    'kg': 3.78541,
+                    'ml': 3785.41,
+                    'liter': 3.78541,
+                    'gal': 1,
+                    'lbs': 8.3454,
+                    'oz': 128
+                },
+                'lbs': {
+                    'mg': 453592.37,
+                    'g': 453.592,
+                    'kg': 0.453592,
+                    'ml': 453.592,
+                    'liter': 0.453592,
+                    'gal': 0.119826,
+                    'lbs': 1,
+                    'oz': 16
+                },
+                'oz': {
+                    'mg': 28349.5,
+                    'g': 28.3495,
+                    'kg': 0.0283495,
+                    'ml': 28.3495,
+                    'liter': 0.0283495,
+                    'gal': 0.0078125,
+                    'lbs': 0.0625,
+                    'oz': 1
+                }
+            };
+
+            if (fromUnit === toUnit || (fromUnit === 'dozan' && toUnit === 'dozan') || (fromUnit === 'piece' && toUnit ===
+                    'piece')) {
+                return quantity;
+            } else if (conversionRates[fromUnit] && conversionRates[fromUnit][toUnit]) {
+                return quantity * conversionRates[fromUnit][toUnit];
+            } else {
+                return quantity;
+            }
+        }
 
         const searchBar = document.getElementById('Search');
         const stockItems = document.querySelectorAll('.stockContainer p');

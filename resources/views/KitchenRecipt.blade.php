@@ -86,12 +86,12 @@
             <br>
 
             <div style="border-bottom: 1px solid black;">
-                <div class="transactionDetails" style="font-weight: bold; border-bottom:1px solid black;">
+                <div class="transactionDetails" style=" border-bottom:1px solid black;">
                     <table>
                         <thead>
                             <tr>
                                 <th>No.</th>
-                                <th>NAME</th>
+                                <th style="width: 180px;">NAME</th>
                                 <th>QTY</th>
                             </tr>
                         </thead>

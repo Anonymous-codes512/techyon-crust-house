@@ -185,10 +185,6 @@ class AdminController extends Controller
         }
         $categories = Category::all();
         $products = Product::orderBy('category_name')->get();
-        if ($categories->isEmpty()) {
-            return view('Admin.Product');
-        }
-
         return view('Admin.Product')->with(['categoryData' => $categories, 'productsData' => $products]);
     }
 
@@ -668,8 +664,10 @@ class AdminController extends Controller
         }
         $categories = Category::all();
         $stocks = Stock::all();
+        $recipe = Recipe::with('product','stock')->get();
+
         session(['showproductRecipe' => false]);
-        return view('Admin.Recipe')->with(['categoryProducts' => null, 'categories' => $categories, 'stocks' => $stocks, 'recipes' => null]);
+        return view('Admin.Recipe')->with(['categoryProducts' => null, 'categories' => $categories, 'stocks' => $stocks, 'recipes' => $recipe]);
     }
 
     public function createRecipe(Request $request)
@@ -703,6 +701,14 @@ class AdminController extends Controller
             }
         }
         return redirect()->route('viewRecipePage');
+    }
+
+    public function editProductRecipe(Request $req){
+        $recipe = Recipe::find($req->recipeId);
+        $recipe->quantity = $req->input('item-stock-quantity'). ' ' . $req->input('unit1');
+        $recipe->save();
+        $req->session()->put('editproductrecipie', true);
+        return response()->json(['message' => 'Recipe updated successfully']);
     }
 
     public function viewProductRecipe($category_id, $product_id)
@@ -747,8 +753,9 @@ class AdminController extends Controller
         }
         $categories = Category::all();
         $stocks = Stock::all();
+        $recipes = Recipe::with('product', 'stock')->get();
         $categoryProducts = Product::where('category_id', $category_id)->get();
-        return view('Admin.Recipe')->with(['categoryProducts' => $categoryProducts, 'categories' => $categories, 'stocks' => $stocks, 'recipes' => null]);
+        return view('Admin.Recipe')->with(['categoryProducts' => $categoryProducts, 'categories' => $categories, 'stocks' => $stocks, 'recipes' => $recipes]);
     }
 
     /*
@@ -792,13 +799,57 @@ class AdminController extends Controller
 
     public function cancelOrder($order_id)
     {
+
         $order = Order::with('salesman')->where('id', $order_id)->first();
         $order->status = 3;
+        $this->returnStock($order_id);
         $order->save();
 
-        $this->deductStock($order_id);
-
         return redirect()->back();
+    }
+
+    public function returnStock($order_id)
+    {
+        $order = Order::with('items')->find($order_id);
+        $productQuantities = [];
+
+        foreach ($order->items as $item) {
+            $deals = Deal::with('handlers', 'products')->find($item->product_id);
+
+            if ($deals && $deals->dealTitle === $item->product_name) {
+                foreach ($deals->handlers as $dealHandler) {
+                    if (!isset($productQuantities[$dealHandler->product_id])) {
+                        $productQuantities[$dealHandler->product_id] = 0;
+                    }
+                    $productQuantities[$dealHandler->product_id] += $dealHandler->product_quantity * $item->product_quantity;
+                }
+            } else {
+                if (!isset($productQuantities[$item->product_id])) {
+                    $productQuantities[$item->product_id] = 0;
+                }
+                $productQuantities[$item->product_id] += $item->product_quantity;
+            }
+        }
+
+        foreach ($productQuantities as $product_id => $totalQuantity) {
+            $product = Product::find($product_id);
+            $recipes = Recipe::where('product_id', $product->id)->get();
+
+            foreach ($recipes as $recipeItem) {
+                $quantityToReturn = floatval($recipeItem->quantity);
+                $stockItem = Stock::find($recipeItem->stock_id);
+
+                if ($stockItem) {
+                    $currentQuantityInBaseUnit = $this->convertToBaseUnit($stockItem->itemQuantity);
+                    $deductedQuantityInBaseUnit = $quantityToReturn * $totalQuantity;
+                    $newQuantityInBaseUnit = $currentQuantityInBaseUnit + $deductedQuantityInBaseUnit;
+                    $newQuantity = $this->convertFromBaseUnit($newQuantityInBaseUnit, $stockItem->itemQuantity);
+
+                    $stockItem->itemQuantity = $newQuantity;
+                    $stockItem->save();
+                }
+            }
+        }
     }
 
     public function viewStaffPage()
@@ -810,7 +861,7 @@ class AdminController extends Controller
         $staff = User::with('branch')
             ->whereIn('role', ['salesman', 'chef', 'admin'])
             ->get();
-        return view('Admin.Staff')->with(['Staff' => $staff, 'branches'=>$branches]);
+        return view('Admin.Staff')->with(['Staff' => $staff, 'branches'=>$branches])->with('success', 'User registered successfully');
     }
 
     public function updateStaff(Request $req)
@@ -861,44 +912,6 @@ class AdminController extends Controller
         $staff = User::find($id);
         $staff->delete();
         return redirect()->route('viewStaffPage');
-    }
-
-    public function deductStock($order_id)
-    {
-        $order = Order::with('items')->find($order_id);
-        $productQuantities = [];
-
-        foreach ($order->items as $item) {
-            if (!isset($productQuantities[$item->product_id])) {
-                $productQuantities[$item->product_id] = 0;
-            }
-            $productQuantities[$item->product_id] += $item->product_quantity;
-        }
-
-        foreach ($productQuantities as $product_id => $totalQuantity) {
-            $product = Product::find($product_id);
-            $recipes = Recipe::where('product_id', $product->id)->get();
-
-            foreach ($recipes as $recipeItem) {
-                $quantityToDeduct = floatval($recipeItem->quantity);
-                $stockItem = Stock::find($recipeItem->stock_id);
-
-                if ($stockItem) {
-                    $currentQuantityInBaseUnit = $this->convertToBaseUnit($stockItem->itemQuantity);
-                    $deductedQuantityInBaseUnit = $quantityToDeduct * $totalQuantity;
-                    $newQuantityInBaseUnit = $currentQuantityInBaseUnit + $deductedQuantityInBaseUnit;
-                    $newQuantity = $this->convertFromBaseUnit($newQuantityInBaseUnit, $stockItem->itemQuantity);
-
-                    echo "Current Quantity in Base Unit: " . $currentQuantityInBaseUnit . '<br>';
-                    echo "Deducted Quantity in Base Unit: " . $deductedQuantityInBaseUnit . '<br>';
-                    echo "New Quantity in Base Unit: " . $newQuantityInBaseUnit . '<br>';
-                    echo "New Quantity: " . $newQuantity . '<br><br>';
-
-                    $stockItem->itemQuantity = $newQuantity;
-                    $stockItem->save();
-                }
-            }
-        }
     }
 
     private function convertToBaseUnit($quantity)

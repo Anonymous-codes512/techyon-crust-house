@@ -25,7 +25,6 @@ class SalesmanController extends Controller
 
         $products = Product::all();
         $categories = Category::all();
-        $deals = Deal::all();
         $deals = Handler::with('deal', 'product')->get();
         $cartproducts = Cart::where('salesman_id', $id)->get();
 
@@ -76,7 +75,6 @@ class SalesmanController extends Controller
     public function deals()
     {
         $deals = Handler::with('deal', 'product')->get();
-        // dd($deals);
         return $deals;
     }
 
@@ -267,7 +265,6 @@ class SalesmanController extends Controller
         $addon = explode(' (Rs. ', rtrim($request->input('addOn'), ')'));
         $variations = explode(' (Rs. ', rtrim($request->input('prodVariation'), ')'));
 
-        
         $productOrder->salesman_id = $salesman_id;
         $productOrder->product_id = $request->input('product_id');
         $productOrder->productName = $request->input('productname');
@@ -293,10 +290,21 @@ class SalesmanController extends Controller
         $productQuantities = [];
 
         foreach ($order->items as $item) {
-            if (!isset($productQuantities[$item->product_id])) {
-                $productQuantities[$item->product_id] = 0;
+            $deals = Deal::with('handlers', 'products')->find($item->product_id);
+
+            if ($deals && $deals->dealTitle === $item->product_name) {
+                foreach ($deals->handlers as $dealHandler) {
+                    if (!isset($productQuantities[$dealHandler->product_id])) {
+                        $productQuantities[$dealHandler->product_id] = 0;
+                    }
+                    $productQuantities[$dealHandler->product_id] += $dealHandler->product_quantity * $item->product_quantity;
+                }
+            } else {
+                if (!isset($productQuantities[$item->product_id])) {
+                    $productQuantities[$item->product_id] = 0;
+                }
+                $productQuantities[$item->product_id] += $item->product_quantity;
             }
-            $productQuantities[$item->product_id] += $item->product_quantity;
         }
 
         foreach ($productQuantities as $product_id => $totalQuantity) {
@@ -313,11 +321,6 @@ class SalesmanController extends Controller
                     $newQuantityInBaseUnit = $currentQuantityInBaseUnit - $deductedQuantityInBaseUnit;
                     $newQuantity = $this->convertFromBaseUnit($newQuantityInBaseUnit, $stockItem->itemQuantity);
 
-                    echo "Current Quantity in Base Unit: " . $currentQuantityInBaseUnit . '<br>';
-                    echo "Deducted Quantity in Base Unit: " . $deductedQuantityInBaseUnit . '<br>';
-                    echo "New Quantity in Base Unit: " . $newQuantityInBaseUnit . '<br>';
-                    echo "New Quantity: " . $newQuantity . '<br><br>';
-
                     $stockItem->itemQuantity = $newQuantity;
                     $stockItem->save();
                 }
@@ -327,7 +330,6 @@ class SalesmanController extends Controller
 
     private function convertToBaseUnit($quantity)
     {
-        // Assuming quantity is in the format "10 kg", "5 liter", etc.
         preg_match('/(\d+(\.\d+)?)\s*(\w+)/', $quantity, $matches);
         $quantityValue = floatval($matches[1]);
         $unit = strtolower($matches[3]);
@@ -341,9 +343,9 @@ class SalesmanController extends Controller
             case 'liter':
                 return $quantityValue * 1000;
             case 'lbs':
-                return $quantityValue * 453.592; // 1 lb = 453.592 g
+                return $quantityValue * 453.592; 
             case 'oz':
-                return $quantityValue * 28.3495; // 1 oz = 28.3495 g
+                return $quantityValue * 28.3495; 
             default:
                 return $quantityValue;
         }

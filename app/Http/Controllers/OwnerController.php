@@ -11,19 +11,22 @@ use Illuminate\Support\Facades\Hash;
 class OwnerController extends Controller
 {
 
-    public function viewOwnerDashboard(){
+    public function viewOwnerDashboard()
+    {
         $totalBranches = $this->totalBranches();
-        return view('Owner.Dashboard')->with(['totalBranches'=>$totalBranches]);
+        return view('Owner.Dashboard')->with(['totalBranches' => $totalBranches]);
     }
 
-    public function addNewBranchIndex(){
+    public function addNewBranchIndex()
+    {
         return view('Owner.AddNewBranch');
     }
 
-    public function viewBranchesDashboard(){
+    public function viewBranches()
+    {
         $branchData = Branch::all();
         $totalBranches = $this->totalBranches();
-        return view('Owner.BranchesDashboard')->with(['branchData'=>$branchData, 'totalBranches'=>$totalBranches]);
+        return view('Owner.MyBranches')->with(['branchData' => $branchData, 'totalBranches' => $totalBranches]);
     }
 
     public function newBranch(Request $req)
@@ -34,33 +37,68 @@ class OwnerController extends Controller
             'branchcode' => 'required|string|max:50|unique:branches',
             'address' => 'required|string|max:255'
         ]);
-        
+
         $riderOption = $req->has('riderOption') ? true : false;
         $onlineDeliveryOption = $req->has('onlineDeliveryOption') ? true : false;
         $diningTableOption = $req->has('diningTableOption') ? true : false;
-        
+
         $newBranch = new Branch();
         $newBranch->branchLocation = $validatedData['branchArea'];
         $newBranch->branchName = $validatedData['branchname'];
         $newBranch->branchCode = $validatedData['branchcode'];
         $newBranch->address = $validatedData['address'];
-    
+
         $newBranch->riderOption = $riderOption;
         $newBranch->onlineDeliveryOption = $onlineDeliveryOption;
         $newBranch->diningTableOption = $diningTableOption;
 
         $newBranch->save();
 
-        return redirect()->route('dashboard');
+        return redirect()->back();
     }
 
-    public function viewAddStaff(){
-        $branches = Branch::all();
-        $staff = User::with('branch')->get();
-        return view('Owner.MyStaff')->with(['branches'=>$branches, 'Staff'=>$staff]); 
-    }
+    public function updateBranches(Request $req)
+    {
+        $validatedData = $req->validate([
+            'branchArea' => 'required|string|max:255',
+            'branchname' => 'required|string|max:255',
+            'branchcode' => 'required|string|max:50|unique:branches',
+            'address' => 'required|string|max:255'
+        ]);
 
-    public function updateStaffData(Request $req){
+        $riderOption = $req->has('riderOption') ? true : false;
+        $onlineDeliveryOption = $req->has('onlineDeliveryOption') ? true : false;
+        $diningTableOption = $req->has('diningTableOption') ? true : false;
+
+        $branchData = Branch::find($req->branch_id);
+        $branchData->branchLocation = $validatedData['branchArea'];
+        $branchData->branchName = $validatedData['branchname'];
+        $branchData->branchCode = $validatedData['branchcode'];
+        $branchData->address = $validatedData['address'];
+        $branchData->riderOption = $riderOption;
+        $branchData->onlineDeliveryOption = $onlineDeliveryOption;
+        $branchData->diningTableOption = $diningTableOption;
+        $branchData->save();
+        
+        return redirect()->back();
+        }
+        
+        public function deleteBranch($branch_id)
+        {
+            $branchData = Branch::find($branch_id);
+            $branchData->delete();
+            return redirect()->back();
+    
+        }
+        public function viewAddStaff()
+        {
+            $branches = Branch::all();
+            $staff = User::with('branch')->get();
+            return view('Owner.MyStaff')->with(['branches' => $branches, 'Staff' => $staff]);
+    }
+    
+    public function updateStaffData(Request $req)
+    {
 
         $auth = User::find($req->input('staffId'));
         if ($req->hasFile('updated_profile_picture')) {
@@ -95,9 +133,10 @@ class OwnerController extends Controller
         return redirect()->back();
     }
 
-    public function totalBranches(){
+    public function totalBranches()
+    {
         $totalBranches = Branch::count();
-        session(['totalBranches'=>$totalBranches]);   
+        session(['totalBranches' => $totalBranches]);
         return $totalBranches;
     }
 }

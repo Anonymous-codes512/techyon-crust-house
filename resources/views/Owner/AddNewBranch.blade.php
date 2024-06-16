@@ -7,7 +7,7 @@
 @section('main')
  
 <main id="dashboard">
-    <div class="path">
+    <div class="path"> 
         <p>Dashboard > Add New Branch</p>
     </div>
 

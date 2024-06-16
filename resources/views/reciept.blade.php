@@ -298,9 +298,9 @@
                         <thead class="border-black">
                             <tr>
                                 <th>No.</th>
-                                <th>NAME</th>
-                                <th> QTY</th>
-                                <th> PRICE</th>
+                                <th style="width: 180px;">NAME</th>
+                                <th>QTY</th>
+                                <th>PRICE</th>
                             </tr>
                         </thead>
                         <br>
@@ -379,90 +379,3 @@
 </body>
 
 </html>
-
-
-
-
-
-{{-- 
-public function placeOrder($salesman_id)
-{
-    if (!session()->has('salesman')) {
-        return redirect()->route('viewLoginPage');
-    }
-
-    $newOrderNumber = 0;
-
-    $lastOrder = Order::orderBy('id', 'desc')->first();
-    if ($lastOrder) {
-        $lastOrderNumber = intval(substr($lastOrder->order_number, 3));
-        $newOrderNumber = 'CH-' . sprintf('%03d', ($lastOrderNumber + 1));
-    } else {
-        $newOrderNumber = 'CH-100';
-    }
-
-    $order = new Order();
-    $cartedProducts = Cart::where('salesman_id', $salesman_id)->get();
-    $totalBill = 0.0;
-
-    $order->order_number = $newOrderNumber;
-    $order->total_bill = $totalBill;
-    $order->salesman_id = $salesman_id;
-    $order->save();
-
-    foreach ($cartedProducts as $cartItem) {
-        preg_match('/\d+(\.\d+)?/', $cartItem->totalPrice, $matches);
-        $numericPart = $matches[0];
-        $totalProductPrice = floatval($numericPart);
-        $quantity = intval($cartItem->productQuantity);
-        $totalBill += $totalProductPrice;
-
-        $orderItem = new OrderItem();
-        $orderItem->order_id = $order->id;
-        $orderItem->order_number = $newOrderNumber;
-        $orderItem->product_name = $cartItem->productName;
-        $orderItem->product_variation = $cartItem->productVariation;
-        $orderItem->addons = $cartItem->productAddon;
-        $orderItem->product_price = 'Rs. ' . ($totalProductPrice / $quantity);
-        $orderItem->product_quantity = $quantity;
-        $orderItem->total_price = $cartItem->totalPrice;
-        $orderItem->save();
-    }
-
-    foreach ($cartedProducts as $cartItem) {
-        $cartItem->delete();
-    }
-
-    $order->total_bill = 'Rs. ' . $totalBill;
-    $order->save();
-
-    $this->createCustomerPDF( $order->id, $newOrderNumber);
-    $this->createKitchenPDF( $order->id, $newOrderNumber);
-
-    return redirect()->back();
-}
-public function createCustomerPDF($order_id, $orderNumber){
-    $products = OrderItem::where('order_id', $order_id)->get();
-    $order = Order::with('salesman')->where('id', $order_id)->first();
-    $customerRecipt = view('reciept', ['products' => $products, 'saleman' => $order->salesman->name, 'ordernumber' => $order->order_number])->render();
-    $dompdf1 = new Dompdf();
-    $dompdf1->loadHtml($customerRecipt);
-    $height = $dompdf1->getCanvas()->get_height();
-    $dompdf1->setPaper([0, 0, 300, $height], 'portrait');
-    $dompdf1->render();
-
-    $dompdf1->stream($orderNumber . '.pdf');
-}
-public function createKitchenPDF($order_id, $orderNumber){
-    $products = OrderItem::where('order_id', $order_id)->get();
-    $order = Order::with('salesman')->where('id', $order_id)->first();
-    $KitchenRecipt = view('KitchenRecipt', ['products' => $products, 'saleman' => $order->salesman->name, 'ordernumber' => $order->order_number])->render();
-    $dompdf2 = new Dompdf();
-    $dompdf2->loadHtml($KitchenRecipt);
-    $height = $dompdf2->getCanvas()->get_height();
-    $dompdf2->setPaper([0, 0, 300, $height], 'portrait');
-    $dompdf2->render();
-
-    $dompdf2->stream($orderNumber . '.pdf');
-
-} --}}

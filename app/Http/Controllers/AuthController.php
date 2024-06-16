@@ -50,14 +50,14 @@ class AuthController extends Controller
         ]);
 
         $user = new User();
+
         if ($req->hasFile('profile_picture')) {
             $image = $req->file('profile_picture');
             $imageName = time() . '.' . $image->getClientOriginalExtension();
             $image->move(public_path('Images/UsersImages'), $imageName);
             $user->profile_picture = $imageName;
         } else {
-            $imageName = null;
-            $user->profile_picture = $imageName;
+            $user->profile_picture = null;
         }
 
         $user->name = $req->name;
@@ -68,9 +68,9 @@ class AuthController extends Controller
         $user->save();
 
         if ($req->has('role')) {
-            return redirect()->route('viewStaffPage');
+            return redirect()->route('viewStaffPage')->with('success', 'User registered successfully');
         } else {
-            return redirect()->route('viewLoginPage');
+            return redirect()->route('viewLoginPage')->with('success', 'User registered successfully');
         }
     }
 

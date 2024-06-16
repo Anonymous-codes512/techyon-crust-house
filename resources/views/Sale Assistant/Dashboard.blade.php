@@ -204,7 +204,7 @@
             <div id="quantity">
                 <p>Quantity</p>
                 <i onclick="decrease()" class='bx bxs-checkbox-minus'></i>
-                <input type="number" name="prodQuantity" id="prodQuantity" value="1">
+                <input type="number" name="prodQuantity" id="prodQuantity" value="1" min="0">
                 <i onclick="increase()" class='bx bxs-plus-square'></i>
             </div>
 

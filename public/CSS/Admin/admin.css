@@ -66,6 +66,11 @@ nav {
     cursor: pointer;
 }
 
+.menuItems:hover i,
+.menuItems:hover a p {
+    color: #ffbb00;
+}
+
 .menuItems i,
 .menuItems a p {
     color: #000;
@@ -75,6 +80,11 @@ nav {
 .active a p {
     color: #ffbb00 !important;
 }
+/* 
+.active i:hover,
+.active a p:hover {
+    color: #ffbb00 !important;
+} */
 
 .menuItems i {
     display: flex;
@@ -236,7 +246,7 @@ input[type="number"]::-webkit-inner-spin-button {
     z-index: 1;
 }
 
-.notificationBox .message{
+.notificationBox .message {
     display: flex;
     flex-direction: column;
     padding: 05px 10px;
@@ -244,37 +254,49 @@ input[type="number"]::-webkit-inner-spin-button {
     font-family: "Poppins", sans-serif;
     border-bottom: 1px solid #000;
 }
-.message p{
+.message p {
     margin: 0;
-    padding:0;
+    padding: 0;
     font-size: medium;
 }
 
-.message .buttons{
+.message .buttons {
     display: flex;
     margin: 0;
-    padding:0;
+    padding: 0;
 }
 
-.buttons a{
+.buttons a {
     margin-right: 1vw;
-    font-size:1.5vw;
+    font-size: 1.5vw;
 }
 
-.bxs-trash{
+.bxs-trash {
     color: #b83636;
 }
 
-.bxs-book-reader{
+.bxs-book-reader {
     color: #138141;
 }
 
-.bxs-trash:hover{
+.bxs-trash:hover {
     color: #e26161;
 }
 
-.bxs-book-reader:hover{
+.bxs-book-reader:hover {
     color: #2ea25f;
+}
+
+.alert-danger {
+    color: #f45b69;
+    font-size: 0.7rem;
+    margin: 0px 20px;
+}
+
+.alert-success {
+    color: #40c788;
+    font-size: 0.7rem;
+    margin: 0px 20px;
 }
 
 @media (max-width: 1050px) and (min-width: 600px) {

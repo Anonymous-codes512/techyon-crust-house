@@ -94,6 +94,8 @@
                         <option value="lbs">Pound</option>
                         <option value="gal">Gallan</option>
                         <option value="oz">Ounce</option>
+                        <option value="dozan">Dozan</option>
+                        <option value="piece">Piece</option>
                     </select>
                 </div>
             </div>
@@ -117,6 +119,8 @@
                         <option value="lbs">Pound</option>
                         <option value="gal">Gallan</option>
                         <option value="oz">Ounce</option>
+                        <option value="dozan">Dozan</option>
+                        <option value="piece">Piece</option>
                     </select>
                 </div>
             </div>
@@ -171,6 +175,8 @@
                         <option value="gal">Gallon</option>
                         <option value="lbs">Pound</option>
                         <option value="oz">Ounce</option>
+                        <option value="dozan">Dozan</option>
+                        <option value="piece">Piece</option>
                     </select>
                 </div>
             </div>
@@ -193,6 +199,8 @@
                         <option value="gal">Gallon</option>
                         <option value="lbs">Pound</option>
                         <option value="oz">Ounce</option>
+                        <option value="dozan">Dozan</option>
+                        <option value="piece">Piece</option>
                     </select>
                 </div>
             </div>

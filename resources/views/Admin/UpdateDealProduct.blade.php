@@ -12,6 +12,8 @@
             $dealId = $dealId;
             $dealProducts = $dealproducts;
             $dealProductsIds = [];
+            $dealActualPrice = $dealProducts->dealActualPrice;
+            $dealDiscountedPrice = $dealProducts->dealDiscountedPrice;
             foreach ($dealProducts->handlers as $product) {
                 $dealProductsIds[] = $product->product_id;
             }
@@ -21,7 +23,7 @@
                 @php
                     $isSelected = in_array($product->id, $dealProductsIds);
                 @endphp
-                 <div class="imgbox {{ $isSelected ? 'selected' : '' }}" onclick="toggleProductSelection(this)">
+                <div class="imgbox {{ $isSelected ? 'selected' : '' }}" onclick="toggleProductSelection(this)">
                     <img src="{{ asset('Images/ProductImages/' . $product->productImage) }}" alt="Product">
                     <p class="category_name">{{ $product->category_name }}</p>
                     <p class="product_id">{{ $product->id }}</p>
@@ -63,7 +65,7 @@
 
             <div class="btns">
                 <button type="button" id="cancel" onclick="closeDetails()">Cancel</button>
-                <input type="button" value="Calculate" onclick="calculatedealPrice()">
+                <input type="button" value="Calculate" onclick="calculatedealPrice({{ json_encode($dealActualPrice) }}, {{ json_encode($dealDiscountedPrice) }})">
                 <input type="submit" value="Add Product">
             </div>
         </form>
@@ -237,8 +239,12 @@
             return total;
         }
 
-        function calculatedealPrice() {
-            let dealPrice = 0;
+        function calculatedealPrice(dealActualPrice, dealDiscountedPrice) {
+
+            let ActualPrice = parseFloat(dealActualPrice.match(/\d+/)[0]);
+            let DiscountedPrice = parseFloat(dealDiscountedPrice.match(/\d+/)[0]);
+            let dealPrice = ActualPrice;
+            let deal_discounted_Price = DiscountedPrice;
             let totalInputs = document.querySelectorAll('.total-price');
             let parts, numericPart, currencyPart;
             totalInputs.forEach(input => {
@@ -246,9 +252,12 @@
                 numericPart = parseFloat(parts[0]);
                 currencyPart = parts[1];
                 dealPrice += numericPart;
+                deal_discounted_Price += numericPart;
             });
             let currentDealPrice = document.getElementById('currentDealPrice');
             currentDealPrice.value = dealPrice + " " + currencyPart;
+            let DealPrice = document.getElementById('dealFinalPrice');
+            DealPrice.value = deal_discounted_Price;
         }
 
         function closeDetails() {

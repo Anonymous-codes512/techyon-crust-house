@@ -4,6 +4,7 @@ main {
     background-color: #e0e0e0;
     border-radius: 03px;
     width: 100%;
+    font-size: 1.2vw;
 }
 
 .path {
@@ -17,26 +18,24 @@ main {
     margin: 0;
 }
 
-.newCategory {
+.newBranch {
     display: flex;
     font-family: "Poppins", sans-serif;
     width: 85%;
     font-size: 1vw;
-    margin: 0.5vw auto;
-    padding: 0.5vw 1vw;
+    margin: 1vw auto;
 }
 
-.newCategory button {
+.newBranch button {
     background-color: #ffbb00;
     border: none;
-    padding: 0.81vw 1.2vw;
     color: #fff;
-    font-size: 1rem;
     font-weight: 550;
     border-radius: 10px;
     cursor: pointer;
+    padding: 1vw 2vw;
 }
-.newCategory button:hover {
+.newBranch button:hover {
     background-color: #bc9017;
 }
 
@@ -45,6 +44,7 @@ table {
     width: 85%;
     margin: 1vw auto;
     margin-bottom: 2vw;
+    font-size: 1.2vw;
 }
 
 table thead tr {
@@ -59,15 +59,12 @@ table tbody tr {
     border-bottom: 1px solid #898989;
 }
 
-table tbody tr td:first-child {
-    text-align: left;
+table tbody tr td {
+    padding:1.5vw 0;
 }
 
-table tbody tr td:first-child img {
-    width: 100px;
-    height: 70px;
-    padding: 5px;
-    border-radius: 15px;
+table tbody tr td:first-child {
+    text-align: left;
 }
 
 table tbody tr td:last-child a {
@@ -94,8 +91,8 @@ table tbody tr td:last-child a:last-child:hover {
     background-color: #f84857;
 }
 
-#overlay,
-#editOverlay {
+#addNewBranchOverlay,
+#editBranchOverlay {
     position: fixed;
     top: 0;
     left: 0;
@@ -106,57 +103,31 @@ table tbody tr td:last-child a:last-child:hover {
     z-index: 999;
 }
 
-.newproduct,
-.editproduct {
+#addNewBranch,
+#editBranch{
     display: none;
     flex-direction: column;
     background-color: #ffffff;
     position: absolute;
     border-radius: 10px;
-    width: 30vw;
+    width: 40vw;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     z-index: 1000;
 }
 
-.newproduct h3,
-.editproduct h3 {
+#addNewBranch h3,
+#editBranch h3 {
     margin: 0;
     padding: 1vw 2vw;
     font-family: "Poppins", sans-serif;
 }
-.newproduct hr,
-.editproduct hr {
+#addNewBranch hr ,
+#editBranch hr {
     border: 1px solid #9b9b9b;
     width: 98%;
     margin: 0 auto 1vw;
-}
-
-.choose-file-btn {
-    display: flex;
-    background-color: #e2e2e2;
-    color: #333;
-    text-align: center;
-    border-radius: 10px;
-}
-
-.choose-file-btn input[type="file"] {
-    display: none;
-}
-
-.choose-file-btn span {
-    padding: 0.5vw;
-    border: 1px solid #bbbbbb;
-    background-color: #bbbbbb;
-    border-top-left-radius: 10px;
-    border-bottom-left-radius: 10px;
-    cursor: pointer;
-}
-
-.choose-file-btn p {
-    margin: 0;
-    padding: 0.5vw;
 }
 
 .inputdivs {
@@ -168,52 +139,32 @@ table tbody tr td:last-child a:last-child:hover {
     font-size: 1vw;
 }
 
-.inputProductName {
-    display: flex;
-    flex-direction: row;
-}
-
-#variationsGroup {
-    display: flex;
-    flex-direction: column;
-    overflow-y: auto;
-    max-height: 150px;
-}
-
-.variation-item {
-    display: flex;
-    flex-direction: row;
-    margin: 0.4vw auto;
-    width: 85%;
-    font-family: "Poppins", sans-serif;
-    font-size: 1vw;
-}
-
-.ProductName,
-.ProductVariation,
-.product-price,
-.product-variation {
-    width: 70%;
-    display: flex;
-    flex-direction: column;
-    font-family: "Poppins", sans-serif;
-    font-size: 1vw;
-}
-
-.ProductVariation,
-.product-price {
-    margin-left: 0.4vw;
-    width: 30%;
-}
-
 .inputdivs input,
-.inputdivs select,
-.product-price input,
-.product-variation input{
+.inputdivs select {
     border: none;
     border-radius: 10px;
     padding: 0.71vw 0.5vw;
     background-color: #e2e2e2;
+}
+
+.options {
+    display: flex;
+    flex-direction: column;
+    height: 20%;
+    justify-content: center;
+    align-items: start;
+    border-radius: 10px;
+    padding: 0.71vw 0.5vw;
+    background-color: #e2e2e2;
+}
+.opt {
+    display: flex;
+    flex-direction: row;
+    margin: 0.5vw 0;
+}
+
+.opt-txt {
+    margin: 0;
 }
 
 .btns {

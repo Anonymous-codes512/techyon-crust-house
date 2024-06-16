@@ -43,8 +43,8 @@
         </table>
 
         <div id="overlay"></div>
-        <form class="newstaff" id="newStaff" action="{{ route('storeRegistrationData') }} " method="POST"
-            enctype="multipart/form-data">
+        <form class="newstaff" id="newStaff" action="{{ route('storeRegistrationData') }}" method="POST"
+            enctype="multipart/form-data" onsubmit="return checkFormSubmission()">
             @csrf
             <h3>Add New Staff Member</h3>
 
@@ -78,8 +78,7 @@
                 <select name="branch" id="branch">
                     <option value="none" selected disabled>Select Branch</option>
                     @foreach ($branches as $branch)
-                        <option value="{{ $branch->id }}">{{ $branch->branchName }}
-                        </option>
+                        <option value="{{ $branch->id }}">{{ $branch->branchName }}</option>
                     @endforeach
                 </select>
             </div>
@@ -96,7 +95,8 @@
             <div class="inputdivs">
                 <label for="password">Password</label>
                 <div class="passwordfield">
-                    <input type="password" id="password" name="password" placeholder="Password" required>
+                    <input type="password" id="password" name="password" placeholder="Password" required
+                        oninput="validatePassword()">
                     <i class='bx bxs-lock-alt' onclick="showAndHidePswd()"></i>
                 </div>
             </div>
@@ -105,28 +105,25 @@
                 <label for="cnfrmPswd">Confirm Password</label>
                 <div class="passwordfield">
                     <input type="password" id="cnfrmPswd" name="password_confirmation" placeholder="Confirm Password"
-                        required>
+                        required oninput="validatePassword()">
                     <i class='bx bxs-lock-alt' onclick="showAndHideCnfrmPswd()"></i>
                 </div>
             </div>
 
             @error('password')
-                <div onload="addStaff()" class="error-message">{{ $message }}</div>
+                <div class="error-message">{{ $message }}</div>
             @enderror
-
+            <div id="message" class="error"></div>
             <div class="btns">
-                <button id="cancel" onclick="closeAddStaff()">Cancel</button>
+                <button id="cancel" type="button" onclick="closeAddStaff()">Cancel</button>
                 <input type="submit" value="Add Now">
             </div>
-
         </form>
-
 
         <div id="editOverlay"></div>
         <form class="editstaff" id="editStaff" action="{{ route('updateStaff') }}" method="POST"
             enctype="multipart/form-data">
             @csrf
-
             <h3>Edit Staff Member</h3>
             <input type="hidden" id="staffId" name="staffId">
 
@@ -156,8 +153,7 @@
                 <select name="branch" id="editbranch">
                     <option value="none" selected disabled>Select Branch</option>
                     @foreach ($branches as $branch)
-                        <option value="{{ $branch->id }}">{{ $branch->branchName }}
-                        </option>
+                        <option value="{{ $branch->id }}">{{ $branch->branchName }}</option>
                     @endforeach
                 </select>
             </div>
@@ -172,25 +168,26 @@
             </div>
 
             <div class="inputdivs">
-                <label for="password">Password</label>
+                <label for="editpassword">Password</label>
                 <div class="passwordfield">
-                    <input type="password" id="editpassword" name="password">
+                    <input type="password" id="editpassword" name="password" oninput="validateEditPassword()">
                     <i class='bx bxs-lock-alt' onclick="showAndHideEditPswd()"></i>
                 </div>
             </div>
 
             <div class="inputdivs">
-                <label for="cnfrmPswd">Confirm Password</label>
+                <label for="editcnfrmPswd">Confirm Password</label>
                 <div class="passwordfield">
-                    <input type="password" id="editcnfrmPswd" name="password_confirmation">
+                    <input type="password" id="editcnfrmPswd" name="password_confirmation"
+                        oninput="validateEditPassword()">
                     <i class='bx bxs-lock-alt' onclick="showAndHideEditCnfrmPswd()"></i>
                 </div>
             </div>
 
             @error('password')
-                <div onload="addStaff()" class="error-message">{{ $message }}</div>
+                <div class="error-message">{{ $message }}</div>
             @enderror
-
+            <div id="editMessage" class="error"></div>
             <div class="btns">
                 <button type="button" id="Cancel" onclick="closeEditStaff()">Cancel</button>
                 <input type="submit" value="Update Staff Data">
@@ -199,6 +196,51 @@
     </main>
 
     <script>
+        function validatePassword() {
+            let password = document.getElementById('password').value;
+            let confirmPassword = document.getElementById('cnfrmPswd').value;
+            let message = document.getElementById('message');
+
+            if (password.length < 8) {
+                message.textContent = "Password must be at least 8 characters long!";
+                message.className = "error";
+            } else if (password !== confirmPassword) {
+                message.textContent = "Passwords do not match!";
+                message.className = "error";
+            } else {
+                message.textContent = "Passwords match!";
+                message.className = "success";
+            }
+        }
+
+        function validateEditPassword() {
+            let password = document.getElementById('editpassword').value;
+            let confirmPassword = document.getElementById('editcnfrmPswd').value;
+            let message = document.getElementById('editMessage');
+
+            if (password.length < 8) {
+                message.textContent = "Password must be at least 8 characters long!";
+                message.className = "error";
+            } else if (password !== confirmPassword) {
+                message.textContent = "Passwords do not match!";
+                message.className = "error";
+            } else {
+                message.textContent = "Passwords match!";
+                message.className = "success";
+            }
+        }
+
+        function checkFormSubmission() {
+            validatePassword();
+            let message = document.getElementById('message');
+
+            if (message.className === "success") {
+                return true;
+            } else {
+                return false;
+            }
+        }
+
         function addStaff() {
             let overlay = document.getElementById('overlay');
             let popup = document.getElementById('newStaff');
@@ -217,17 +259,17 @@
 
             let branchDropdown = document.getElementById('editbranch');
             for (let option of branchDropdown.options) {
-                if (option.value === staff.branch_id) {
+                if (option.value == staff.branch_id) {
                     option.selected = true;
-                    break; 
+                    break;
                 }
             }
 
             let roleDropdown = document.getElementById('editrole');
             for (let option of roleDropdown.options) {
-                if (option.value === staff.role) {
+                if (option.value == staff.role) {
                     option.selected = true;
-                    break; 
+                    break;
                 }
             }
 
@@ -238,7 +280,7 @@
         function closeEditStaff() {
             let overlay = document.getElementById('editOverlay');
             let popup = document.getElementById('editStaff');
-
+            popup.reset();
             overlay.style.display = 'none';
             popup.style.display = 'none';
         }
@@ -246,17 +288,26 @@
         function closeAddStaff() {
             let overlay = document.getElementById('overlay');
             let popup = document.getElementById('newStaff');
-
+            popup.reset();
             overlay.style.display = 'none';
             popup.style.display = 'none';
         }
 
         function showAndHidePswd() {
-            let pswd = document.getElementById('epassword');
+            let pswd = document.getElementById('password');
             if (pswd.type === 'password') {
                 pswd.type = 'text';
             } else {
                 pswd.type = 'password';
+            }
+        }
+
+        function showAndHideCnfrmPswd() {
+            let cnfrmPswd = document.getElementById('cnfrmPswd');
+            if (cnfrmPswd.type === 'password') {
+                cnfrmPswd.type = 'text';
+            } else {
+                cnfrmPswd.type = 'password';
             }
         }
 
@@ -278,27 +329,18 @@
             }
         }
 
-        function showAndHideCnfrmPswd() {
-            let cnfrmPswd = document.getElementById('cnfrmPswd');
-            if (cnfrmPswd.type === 'password') {
-                cnfrmPswd.type = 'text';
-            } else {
-                cnfrmPswd.type = 'password';
-            }
-        }
-
         const uploadUpdatedFile = document.getElementById('upload-update-file');
-        const filenamSpan = document.getElementById('namefile');
+        const filenameSpan = document.getElementById('namefile');
         uploadUpdatedFile.addEventListener('change', function(e) {
-            const fileNam = this.value.split('\\').pop();
-            filenamSpan.textContent = fileNam ? fileNam : 'No file chosen';
+            const fileName = this.value.split('\\').pop();
+            filenameSpan.textContent = fileName ? fileName : 'No file chosen';
         });
 
         const uploadFile = document.getElementById('upload-file');
-        const filenameSpan = document.getElementById('filename');
+        const filenameSpanNew = document.getElementById('filename');
         uploadFile.addEventListener('change', function(e) {
             const fileName = this.value.split('\\').pop();
-            filenameSpan.textContent = fileName ? fileName : 'No file chosen';
+            filenameSpanNew.textContent = fileName ? fileName : 'No file chosen';
         });
     </script>
 @endsection
